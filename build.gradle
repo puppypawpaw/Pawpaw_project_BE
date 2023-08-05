@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.14'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id "com.google.cloud.tools.jib" version "3.3.2"
 }
 
 group = 'com.puppy'
@@ -44,6 +45,28 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
+bootJar {
+    enabled = true
+}
+
+jar {
+    enabled = false
+}
+
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+jib {
+    from {
+        image = 'openjdk:11-jre-slim-bullseye'
+    }
+    to {
+        image = '520511553477.dkr.ecr.ap-northeast-2.amazonaws.com/pawpaw/dev'
+    }
+    container {
+        mainClass = "com.puppy.pawpaw_project_be.PawpawProjectBeApplication"
+        jvmFlags = ['-Duser.timezone=Asia/Seoul', '-Dspring.profiles.active=dev', '-XX:+UseContainerSupport']
+        volumes = ["/tmp"]
+    }
 }

@@ -239,10 +239,6 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
-#application.yml
-src/main/resources/application.yml
-*.yml
-
 #config
 src/main/java/com/fc/final7/global/config
 
@@ -251,3 +247,5 @@ src/main/generated/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,intellij+all,gradle,java
 /docker/data/
+/.github/workflows/publish.yml
+/src/main/resources/application-secret.yml
