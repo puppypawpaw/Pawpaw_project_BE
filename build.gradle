@@ -62,7 +62,7 @@ jib {
         image = 'openjdk:11-jre-slim-bullseye'
     }
     to {
-        image = '520511553477.dkr.ecr.ap-northeast-2.amazonaws.com/pawpaw/dev'
+        image = '520511553477.dkr.ecr.ap-northeast-2.amazonaws.com/pawpaw-back-dev'
     }
     container {
         mainClass = "com.puppy.pawpaw_project_be.PawpawProjectBeApplication"
