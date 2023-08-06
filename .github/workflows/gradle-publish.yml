@@ -44,10 +44,3 @@ jobs:
       #     echo "$SECRET_YML" > ./src/main/resources/application-secret.yml
       #     ./gradlew clean jib
       
-      - name: Send Webhook to Jenkins
-        uses: joelwmale/webhook-action@master
-        with:
-          url: ${{ secrets.DEV_JENKINS_WEBHOOK_URL }}
-          headers: '{"Content-Type": "application/json"}'
-          body: '{"event": "deployment", "repository": "puppypawpaw/Pawpaw_project_BE"}'
-      
