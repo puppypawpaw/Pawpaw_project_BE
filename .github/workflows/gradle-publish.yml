@@ -43,9 +43,10 @@ jobs:
       #   run: |
       #     echo "$SECRET_YML" > ./src/main/resources/application-secret.yml
       #     ./gradlew clean jib
+      
       - name: Send Webhook to Jenkins
         uses: fjogeleit/http-request-action@v1
         with:
-          url: ${{ secrets.DEV_JENKINS_WEBHOOK_URL }}${{ secrets.DEV_JENKINS_WEBHOOK_TOKEN }}
+          url: ${{ secrets.DEV_JENKINS_WEBHOOK_URL }}
           method: 'GET'
       
