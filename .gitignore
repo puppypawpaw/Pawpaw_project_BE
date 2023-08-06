@@ -242,7 +242,7 @@ gradle-app.setting
 # config
 src/main/java/com/fc/final7/global/config
 
-#QueryDSL
+# QueryDSL
 src/main/generated/
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,intellij+all,gradle,java
