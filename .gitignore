@@ -239,7 +239,7 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
-#config
+# config
 src/main/java/com/fc/final7/global/config
 
 #QueryDSL
