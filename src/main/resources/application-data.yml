@@ -15,8 +15,7 @@ spring:
       hibernate:
         default_batch_fetch_size: 1000
         format_sql: true
-  data:
-    redis:
-      host: ${properties.data.redis.host}
-      port: ${properties.data.redis.port}
-      password: ${properties.data.redis.password}
+  redis:
+    host: ${properties.data.redis.host}
+    port: ${properties.data.redis.port}
+    password: ${properties.data.redis.password}
