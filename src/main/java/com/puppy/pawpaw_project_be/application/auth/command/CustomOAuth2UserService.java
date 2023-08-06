@@ -37,7 +37,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         Map<String, Object> originAttributes = oAuth2User.getAttributes();
 
-        Oauth2Provider provider = Oauth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId());
+        Oauth2Provider provider = Oauth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
 
         OAuthAttributes attributes = OAuthAttributes.of(provider, originAttributes);
         User user = saveOrUpdate(provider, Objects.requireNonNull(attributes));

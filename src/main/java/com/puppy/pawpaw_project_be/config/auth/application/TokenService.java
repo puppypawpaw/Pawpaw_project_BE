@@ -71,7 +71,7 @@ public class TokenService {
 
     public UserId refreshTokenByUserId(final String refreshToken) {
         return UserId.of(refreshTokenRepository.findByValue(refreshToken)
-            .orElseThrow(IllegalArgumentException::new)
-            .getUserId());
+            .map(RefreshToken::getUserId)
+            .orElseThrow(IllegalArgumentException::new));
     }
 }
