@@ -3,11 +3,14 @@ package com.puppy.pawpaw_project_be.application.auth.command;
 import com.puppy.pawpaw_project_be.application.user.command.UserService;
 import com.puppy.pawpaw_project_be.application.user.query.UserQuery;
 import com.puppy.pawpaw_project_be.config.auth.application.TokenService;
+import com.puppy.pawpaw_project_be.domain.auth.domain.OAuth2CustomUser;
+import com.puppy.pawpaw_project_be.domain.auth.domain.Oauth2Provider;
 import com.puppy.pawpaw_project_be.domain.auth.domain.TokenType;
 import com.puppy.pawpaw_project_be.domain.auth.dto.request.SignInRequest;
 import com.puppy.pawpaw_project_be.domain.auth.dto.request.SignUpRequest;
 import com.puppy.pawpaw_project_be.domain.auth.dto.response.TokenResponse;
 import com.puppy.pawpaw_project_be.domain.user.domain.UserId;
+import com.puppy.pawpaw_project_be.domain.user.domain.User;
 import com.puppy.pawpaw_project_be.domain.user.domain.repository.UserRepository;
 import com.puppy.pawpaw_project_be.domain.user.dto.response.UserResponse;
 import com.puppy.pawpaw_project_be.exception.user.NotFoundUserException;
@@ -17,7 +20,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +35,6 @@ public class SignService {
     private final String domain;
     private final String sameSite;
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     public SignService(
         final UserService userService,
@@ -42,8 +43,7 @@ public class SignService {
         final TokenService tokenService,
         @Value("${custom.cookieDomain}") final String domain,
         @Value("${custom.sameSite}") final String sameSite,
-        final UserRepository userRepository,
-        final PasswordEncoder passwordEncoder
+        final UserRepository userRepository
     ) {
         this.userService = userService;
         this.userQuery = userQuery;
@@ -52,7 +52,6 @@ public class SignService {
         this.domain = domain;
         this.sameSite = sameSite;
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -98,7 +97,13 @@ public class SignService {
         final Authentication authenticate
     ) {
         TokenResponse tokenResponse = tokenService.createTokenResponse(authenticate);
-        tokenService.saveRefreshToken(UserId.of(authenticate.getName()), tokenResponse.getRefreshToken());
+
+        UserId userId = userRepository.findByIdAndProvider(((OAuth2CustomUser)authenticate.getPrincipal()).getEmail(),
+                Oauth2Provider.valueOf(authenticate.getName().toUpperCase()))
+            .map(User::getUserId)
+            .orElseThrow(NotFoundUserException::new);
+
+        tokenService.saveRefreshToken(userId, tokenResponse.getRefreshToken());
 
         CookieUtil.addCookie(
             response,
