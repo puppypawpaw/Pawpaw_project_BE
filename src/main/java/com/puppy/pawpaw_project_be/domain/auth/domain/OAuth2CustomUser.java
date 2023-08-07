@@ -1,5 +1,6 @@
 package com.puppy.pawpaw_project_be.domain.auth.domain;
 
+import com.puppy.pawpaw_project_be.domain.user.domain.UserId;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -11,10 +12,9 @@ import java.util.Map;
 
 @AllArgsConstructor
 public class OAuth2CustomUser implements OAuth2User, Serializable {
-    private final Oauth2Provider provider;
     private final Map<String, Object> attributes;
     private final List<GrantedAuthority> authorities;
-    private final String email;
+    private final UserId userId;
 
     @Override
     public Map<String, Object> getAttributes() {
@@ -28,10 +28,6 @@ public class OAuth2CustomUser implements OAuth2User, Serializable {
 
     @Override
     public String getName() {
-        return this.provider.name();
-    }
-
-    public String getEmail() {
-        return email;
+        return this.userId.getValue();
     }
 }

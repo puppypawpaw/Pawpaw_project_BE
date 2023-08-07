@@ -53,7 +53,11 @@ public class JwtFilter extends OncePerRequestFilter {
 	}
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilterInternal(
+		final HttpServletRequest request,
+		final HttpServletResponse response,
+		final FilterChain filterChain
+	) throws ServletException, IOException {
 		String accessToken = CookieUtil.getCookie(request, TokenType.ACCESS.name())
 			.map(JwtFilter::resolveToken)
 			.orElse("");
@@ -84,7 +88,7 @@ public class JwtFilter extends OncePerRequestFilter {
 		User user = userRepository.findById(userId)
 			.orElseThrow(NotFoundUserException::new);
 		UserDetails userDetails = builder()
-			.username(user.getId())
+			.username(user.getUserId().getValue())
 			.password(user.getPassword())
 			.authorities(Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())))
 			.build();

@@ -1,6 +1,7 @@
 package com.puppy.pawpaw_project_be.controller.auth;
 
 import com.puppy.pawpaw_project_be.application.auth.command.SignService;
+import com.puppy.pawpaw_project_be.application.auth.query.AuthQuery;
 import com.puppy.pawpaw_project_be.config.annotation.AuthenticatedUserId;
 import com.puppy.pawpaw_project_be.domain.auth.dto.request.SignInRequest;
 import com.puppy.pawpaw_project_be.domain.auth.dto.request.SignUpRequest;
@@ -24,6 +25,7 @@ import javax.validation.Valid;
 @RequiredArgsConstructor
 public class AuthController {
     private final SignService signService;
+    private final AuthQuery authQuery;
 
     @ApiResponse(responseCode = "204")
     @Operation(
@@ -68,5 +70,18 @@ public class AuthController {
     ) {
         signService.signOut(userId, request, response);
         return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponse(responseCode = "200")
+    @Operation(
+        method = "GET",
+        summary = "회원정보 가져오기",
+        description = "회원정보 가져오기"
+    )
+    @GetMapping
+    public ResponseEntity<UserResponse> whoAmI(
+        @AuthenticatedUserId final UserId userId
+    ) {
+        return ResponseEntity.ok(authQuery.whoAmI(userId));
     }
 }
