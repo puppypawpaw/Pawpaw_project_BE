@@ -41,10 +41,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         OAuthAttributes attributes = OAuthAttributes.of(provider, originAttributes);
         User user = saveOrUpdate(provider, Objects.requireNonNull(attributes));
-        String email = user.getId();
+
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().getAuthority()));
 
-        return new OAuth2CustomUser(provider, originAttributes, authorities, email);
+        return new OAuth2CustomUser(originAttributes, authorities, user.getUserId());
     }
 
     private User saveOrUpdate(

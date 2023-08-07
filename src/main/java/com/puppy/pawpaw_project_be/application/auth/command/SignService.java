@@ -3,14 +3,11 @@ package com.puppy.pawpaw_project_be.application.auth.command;
 import com.puppy.pawpaw_project_be.application.user.command.UserService;
 import com.puppy.pawpaw_project_be.application.user.query.UserQuery;
 import com.puppy.pawpaw_project_be.config.auth.application.TokenService;
-import com.puppy.pawpaw_project_be.domain.auth.domain.OAuth2CustomUser;
-import com.puppy.pawpaw_project_be.domain.auth.domain.Oauth2Provider;
 import com.puppy.pawpaw_project_be.domain.auth.domain.TokenType;
 import com.puppy.pawpaw_project_be.domain.auth.dto.request.SignInRequest;
 import com.puppy.pawpaw_project_be.domain.auth.dto.request.SignUpRequest;
 import com.puppy.pawpaw_project_be.domain.auth.dto.response.TokenResponse;
 import com.puppy.pawpaw_project_be.domain.user.domain.UserId;
-import com.puppy.pawpaw_project_be.domain.user.domain.User;
 import com.puppy.pawpaw_project_be.domain.user.domain.repository.UserRepository;
 import com.puppy.pawpaw_project_be.domain.user.dto.response.UserResponse;
 import com.puppy.pawpaw_project_be.exception.user.NotFoundUserException;
@@ -67,26 +64,8 @@ public class SignService {
     ) {
         AuthenticationManager authenticationManager = authenticationManagerBuilder.getObject();
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getId(), request.getPassword()));
-        TokenResponse tokenResponse = tokenService.createTokenResponse(authenticate);
-        tokenService.saveRefreshToken(UserId.of(authenticate.getName()), tokenResponse.getRefreshToken());
 
-        CookieUtil.addCookie(
-            response,
-            TokenType.ACCESS.name(),
-            tokenResponse.getAccessToken(),
-            tokenResponse.getAccessTokenLifeTime() / 1000,
-            domain,
-            sameSite
-        );
-
-        CookieUtil.addCookie(
-            response,
-            TokenType.REFRESH.name(),
-            tokenResponse.getRefreshToken(),
-            tokenResponse.getRefreshTokenLifeTime() / 1000,
-            domain,
-            sameSite
-        );
+        signIn(response, authenticate);
 
         return getUserInfo(request);
     }
@@ -97,13 +76,7 @@ public class SignService {
         final Authentication authenticate
     ) {
         TokenResponse tokenResponse = tokenService.createTokenResponse(authenticate);
-
-        UserId userId = userRepository.findByIdAndProvider(((OAuth2CustomUser)authenticate.getPrincipal()).getEmail(),
-                Oauth2Provider.valueOf(authenticate.getName().toUpperCase()))
-            .map(User::getUserId)
-            .orElseThrow(NotFoundUserException::new);
-
-        tokenService.saveRefreshToken(userId, tokenResponse.getRefreshToken());
+        tokenService.saveRefreshToken(UserId.of(authenticate.getName()), tokenResponse.getRefreshToken());
 
         CookieUtil.addCookie(
             response,
