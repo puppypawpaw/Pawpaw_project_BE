@@ -1,15 +1,7 @@
 package com.puppy.pawpaw_project_be.exception.common;
 
-public class BusinessException extends RuntimeException {
+public abstract class BusinessException extends RuntimeException {
     private final ErrorCode errorCode;
-
-    public BusinessException(
-        final String message,
-        final ErrorCode errorCode
-    ) {
-        super(message);
-        this.errorCode = errorCode;
-    }
 
     public BusinessException(final ErrorCode errorCode) {
         super(errorCode.getMessage());
