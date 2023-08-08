@@ -69,6 +69,13 @@ public final class Board {
         return board;
     }
 
+    public void plusLikedCount(){
+        this.likedCount = likedCount +1;
+    }
+    public void minusLikedCount(){
+        this.likedCount = likedCount - 1;
+    }
+
 
     public void updateTitle(String title){
         this.title = title;
