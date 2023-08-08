@@ -49,4 +49,5 @@ jobs:
         with:
           url: ${{ secrets.DEV_JENKINS_WEBHOOK_URL }}
           method: 'GET'
+          timeout: 60000
       
