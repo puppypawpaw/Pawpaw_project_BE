@@ -1,6 +1,6 @@
 package com.puppy.pawpaw_project_be.domain.user.domain.repository;
 
-import com.puppy.pawpaw_project_be.domain.auth.domain.Oauth2Provider;
+import com.puppy.pawpaw_project_be.domain.auth.domain.OAuth2Provider;
 import com.puppy.pawpaw_project_be.domain.user.domain.User;
 import com.puppy.pawpaw_project_be.domain.user.domain.UserId;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +13,6 @@ public interface UserRepository extends JpaRepository<User, UserId> {
 
     Optional<User> findByIdAndProvider(
         final String id,
-        final Oauth2Provider provider
+        final OAuth2Provider provider
     );
 }

@@ -1,6 +1,6 @@
 package com.puppy.pawpaw_project_be.domain.user.domain;
 
-import com.puppy.pawpaw_project_be.domain.auth.domain.Oauth2Provider;
+import com.puppy.pawpaw_project_be.domain.auth.domain.OAuth2Provider;
 import com.puppy.pawpaw_project_be.domain.common.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,7 +27,7 @@ public class User extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private Role role;
     @Enumerated(value = EnumType.STRING)
-    private Oauth2Provider provider;
+    private OAuth2Provider provider;
 
     @Builder
     public User(
@@ -36,7 +36,7 @@ public class User extends BaseTimeEntity {
         final String nickname,
         final String phoneNumber,
         final String imageUrl,
-        final Oauth2Provider provider
+        final OAuth2Provider provider
     ) {
         this.userId = UserId.create();
         this.id = id;

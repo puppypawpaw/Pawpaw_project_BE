@@ -7,24 +7,24 @@ import lombok.Getter;
 import java.util.Map;
 
 @Getter
-public class OAuthAttributes {
+public class OAuth2Attributes {
     private Map<String, Object> attributes;
     private String nameAttributesKey;
     private String name;
     private String email;
     private String phoneNumber;
     private String profileImageUrl;
-    private Oauth2Provider provider;
+    private OAuth2Provider provider;
 
     @Builder
-    public OAuthAttributes(
+    public OAuth2Attributes(
         final Map<String, Object> attributes,
         final String nameAttributesKey,
         final String name,
         final String email,
         final String phoneNumber,
         final String profileImageUrl,
-        final Oauth2Provider provider
+        final OAuth2Provider provider
     ) {
         this.attributes = attributes;
         this.nameAttributesKey = nameAttributesKey;
@@ -35,27 +35,27 @@ public class OAuthAttributes {
         this.provider = provider;
     }
 
-    public static OAuthAttributes of(
-        final Oauth2Provider provider,
+    public static OAuth2Attributes of(
+        final OAuth2Provider provider,
         final Map<String, Object> attributes
     ) {
-        if (provider.equals(Oauth2Provider.KAKAO)) {
+        if (provider.equals(OAuth2Provider.KAKAO)) {
             return ofKakao("id", attributes, provider);
-        } else if (provider.equals(Oauth2Provider.GOOGLE)) {
+        } else if (provider.equals(OAuth2Provider.GOOGLE)) {
             return ofGoogle("sub", attributes, provider);
-        } else if (provider.equals(Oauth2Provider.NAVER)) {
+        } else if (provider.equals(OAuth2Provider.NAVER)) {
             return ofNaver("id", attributes, provider);
         }
 
         return null;
     }
 
-    private static OAuthAttributes ofGoogle(
+    private static OAuth2Attributes ofGoogle(
         final String userNameAttributeName,
         final Map<String, Object> attributes,
-        final Oauth2Provider provider
+        final OAuth2Provider provider
     ) {
-        return OAuthAttributes.builder()
+        return OAuth2Attributes.builder()
             .name(String.valueOf(attributes.get("name")))
             .email(String.valueOf(attributes.get("email")))
             .profileImageUrl(String.valueOf(attributes.get("picture")))
@@ -65,15 +65,15 @@ public class OAuthAttributes {
             .build();
     }
 
-    private static OAuthAttributes ofKakao(
+    private static OAuth2Attributes ofKakao(
         final String userNameAttributeName,
         final Map<String, Object> attributes,
-        final Oauth2Provider provider
+        final OAuth2Provider provider
     ) {
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
 
-        return OAuthAttributes.builder()
+        return OAuth2Attributes.builder()
             .name(String.valueOf(kakaoProfile.get("nickname")))
             .email(String.valueOf(kakaoAccount.get("email")))
             .profileImageUrl(String.valueOf(kakaoProfile.get("profile_image_url")))
@@ -83,14 +83,14 @@ public class OAuthAttributes {
             .build();
     }
 
-    public static OAuthAttributes ofNaver(
+    public static OAuth2Attributes ofNaver(
         final String userNameAttributeName,
         final Map<String, Object> attributes,
-        final Oauth2Provider provider
+        final OAuth2Provider provider
     ) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
-        return OAuthAttributes.builder()
+        return OAuth2Attributes.builder()
             .name(String.valueOf(response.get("nickname")))
             .email(String.valueOf(response.get("email")))
             .profileImageUrl(String.valueOf(response.get("profile_image")))
