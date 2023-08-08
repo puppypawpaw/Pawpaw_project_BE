@@ -8,8 +8,8 @@ import com.puppy.pawpaw_project_be.domain.auth.dto.request.SignUpRequest;
 import com.puppy.pawpaw_project_be.domain.user.domain.UserId;
 import com.puppy.pawpaw_project_be.domain.user.dto.response.UserResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,10 @@ public class AuthController {
     private final SignService signService;
     private final AuthQuery authQuery;
 
-    @ApiResponse(responseCode = "204")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(responseCode = "409", description = "중복된 아이디 입니다.")
+    })
     @Operation(
         method = "POST",
         summary = "회원가입",
@@ -42,7 +45,10 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @ApiResponse(responseCode = "200")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "400", description = "잘못된 계정정보입니다.")
+    })
     @Operation(
         method = "POST",
         summary = "로그인",
@@ -56,7 +62,10 @@ public class AuthController {
         return ResponseEntity.ok(signService.signIn(response, request));
     }
 
-    @ApiResponse(responseCode = "204")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(responseCode = "400", description = "로그인 상태가 아닙니다.")
+    })
     @Operation(
         method = "DELETE",
         summary = "로그아웃",
@@ -66,13 +75,16 @@ public class AuthController {
     public ResponseEntity<Void> signOut(
         final HttpServletRequest request,
         final HttpServletResponse response,
-        @Schema(hidden = true) @AuthenticatedUserId final UserId userId
+        @AuthenticatedUserId final UserId userId
     ) {
         signService.signOut(userId, request, response);
         return ResponseEntity.noContent().build();
     }
 
-    @ApiResponse(responseCode = "200")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "404", description = "존재하지 않는 유저입니다.")
+    })
     @Operation(
         method = "GET",
         summary = "회원정보 가져오기",
