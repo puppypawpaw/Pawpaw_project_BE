@@ -27,7 +27,7 @@ public class Term extends BaseTimeEntity {
     @Column(nullable = false)
     private Boolean required;
 
-    @Column(name = "term_order")
+    @Column(name = "term_order", unique = true)
     private Long order;
 
     @Builder
