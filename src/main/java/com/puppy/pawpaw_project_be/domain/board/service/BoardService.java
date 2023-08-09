@@ -1,6 +1,5 @@
 package com.puppy.pawpaw_project_be.domain.board.service;
 
-import com.puppy.pawpaw_project_be.domain.board.dto.BoardDto;
 import com.puppy.pawpaw_project_be.domain.board.dto.BoardDto.BoardRegisterDto;
 import com.puppy.pawpaw_project_be.domain.board.dto.BoardDto.BoardResponseDto;
 import com.puppy.pawpaw_project_be.domain.board.dto.BoardDto.BoardUpdateDto;
@@ -11,9 +10,6 @@ import com.puppy.pawpaw_project_be.domain.user.domain.UserId;
 import com.puppy.pawpaw_project_be.domain.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -54,16 +50,16 @@ public class BoardService {
 
         User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
         Board board = boardRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        if (user.getUserId() != board.getUser().getUserId()){
+        if (user.getUserId() != board.getUser().getUserId()) {
             return null;
         }
 
-        if (updateDto.getTitle() != null) {
-            board.updateTitle(updateDto.getTitle());
+        if (updateDto.getTitle() != null || updateDto.getContent() != null){
+            board.updateTitleAndContent(updateDto.getTitle(), updateDto.getContent());
         }
-        if (updateDto.getContent() != null) {
-            board.updateContent(updateDto.getContent());
-        }
+
+
+
 
         return BoardUpdateDto.builder()
                 .title(board.getTitle())
@@ -78,7 +74,7 @@ public class BoardService {
 
         User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
         Board board = boardRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-        if (user.getUserId() != board.getUser().getUserId()){
+        if (user.getUserId() != board.getUser().getUserId()) {
 
         }
         boardRepository.delete(board);

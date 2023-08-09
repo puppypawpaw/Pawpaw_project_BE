@@ -9,6 +9,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -46,6 +48,9 @@ public final class Board {
     @Column
     private LocalDateTime updatedAt = LocalDateTime.now();
 
+    @OneToMany(mappedBy = "board", orphanRemoval = true)
+    private Set<BoardLikes> boardLikes = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -77,14 +82,7 @@ public final class Board {
     }
 
 
-    public void updateTitle(String title){
-        this.title = title;
-    }
-    public void updateContent(String content){
-        this.content = content;
-    }
-
-    public void updateBoard(String title, String content){
+    public void updateTitleAndContent(String title, String content){
         this.title = title;
         this.content = content;
     }
@@ -92,5 +90,4 @@ public final class Board {
     public void remove() {
         this.isRemoved = true;
     }
-
 }
