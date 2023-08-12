@@ -29,7 +29,12 @@ public class AuthController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
-        @ApiResponse(responseCode = "409", description = "중복된 아이디 입니다.")
+        @ApiResponse(responseCode = "409", description = "중복된 아이디 입니다."),
+        @ApiResponse(responseCode = "400", description = "모든 필수 약관에 동의가 필요합니다."),
+        @ApiResponse(responseCode = "400", description = "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
+        @ApiResponse(responseCode = "400", description = "유효하지 않은 반려동물 이름입니다."),
+        @ApiResponse(responseCode = "400", description = "유효하지 않은 반려동물 소개입니다."),
+        @ApiResponse(responseCode = "400", description = "중복된 아이디 입니다.")
     })
     @Operation(
         method = "POST",
@@ -47,7 +52,8 @@ public class AuthController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200"),
-        @ApiResponse(responseCode = "400", description = "잘못된 계정정보입니다.")
+        @ApiResponse(responseCode = "400", description = "잘못된 계정정보입니다."),
+        @ApiResponse(responseCode = "400", description = "존재하지 않는 유저입니다.")
     })
     @Operation(
         method = "POST",

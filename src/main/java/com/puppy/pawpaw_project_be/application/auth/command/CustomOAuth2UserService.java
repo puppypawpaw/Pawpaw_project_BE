@@ -1,8 +1,8 @@
 package com.puppy.pawpaw_project_be.application.auth.command;
 
 import com.puppy.pawpaw_project_be.domain.auth.domain.OAuth2CustomUser;
-import com.puppy.pawpaw_project_be.domain.auth.domain.OAuthAttributes;
-import com.puppy.pawpaw_project_be.domain.auth.domain.Oauth2Provider;
+import com.puppy.pawpaw_project_be.domain.auth.domain.OAuth2Attributes;
+import com.puppy.pawpaw_project_be.domain.auth.domain.OAuth2Provider;
 import com.puppy.pawpaw_project_be.domain.user.domain.User;
 import com.puppy.pawpaw_project_be.domain.user.domain.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
@@ -37,9 +37,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         Map<String, Object> originAttributes = oAuth2User.getAttributes();
 
-        Oauth2Provider provider = Oauth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
+        OAuth2Provider provider = OAuth2Provider.valueOf(userRequest.getClientRegistration().getRegistrationId().toUpperCase());
 
-        OAuthAttributes attributes = OAuthAttributes.of(provider, originAttributes);
+        OAuth2Attributes attributes = OAuth2Attributes.of(provider, originAttributes);
         User user = saveOrUpdate(provider, Objects.requireNonNull(attributes));
 
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().getAuthority()));
@@ -48,8 +48,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private User saveOrUpdate(
-        final Oauth2Provider provider,
-        final OAuthAttributes authAttributes
+        final OAuth2Provider provider,
+        final OAuth2Attributes authAttributes
     ) {
         User user = userRepository.findByIdAndProvider(authAttributes.getEmail(), provider)
             .map(entity -> entity.update(authAttributes.getName(), authAttributes.getProfileImageUrl()))

@@ -1,6 +1,7 @@
 package com.puppy.pawpaw_project_be.application.user.query;
 
 import com.puppy.pawpaw_project_be.domain.auth.dto.request.SignUpRequest;
+import com.puppy.pawpaw_project_be.domain.user.domain.Role;
 import com.puppy.pawpaw_project_be.domain.user.domain.User;
 import com.puppy.pawpaw_project_be.domain.user.domain.UserId;
 import com.puppy.pawpaw_project_be.domain.user.domain.repository.UserRepository;
@@ -12,19 +13,30 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class UserQuery {
     private final UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public void checkDuplication(final SignUpRequest request) {
         if (userRepository.existsById(request.getId())) {
             throw new DuplicateIdException();
         }
     }
 
-    public UserId getUserIdByOAuthEmail(final String email) {
-        return userRepository.findById(email)
-            .map(User::getUserId)
+    @Transactional(readOnly = true)
+    public boolean checkUserRole(
+        final UserId userId,
+        final Role role
+    ) {
+        return userRepository.existsByUserIdAndRole(userId, role);
+    }
+
+    /**
+     * 테스트 용도
+     */
+    @Transactional(readOnly = true)
+    public User getUserById(final String id) {
+        return userRepository.findById(id)
             .orElseThrow(NotFoundUserException::new);
     }
 }
