@@ -12,7 +12,16 @@ public enum ErrorCode {
     PERMISSION_REQUIRED(400, "PM001", "권한이 부족합니다."),
     NOT_EQUAL_PASSWORD_CONFIRM(400, "S001", "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
     INVALID_PET_NAME(400, "P001", "유효하지 않은 반려동물 이름입니다."),
-    INVALID_PET_INTRODUCTION(400, "P002", "유효하지 않은 반려동물 소개입니다.");
+    INVALID_PET_INTRODUCTION(400, "P002", "유효하지 않은 반려동물 소개입니다."),
+    BOARD_NOTFOUND_EXCEPTION(400, "BOARD_NOTFOUND_EXCEPTION", "게시글을 찾지 못했습니다."),
+    BOARD_REGISTRATION_EXCEPTION(400, "BOARD_REGISTRATION_EXCEPTION", "게시글 등록에 실패했습니다"),
+    BOARD_UPDATE_EXCEPTION(400, "BOARD_UPDATE_EXCEPTION", "게시글 수정에 실패했습니다"),
+    BOARD_DELETE_EXCEPTION(400, "BOARD_DELETE_EXCEPTION", "게시글 삭제에 실패했습니다"),
+
+    BOARD_IMG_CANNOT_UPLOAD_EXCEPTION(400, "BOARD_IMG_CANNOT_UPLOAD_EXCEPTION", "이미지 업로드를 실패했습니다"),
+    BOARD_IMG_CANNOT_VIEW_EXCEPTION(400, "BOARD_IMG_CANNOT_VIEW_EXCEPTION", "이미지 조회를 실패했습니다"),
+    BOARD_IMG_CANNOT_REMOVE_EXCEPTION(400, "BOARD_IMG_CANNOT_REMOVE_EXCEPTION", "이미지 삭제를 실패했습니다");
+
 
     private final int status;
     private final String code;
