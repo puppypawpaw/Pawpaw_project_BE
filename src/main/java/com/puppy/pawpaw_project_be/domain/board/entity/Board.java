@@ -1,75 +1,65 @@
 package com.puppy.pawpaw_project_be.domain.board.entity;
 
 import com.puppy.pawpaw_project_be.domain.board.dto.BoardDto;
+import com.puppy.pawpaw_project_be.domain.boardImg.entity.BoardImg;
+import com.puppy.pawpaw_project_be.domain.common.BaseTimeEntity;
 import com.puppy.pawpaw_project_be.domain.user.domain.User;
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.Builder;
+import lombok.Getter;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-public final class Board {
+public class Board extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
-    private Long id;
+    private long id;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
     private String writer;
-
-    private int commentCount;
 
     private boolean isRemoved = false;
 
-    @ColumnDefault("0")
-    @Column(name = "view_count",nullable = false)
-    private int viewCount;
-
-    @ColumnDefault("0")
     @Column(name = "liked_count")
     private int likedCount;
 
-    @CreationTimestamp // INSERT, UPDATE 등의 쿼리가 발생할 때, 현재 시간을 자동으로 저장
-    @Column(updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @UpdateTimestamp
-    @Column
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @OneToMany(mappedBy = "board", orphanRemoval = true)
+    @OneToMany(mappedBy = "board", orphanRemoval = true, cascade = CascadeType.ALL)
     private Set<BoardLikes> boardLikes = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @Builder.Default
+    private Set<BoardImg> imgSet = new HashSet<>();
+
     @Builder
-    public Board(String title, String content, User user) {
+    public Board(String title, String content, User user, String writer) {
         this.title = title;
         this.content = content;
         this.user = user;
+        this.writer = writer;
     }
 
     public static Board createBoard(BoardDto.BoardRegisterDto registerDto, User user){
         Board board = Board.builder()
-                .id(registerDto.getId())
                 .title(registerDto.getTitle())
                 .content(registerDto.getContent())
                 .writer(user.getNickname())
                 .user(user)
-                .isRemoved(false)
                 .build();
         return board;
     }
@@ -89,5 +79,24 @@ public final class Board {
 
     public void remove() {
         this.isRemoved = true;
+    }
+
+
+    public void addImage(String uuid, String fileName){
+        BoardImg boardImg = BoardImg.builder()
+                .uuid(uuid)
+                .fileName(fileName)
+                .board(this)
+                .ord(imgSet.size())
+                .build();
+        imgSet.add(boardImg);
+    }
+
+    public void clearImages(){
+        imgSet.stream().forEach(boardImg -> boardImg.changeBoard(null));  // 관계를 끊어준다
+        this.imgSet.clear();
+    }
+
+    protected Board() {
     }
 }
