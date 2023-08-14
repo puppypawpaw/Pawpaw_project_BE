@@ -6,6 +6,7 @@ import com.puppy.pawpaw_project_be.domain.common.BaseTimeEntity;
 import com.puppy.pawpaw_project_be.domain.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -13,6 +14,7 @@ import java.util.Set;
 
 @Entity
 @Getter
+@Where(clause = "isRemoved = false")
 public class Board extends BaseTimeEntity {
 
     @Id
