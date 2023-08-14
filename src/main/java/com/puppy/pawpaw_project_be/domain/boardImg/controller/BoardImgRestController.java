@@ -4,7 +4,7 @@ import com.puppy.pawpaw_project_be.domain.boardImg.dto.BoardImgDto.BoardImgResul
 import com.puppy.pawpaw_project_be.domain.boardImg.dto.BoardImgDto.BoardImgUploadDto;
 import com.puppy.pawpaw_project_be.domain.boardImg.service.BoardImgService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 @RequestMapping("/file")
 public class BoardImgRestController {
     private final BoardImgService imgService;
