@@ -1,0 +1,3 @@
+server:
+  allowedOrigins: ${properties.server.allowedOrigins}
+  port: 8081

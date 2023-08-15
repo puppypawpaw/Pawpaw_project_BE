@@ -1,0 +1,25 @@
+spring:
+  profiles:
+    active: local
+    group:
+      prod:
+        - rdb
+        - redis
+        - jwt
+        - cookie
+        - secret
+        - server
+      dev:
+        - rdb
+        - redis
+        - jwt
+        - cookie
+        - secret
+        - server
+      local:
+        - rdb
+        - redis
+        - jwt
+        - cookie
+        - secret
+        - server

@@ -1,73 +1,79 @@
-plugins {
-    id 'java'
-    id 'org.springframework.boot' version '2.7.14'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-    id "com.google.cloud.tools.jib" version "3.3.2"
+buildscript {
+    ext {
+        springBootVersion = '2.7.14'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "io.spring.gradle:dependency-management-plugin"
+    }
 }
 
-group = 'com.puppy'
-version = '0.0.1-SNAPSHOT'
+allprojects {
+    group = 'kr.co.pawpaw'
+    version = '1.0'
+}
 
-java {
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
     sourceCompatibility = '11'
-}
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+    dependencies {
+        //lombok
+        implementation 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
     }
 }
 
-repositories {
-    mavenCentral()
+project(':domain') {
+
 }
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-    implementation 'io.hypersistence:hypersistence-utils-hibernate-55:3.5.1'
-    implementation 'org.projectlombok:lombok'
-    implementation 'javax.validation:validation-api'
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    testImplementation 'com.h2database:h2'
-    testAnnotationProcessor 'org.projectlombok:lombok'
+project(':domain:domain-redis') {
+
 }
 
-bootJar {
-    enabled = true
+project(':domain:domain-rdb') {
+
 }
 
-jar {
-    enabled = false
+project(':common') {
+
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
-jib {
-    from {
-        image = 'openjdk:11-jre-slim-bullseye'
+project(':api') {
+    dependencies {
+        implementation project(path: ':domain:domain-rdb', configuration: 'default')
+        implementation project(path: ':domain:domain-redis', configuration: 'default')
+        implementation project(path: ':common', configuration: 'default')
     }
-    to {
-        image = '520511553477.dkr.ecr.ap-northeast-2.amazonaws.com/pawpaw-back-dev'
-    }
-    container {
-        mainClass = "com.puppy.pawpaw_project_be.PawpawProjectBeApplication"
-        jvmFlags = ['-Duser.timezone=Asia/Seoul', '-Dspring.profiles.active=dev', '-XX:+UseContainerSupport']
-        volumes = ["/tmp"]
+}
+
+project(':socket') {
+    dependencies {
+        implementation project(path: ':domain:domain-rdb', configuration: 'default')
+        implementation project(path: ':domain:domain-redis', configuration: 'default')
+        implementation project(path: ':common', configuration: 'default')
     }
 }
