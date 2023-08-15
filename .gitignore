@@ -249,3 +249,4 @@ src/main/generated/
 /docker/data/
 /.github/workflows/publish.yml
 /src/main/resources/application-secret.yml
+README.md
