@@ -48,6 +48,7 @@ public class Term extends BaseTimeEntity {
             try {
                 Field thisField = this.getClass().getDeclaredField(field.getName());
                 thisField.setAccessible(true);
+                field.setAccessible(true);
                 thisField.set(this, field.get(request));
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 // ignore update field

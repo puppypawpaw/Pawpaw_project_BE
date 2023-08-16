@@ -13,19 +13,20 @@ public class UserResponse {
     private Role role;
     @Schema(description = "유저 닉네임", type = "STRING")
     private String nickname;
-    @Schema(description = "유저 전화번호", type = "STRING")
-    private String phoneNumber;
+    @Schema(description = "유저 위치", type = "STRING")
+    private String position;
+
 
     private UserResponse(
         final String id,
         final Role role,
         final String nickname,
-        final String phoneNumber
+        final String position
     ) {
         this.id = id;
         this.role = role;
         this.nickname = nickname;
-        this.phoneNumber = phoneNumber;
+        this.position = position;
     }
 
     public static UserResponse of(final User user) {
@@ -33,7 +34,7 @@ public class UserResponse {
             user.getId(),
             user.getRole(),
             user.getNickname(),
-            user.getPhoneNumber()
+            user.getPosition()
         );
     }
 }

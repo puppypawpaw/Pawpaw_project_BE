@@ -4,7 +4,6 @@ package kr.co.pawpaw.domainrdb.auth.dto.request;
 import kr.co.pawpaw.domainrdb.pet.Pet;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -12,7 +11,6 @@ import javax.validation.constraints.Size;
 import java.util.List;
 
 @Getter
-@NoArgsConstructor
 public class SignUpRequest {
     @NotNull
     private List<Long> termAgrees;

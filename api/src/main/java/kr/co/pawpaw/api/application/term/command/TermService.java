@@ -1,5 +1,7 @@
 package kr.co.pawpaw.api.application.term.command;
 
+import kr.co.pawpaw.api.application.term.query.TermQuery;
+import kr.co.pawpaw.common.exception.term.NotFoundTermException;
 import kr.co.pawpaw.domainrdb.term.domain.Term;
 import kr.co.pawpaw.domainrdb.term.domain.UserTermAgree;
 import kr.co.pawpaw.domainrdb.term.domain.repository.TermRepository;
@@ -10,9 +12,6 @@ import kr.co.pawpaw.domainrdb.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import kr.co.pawpaw.api.application.term.query.TermQuery;
-import kr.co.pawpaw.api.application.user.query.UserQuery;
-import kr.co.pawpaw.common.exception.term.NotFoundTermException;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,7 +20,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TermService {
-    private final UserQuery userQuery;
     private final TermQuery termQuery;
     private final TermRepository termRepository;
     private final UserTermAgreeRepository userTermAgreeRepository;
@@ -61,23 +59,5 @@ public class TermService {
             .collect(Collectors.toList());
 
         userTermAgreeRepository.saveAll(userTermAgree);
-    }
-
-    /**
-     * 테스트 용도
-     * 모든 유저의 모든 약관 동의를 삭제함
-     */
-    @Transactional
-    public void deleteAllTermAgree() {
-        userTermAgreeRepository.deleteAll();
-    }
-
-    /**
-     * 테스트 용도
-     * 모든 약관을 삭제함
-     */
-    @Transactional
-    public void deleteAllTerm() {
-        termRepository.deleteAll();
     }
 }

@@ -22,13 +22,4 @@ public class PetService {
     ) {
         petRepository.save(request.toPet(user));
     }
-
-    /**
-     * 테스트 용도
-     * 모든 유저의 모든 pet을 삭제함
-     */
-    @Transactional
-    public void deleteAll() {
-        petRepository.deleteAll();
-    }
 }
