@@ -15,7 +15,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      SECRET_YML: ${{ secrets.SECRET }}
+      API_SECRET: ${{ secrets.API_SECRET }}
+      SOCKET_SECRET: ${{ secrets.SOCKET_SECRET }}
 
     steps:
       - name: Checkout
@@ -41,7 +42,8 @@ jobs:
 
       - name: Build with gradle
         run: |
-          echo "$SECRET_YML" > ./src/main/resources/application-secret.yml
+          echo "$API_SECRET" > ./api/src/main/resources/application-secret.yml
+          echo "$SOCKET_SECRET" > ./socket/src/main/resources/application-secret.yml
           ./gradlew clean jib
       
       - name: Send Webhook to Jenkins
