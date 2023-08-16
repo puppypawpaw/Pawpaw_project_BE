@@ -1,1 +1,8 @@
 rootProject.name = 'Pawpaw_project_BE'
+
+include 'domain'
+include 'domain:domain-rdb'
+include 'domain:domain-redis'
+include 'socket'
+include 'api'
+include 'common'

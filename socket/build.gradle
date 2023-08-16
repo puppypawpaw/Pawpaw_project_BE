@@ -1,0 +1,25 @@
+plugins {
+    id "com.google.cloud.tools.jib" version "3.3.2"
+}
+
+dependencies {
+    //websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.webjars:sockjs-client:1.5.1'
+    implementation 'org.webjars:stomp-websocket:2.3.4'
+
+    //security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //spring web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-web'
+}
+
+jar {
+    enabled = false
+}
+
+tasks.named('jibDockerBuild') {
+    dependsOn test
+}
