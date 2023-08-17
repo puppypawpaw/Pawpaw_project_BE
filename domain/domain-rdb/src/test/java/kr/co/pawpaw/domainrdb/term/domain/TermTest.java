@@ -1,7 +1,5 @@
 package kr.co.pawpaw.domainrdb.term.domain;
 
-import helper.UpdateTermRequestBuilder;
-import kr.co.pawpaw.domainrdb.term.dto.request.UpdateTermRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,20 +17,18 @@ class TermTest {
             .required(true)
             .build();
 
-        UpdateTermRequest request = UpdateTermRequestBuilder.builder()
-            .content("term content update")
-            .title("term title update")
-            .order(2L)
-            .required(false)
-            .build();
+        String content = "term content update";
+        String title = "term title update";
+        Long order = 2L;
+        boolean required = false;
 
         //when
-        term.update(request);
+        term.update(title, content, required, order);
 
         //then
-        assertThat(term.getContent()).isEqualTo(request.getContent());
-        assertThat(term.getTitle()).isEqualTo(request.getTitle());
-        assertThat(term.getOrder()).isEqualTo(request.getOrder());
-        assertThat(term.getRequired()).isEqualTo(request.getRequired());
+        assertThat(term.getContent()).isEqualTo(content);
+        assertThat(term.getTitle()).isEqualTo(title);
+        assertThat(term.getOrder()).isEqualTo(order);
+        assertThat(term.getRequired()).isEqualTo(required);
     }
 }

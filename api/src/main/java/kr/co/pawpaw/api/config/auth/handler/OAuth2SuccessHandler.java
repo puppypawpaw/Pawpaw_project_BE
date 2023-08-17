@@ -1,34 +1,39 @@
 package kr.co.pawpaw.api.config.auth.handler;
 
-import kr.co.pawpaw.api.application.auth.command.SignService;
+import kr.co.pawpaw.api.config.auth.object.OAuth2Attributes;
+import kr.co.pawpaw.api.config.auth.provider.JwtTokenProvider;
 import kr.co.pawpaw.api.config.auth.repository.CookieAuthorizationRequestRepository;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import kr.co.pawpaw.api.config.property.CookieProperties;
+import kr.co.pawpaw.api.config.property.JwtProperties;
+import kr.co.pawpaw.api.config.property.OAuth2Properties;
+import kr.co.pawpaw.common.util.CookieUtil;
+import kr.co.pawpaw.domainredis.auth.domain.OAuth2TempAttributes;
+import kr.co.pawpaw.domainredis.auth.domain.RefreshToken;
+import kr.co.pawpaw.domainredis.auth.domain.TokenType;
+import kr.co.pawpaw.domainredis.auth.service.command.OAuth2TempAttributesCommand;
+import kr.co.pawpaw.domainredis.auth.service.command.RefreshTokenCommand;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
+import java.util.UUID;
 
-@Slf4j
 @Component
+@RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final String redirectUriSuccess;
-    private final SignService signService;
+    private final OAuth2Properties oAuth2Properties;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtProperties jwtProperties;
+    private final RefreshTokenCommand refreshTokenCommand;
+    private final CookieProperties cookieProperties;
     private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;
-
-    public OAuth2SuccessHandler(
-        @Value("${spring.security.oauth2.redirectUriSuccess}") final String redirectUriSuccess,
-        final SignService signService,
-        final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository
-    ) {
-        this.redirectUriSuccess = redirectUriSuccess;
-        this.signService = signService;
-        this.cookieAuthorizationRequestRepository = cookieAuthorizationRequestRepository;
-    }
+    private final OAuth2TempAttributesCommand oAuth2TempAttributesCommand;
 
     @Override
     public void onAuthenticationSuccess(
@@ -36,31 +41,62 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         final HttpServletResponse response,
         final Authentication authentication
     ) throws IOException {
-        String targetUrl = determineTargetUrl(request, response, authentication);
+        String targetUrl = oAuth2Properties.getRedirectUriSuccess();
+
+        OAuth2Attributes attributes = (OAuth2Attributes) (((OAuth2User) authentication.getPrincipal())
+            .getAttributes()
+            .get("oAuth2Attributes"));
+
+        if (Objects.nonNull(attributes)) {
+            String key = UUID.randomUUID().toString();
+            OAuth2TempAttributes tempAttributes = oAuth2TempAttributesCommand.save(
+                OAuth2TempAttributes.builder()
+                    .key(key)
+                    .email(attributes.getEmail())
+                    .name(attributes.getName())
+                    .provider(attributes.getProvider().name())
+                    .profileImageUrl(attributes.getProfileImageUrl())
+                    .build());
+            targetUrl = oAuth2Properties.getRedirectUriSignUp() + tempAttributes.getKey();
+        } else {
+            String accessTokenValue = jwtTokenProvider.createAccessToken(authentication);
+            String refreshTokenValue = jwtTokenProvider.createRefreshToken();
+
+            RefreshToken refreshToken = RefreshToken.builder()
+                .userId(authentication.getName())
+                .value(refreshTokenValue)
+                .timeout(jwtProperties.getRefreshTokenLifeTime() / 1000)
+                .build();
+
+            refreshTokenCommand.save(refreshToken);
+
+            CookieUtil.addCookie(
+                response,
+                TokenType.ACCESS.name(),
+                accessTokenValue,
+                (int) ((jwtProperties.getAccessTokenLifeTime() / 1000)),
+                cookieProperties.getDomain()
+            );
+
+            CookieUtil.addCookie(
+                response,
+                TokenType.REFRESH.name(),
+                refreshTokenValue,
+                (int) ((jwtProperties.getRefreshTokenLifeTime() / 1000)),
+                cookieProperties.getDomain()
+            );
+        }
 
         if (response.isCommitted()) {
-            log.debug("Response has already been committed.");
             return;
         }
+
         clearAuthenticationAttributes(request, response);
         getRedirectStrategy().sendRedirect(
             request,
             response,
-            UriComponentsBuilder.fromUriString(targetUrl)
-                .build()
-                .toUriString());
-    }
-
-    protected String determineTargetUrl(
-        final HttpServletRequest request,
-        final HttpServletResponse response,
-        final Authentication authentication
-    ) {
-        signService.signIn(response, authentication);
-
-        return UriComponentsBuilder.fromUriString(redirectUriSuccess)
-            .build()
-            .toUriString();
+            targetUrl
+        );
     }
 
     protected void clearAuthenticationAttributes(

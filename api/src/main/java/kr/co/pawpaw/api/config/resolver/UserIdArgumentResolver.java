@@ -1,6 +1,7 @@
 package kr.co.pawpaw.api.config.resolver;
 
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
+import kr.co.pawpaw.common.exception.user.NotSignedInException;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -26,10 +27,10 @@ public class UserIdArgumentResolver implements HandlerMethodArgumentResolver {
         final WebDataBinderFactory binderFactory
     ) {
         if (SecurityContextHolder.getContext().getAuthentication().getPrincipal().equals("anonymousUser")) {
-            return UserId.of(null);
+            throw new NotSignedInException();
         }
 
-        UserDetails principal = (UserDetails)SecurityContextHolder.getContext()
+        UserDetails principal = (UserDetails) SecurityContextHolder.getContext()
             .getAuthentication()
             .getPrincipal();
 

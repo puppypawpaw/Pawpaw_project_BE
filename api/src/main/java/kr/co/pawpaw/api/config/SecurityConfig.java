@@ -1,14 +1,14 @@
 package kr.co.pawpaw.api.config;
 
-import kr.co.pawpaw.api.application.auth.command.CustomOAuth2UserService;
 import kr.co.pawpaw.api.config.auth.filter.JwtFilter;
 import kr.co.pawpaw.api.config.auth.handler.JwtAccessDeniedHandler;
 import kr.co.pawpaw.api.config.auth.handler.JwtAuthenticationEntryPointHandler;
 import kr.co.pawpaw.api.config.auth.handler.OAuth2FailureHandler;
 import kr.co.pawpaw.api.config.auth.handler.OAuth2SuccessHandler;
 import kr.co.pawpaw.api.config.auth.repository.CookieAuthorizationRequestRepository;
+import kr.co.pawpaw.api.config.auth.service.CustomOAuth2UserService;
+import kr.co.pawpaw.api.config.property.ServerProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -29,8 +29,7 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    @Value("${server.allowedOrigins}")
-    private List<String> allowedOrigins;
+    private final ServerProperties serverProperties;
     private final JwtFilter jwtFilter;
     private final JwtAccessDeniedHandler accessDeniedHandler;
     private final JwtAuthenticationEntryPointHandler authenticationEntryPointHandler;
@@ -82,9 +81,7 @@ public class SecurityConfig {
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.setAllowedHeaders(List.of("*"));
         corsConfig.setAllowedMethods(Arrays.asList("GET,POST,PUT,DELETE,OPTIONS,HEAD,PATCH".split(",")));
-        corsConfig.setAllowedOriginPatterns(
-            allowedOrigins
-        );
+        corsConfig.setAllowedOriginPatterns(serverProperties.getAllowedOrigins());
 
         corsConfig.setExposedHeaders(List.of("*"));
         corsConfig.setAllowCredentials(true);

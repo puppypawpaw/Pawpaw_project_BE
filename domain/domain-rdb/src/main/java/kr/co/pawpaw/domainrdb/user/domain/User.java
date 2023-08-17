@@ -1,6 +1,5 @@
 package kr.co.pawpaw.domainrdb.user.domain;
 
-import kr.co.pawpaw.domainrdb.auth.OAuth2Provider;
 import kr.co.pawpaw.domainrdb.common.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,7 +18,7 @@ public class User extends BaseTimeEntity {
     @EmbeddedId
     private UserId userId;
 
-    private String id;
+    private String email;
     private String password;
     private String nickname;
     private String phoneNumber;
@@ -32,7 +31,7 @@ public class User extends BaseTimeEntity {
 
     @Builder
     public User(
-        final String id,
+        final String email,
         final String password,
         final String nickname,
         final String phoneNumber,
@@ -41,7 +40,7 @@ public class User extends BaseTimeEntity {
         final OAuth2Provider provider
     ) {
         this.userId = UserId.create();
-        this.id = id;
+        this.email = email;
         this.password = password;
         this.role = Role.USER;
         this.nickname = nickname;
@@ -49,15 +48,5 @@ public class User extends BaseTimeEntity {
         this.imageUrl = imageUrl;
         this.position = position;
         this.provider = provider;
-    }
-
-    public User update(
-        final String nickname,
-        final String imageUrl
-    ) {
-        this.nickname = nickname;
-        this.imageUrl = imageUrl;
-
-        return this;
     }
 }

@@ -1,7 +1,8 @@
 package kr.co.pawpaw.api.config.auth.handler;
 
 import kr.co.pawpaw.api.config.auth.repository.CookieAuthorizationRequestRepository;
-import org.springframework.beans.factory.annotation.Value;
+import kr.co.pawpaw.api.config.property.OAuth2Properties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -12,17 +13,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {
-    private final String redirectUriFailure;
+    private final OAuth2Properties oAuth2Properties;
     private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;
-
-    public OAuth2FailureHandler(
-        @Value("${spring.security.oauth2.redirectUriFailure}") final String redirectUriFailure,
-        final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository
-    ) {
-        this.redirectUriFailure = redirectUriFailure;
-        this.cookieAuthorizationRequestRepository = cookieAuthorizationRequestRepository;
-    }
 
     @Override
     public void onAuthenticationFailure(
@@ -30,7 +24,7 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
         final HttpServletResponse response,
         final AuthenticationException authenticationException
     ) throws IOException {
-        String targetUrl = UriComponentsBuilder.fromUriString(redirectUriFailure)
+        String targetUrl = UriComponentsBuilder.fromUriString(oAuth2Properties.getRedirectUriFailure())
             .queryParam("error", authenticationException.getLocalizedMessage())
             .build().toUriString();
 

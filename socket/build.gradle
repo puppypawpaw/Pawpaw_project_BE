@@ -23,3 +23,17 @@ jar {
 tasks.named('jibDockerBuild') {
     dependsOn test
 }
+
+jib {
+    from {
+        image = 'openjdk:11-jre-slim-bullseye'
+    }
+    to {
+        image = '520511553477.dkr.ecr.ap-northeast-2.amazonaws.com/pawpaw-socket-dev'
+    }
+    container {
+        mainClass = "kr.co.pawpaw.ws.SocketApplication"
+        jvmFlags = ['-Duser.timezone=Asia/Seoul', '-Dspring.profiles.active=dev', '-XX:+UseContainerSupport']
+        volumes = ["/tmp"]
+    }
+}

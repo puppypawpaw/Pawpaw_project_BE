@@ -33,8 +33,7 @@ public class CookieUtil {
         final String name,
         final Object value,
         final int maxAge,
-        final String domain,
-        final String sameSite
+        final String domain
     ) {
         Cookie cookie = new Cookie(name, serialize(value));
         cookie.setDomain(domain);
@@ -49,9 +48,7 @@ public class CookieUtil {
     public void deleteCookie(
         final HttpServletRequest request,
         final HttpServletResponse response,
-        final String name,
-        final String domain,
-        final String sameSite
+        final String name
     ) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

@@ -1,13 +1,13 @@
 package kr.co.pawpaw.api.application.board;
 
-import kr.co.pawpaw.domainrdb.board.Board;
+import kr.co.pawpaw.domainrdb.board.domain.Board;
 import kr.co.pawpaw.domainrdb.board.dto.BoardDto.BoardRegisterDto;
 import kr.co.pawpaw.domainrdb.board.dto.BoardDto.BoardResponseDto;
 import kr.co.pawpaw.domainrdb.board.dto.BoardDto.BoardUpdateDto;
 import kr.co.pawpaw.domainrdb.board.repository.BoardRepository;
+import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import kr.co.pawpaw.domainrdb.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,14 +22,14 @@ import java.time.LocalDateTime;
 @Slf4j
 public class BoardService {
 
-    private final UserRepository userRepository;
+    private final UserQuery userQuery;
     private final BoardRepository boardRepository;
 
     @Transactional
     public BoardResponseDto register(UserId userId, BoardRegisterDto registerDto) {
         if (StringUtils.hasText(registerDto.getTitle()) && StringUtils.hasText(registerDto.getContent())) {
 
-            User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+            User user = userQuery.findByUserId(userId).orElseThrow(EntityNotFoundException::new);
 
             Board board = Board.createBoard(registerDto, user);
 
@@ -48,7 +48,7 @@ public class BoardService {
     @Transactional
     public BoardUpdateDto update(UserId userId, Long id, BoardUpdateDto updateDto) {
 
-        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        User user = userQuery.findByUserId(userId).orElseThrow(EntityNotFoundException::new);
         Board board = boardRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         if (user.getUserId() != board.getUser().getUserId()) {
             return null;
@@ -72,7 +72,7 @@ public class BoardService {
     @Transactional
     public void removeBoard(UserId userId, Long id) {
 
-        User user = userRepository.findById(userId).orElseThrow(EntityNotFoundException::new);
+        User user = userQuery.findByUserId(userId).orElseThrow(EntityNotFoundException::new);
         Board board = boardRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         if (user.getUserId() != board.getUser().getUserId()) {
 

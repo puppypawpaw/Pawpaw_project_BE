@@ -1,16 +1,16 @@
 package kr.co.pawpaw.api.controller.term;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.pawpaw.api.application.term.command.TermService;
-import kr.co.pawpaw.api.application.term.query.TermQuery;
+import kr.co.pawpaw.api.application.term.TermService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.config.annotation.CheckPermission;
-import kr.co.pawpaw.domainrdb.term.dto.request.CreateTermRequest;
-import kr.co.pawpaw.domainrdb.term.dto.request.UpdateTermRequest;
-import kr.co.pawpaw.domainrdb.term.dto.response.TermResponse;
+import kr.co.pawpaw.api.dto.term.CreateTermRequest;
+import kr.co.pawpaw.api.dto.term.TermResponse;
+import kr.co.pawpaw.api.dto.term.UpdateTermRequest;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,6 @@ import java.util.List;
 @RequestMapping("/api/term")
 @RequiredArgsConstructor
 public class TermController {
-    private final TermQuery termQuery;
     private final TermService termService;
 
     @ApiResponses(value = {
@@ -37,12 +36,16 @@ public class TermController {
     )
     @GetMapping
     public ResponseEntity<List<TermResponse>> getAllTerms() {
-        return ResponseEntity.ok(termQuery.getAllTerms());
+        return ResponseEntity.ok(termService.getAllTerms());
     }
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200"),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 약관입니다.")
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 약관입니다.",
+            content = @Content
+        )
     })
     @Operation(
         method = "GET",
@@ -53,13 +56,17 @@ public class TermController {
     public ResponseEntity<TermResponse> getTerm(
         @PathVariable final Long id
     ) {
-        return ResponseEntity.ok(termQuery.getTerm(id));
+        return ResponseEntity.ok(termService.getTerm(id));
     }
 
     @CheckPermission
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
-        @ApiResponse(responseCode = "400", description = "권한이 부족합니다.")
+        @ApiResponse(
+            responseCode = "400",
+            description = "권한이 부족합니다.",
+            content = @Content
+        )
     })
     @Operation(
         method = "POST",
@@ -79,7 +86,11 @@ public class TermController {
     @CheckPermission
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
-        @ApiResponse(responseCode = "400", description = "권한이 부족합니다.")
+        @ApiResponse(
+            responseCode = "400",
+            description = "권한이 부족합니다.",
+            content = @Content
+        )
     })
     @Operation(
         method = "DELETE",
@@ -99,8 +110,16 @@ public class TermController {
     @CheckPermission
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
-        @ApiResponse(responseCode = "404", description = "존재하지 않는 약관입니다."),
-        @ApiResponse(responseCode = "400", description = "권한이 부족합니다.")
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 약관입니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "권한이 부족합니다.",
+            content = @Content
+        )
     })
     @Operation(
         method = "PATCH",

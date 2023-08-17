@@ -1,14 +1,12 @@
 package kr.co.pawpaw.domainrdb.term.domain;
 
 import kr.co.pawpaw.domainrdb.common.BaseTimeEntity;
-import kr.co.pawpaw.domainrdb.term.dto.request.UpdateTermRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.lang.reflect.Field;
 
 @Entity
 @Getter
@@ -43,16 +41,15 @@ public class Term extends BaseTimeEntity {
         this.order = order;
     }
 
-    public void update(final UpdateTermRequest request) {
-        for (Field field : request.getClass().getDeclaredFields()) {
-            try {
-                Field thisField = this.getClass().getDeclaredField(field.getName());
-                thisField.setAccessible(true);
-                field.setAccessible(true);
-                thisField.set(this, field.get(request));
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                // ignore update field
-            }
-        }
+    public void update(
+        final String title,
+        final String content,
+        final Boolean required,
+        final Long order
+    ) {
+        this.title = title;
+        this.content = content;
+        this.required = required;
+        this.order = order;
     }
 }

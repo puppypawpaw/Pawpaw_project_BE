@@ -1,8 +1,8 @@
 package kr.co.pawpaw.domainrdb.pet.repository;
 
-import kr.co.pawpaw.domainrdb.pet.Pet;
+import kr.co.pawpaw.domainrdb.pet.domain.Pet;
 import kr.co.pawpaw.domainrdb.user.domain.User;
-import kr.co.pawpaw.domainrdb.user.domain.repository.UserRepository;
+import kr.co.pawpaw.domainrdb.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

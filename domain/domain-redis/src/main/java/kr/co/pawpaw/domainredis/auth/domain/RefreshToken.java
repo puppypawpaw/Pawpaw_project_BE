@@ -9,10 +9,8 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
-import java.util.concurrent.TimeUnit;
-
 @Getter
-@RedisHash("refreshToken")
+@RedisHash(value = "refreshToken")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {
     @Id
@@ -21,7 +19,7 @@ public class RefreshToken {
     @Indexed
     private String value;
 
-    @TimeToLive(unit = TimeUnit.MILLISECONDS)
+    @TimeToLive
     private Long timeout;
 
     @Builder

@@ -16,7 +16,7 @@ public class RedisConfig {
     private final RedisProperties properties;
 
     @Bean
-    public RedisConnectionFactory redisConnectionFactory(){
+    public RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(properties.getHost());
         redisStandaloneConfiguration.setPort(properties.getPort());
@@ -26,7 +26,7 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<?,?> redisTemplate(){
+    public RedisTemplate<?,?> redisTemplate() {
         RedisTemplate<byte[], byte[]> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
