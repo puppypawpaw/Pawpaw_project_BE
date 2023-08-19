@@ -1,8 +1,8 @@
 package kr.co.pawpaw.api.config.aspect;
 
-import kr.co.pawpaw.api.application.user.query.UserQuery;
 import kr.co.pawpaw.api.config.annotation.CheckPermission;
 import kr.co.pawpaw.common.exception.common.PermissionRequiredException;
+import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import kr.co.pawpaw.domainrdb.user.domain.Role;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class CheckPermissionAspect {
             }
         }
 
-        if (Objects.isNull(userId) || !userQuery.checkUserRole(userId, requiredRole)) {
+        if (Objects.isNull(userId) || !userQuery.existsByUserIdAndRole(userId, requiredRole)) {
             throw new PermissionRequiredException();
         }
 

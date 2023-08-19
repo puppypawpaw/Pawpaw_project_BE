@@ -1,13 +1,18 @@
 package kr.co.pawpaw.api.config.auth.filter;
 
-import kr.co.pawpaw.api.config.auth.application.TokenService;
 import kr.co.pawpaw.api.config.auth.parser.JwtTokenParser;
+import kr.co.pawpaw.api.config.auth.provider.JwtTokenProvider;
+import kr.co.pawpaw.api.config.property.CookieProperties;
+import kr.co.pawpaw.api.config.property.JwtProperties;
+import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.common.util.CookieUtil;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import kr.co.pawpaw.domainrdb.user.domain.repository.UserRepository;
+import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import kr.co.pawpaw.domainredis.auth.domain.RefreshToken;
 import kr.co.pawpaw.domainredis.auth.domain.TokenType;
-import org.springframework.beans.factory.annotation.Value;
+import kr.co.pawpaw.domainredis.auth.service.query.RefreshTokenQuery;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,34 +28,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
-import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 
 import static org.springframework.security.core.userdetails.User.builder;
 
 @Component
+@RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 	private final JwtTokenParser jwtTokenParser;
-	private final UserRepository userRepository;
-	private final TokenService tokenService;
-	private final Long accessTokenLifeTime;
-	private final String domain;
-	private final String sameSite;
-
-	public JwtFilter(
-		final JwtTokenParser jwtTokenParser,
-		final UserRepository userRepository,
-		final TokenService tokenService,
-		@Value("${custom.jwt.access-token-life-time}") final Long accessTokenLifeTime,
-		@Value("${custom.cookieDomain}") final String domain,
-		@Value("${custom.sameSite}") final String sameSite
-	) {
-		this.jwtTokenParser = jwtTokenParser;
-		this.userRepository = userRepository;
-		this.tokenService = tokenService;
-		this.accessTokenLifeTime = accessTokenLifeTime;
-		this.domain = domain;
-		this.sameSite = sameSite;
-	}
+	private final JwtTokenProvider jwtTokenProvider;
+	private final UserQuery userQuery;
+	private final RefreshTokenQuery refreshTokenQuery;
+	private final CookieProperties cookieProperties;
+	private final JwtProperties jwtProperties;
 
 	@Override
 	protected void doFilterInternal(
@@ -70,22 +59,34 @@ public class JwtFilter extends OncePerRequestFilter {
 			Authentication authentication = jwtTokenParser.extractAuthentication(accessToken);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 		} else if (jwtTokenParser.validateRefreshToken(refreshToken)) {
-			String reissueAccessToken = refreshTokenLogin(tokenService.refreshTokenByUserId(refreshToken));
+			UserId userId = findUserIdByRefreshToken(refreshToken);
+			String reissueAccessToken = reissueAccessTokenByUserId(userId);
 
 			Authentication authentication = jwtTokenParser.extractAuthentication(reissueAccessToken);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
 
-			CookieUtil.addCookie(response, TokenType.ACCESS.name(), reissueAccessToken, (int)(accessTokenLifeTime / 1000), domain, sameSite);
+			CookieUtil.addCookie(
+				response,
+				TokenType.ACCESS.name(),
+				reissueAccessToken,
+				(int) (jwtProperties.getAccessTokenLifeTime() / 1000),
+				cookieProperties.getDomain());
 		} else {
-			CookieUtil.deleteCookie(request, response, TokenType.ACCESS.name(), domain, sameSite);
-			CookieUtil.deleteCookie(request, response, TokenType.REFRESH.name(), domain, sameSite);
+			CookieUtil.deleteCookie(request, response, TokenType.ACCESS.name());
+			CookieUtil.deleteCookie(request, response, TokenType.REFRESH.name());
 		}
 
 		filterChain.doFilter(request, response);
 	}
 
-	private  String refreshTokenLogin(final UserId userId) {
-		User user = userRepository.findById(userId)
+	private UserId findUserIdByRefreshToken(String refreshToken) {
+		return UserId.of(refreshTokenQuery.findByValue(refreshToken)
+			.map(RefreshToken::getUserId)
+			.orElseThrow(IllegalArgumentException::new));
+	}
+
+	private  String reissueAccessTokenByUserId(final UserId userId) {
+		User user = userQuery.findByUserId(userId)
 			.orElseThrow(NotFoundUserException::new);
 		UserDetails userDetails = builder()
 			.username(user.getUserId().getValue())
@@ -93,7 +94,8 @@ public class JwtFilter extends OncePerRequestFilter {
 			.authorities(Collections.singleton(new SimpleGrantedAuthority(user.getRole().name())))
 			.build();
 		Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-		return tokenService.createAccessToken(authentication);
+
+		return jwtTokenProvider.createAccessToken(authentication);
 	}
 
 	public static String resolveToken(final Cookie token) {

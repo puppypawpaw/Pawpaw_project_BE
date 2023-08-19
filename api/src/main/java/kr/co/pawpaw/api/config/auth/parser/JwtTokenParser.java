@@ -6,8 +6,8 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import kr.co.pawpaw.api.config.auth.provider.JwtTokenProvider;
+import kr.co.pawpaw.domainredis.auth.service.query.RefreshTokenQuery;
 import kr.co.pawpaw.domainredis.auth.domain.TokenType;
-import kr.co.pawpaw.domainredis.auth.domain.repository.RefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,7 +18,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -27,15 +26,14 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenParser {
     private final JwtParser jwtParser;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenQuery refreshTokenQuery;
 
     public JwtTokenParser(
         @Value("${custom.jwt.secret-key}") final String secretKey,
-        final RefreshTokenRepository refreshTokenRepository
+        final RefreshTokenQuery refreshTokenQuery
     ) {
-        this.refreshTokenRepository = refreshTokenRepository;
-        Key key = Keys.hmacShaKeyFor(secretKey.getBytes());
-        this.jwtParser = Jwts.parserBuilder().setSigningKey(key).build();
+        this.refreshTokenQuery = refreshTokenQuery;
+        this.jwtParser = Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes())).build();
     }
 
     public Authentication extractAuthentication(final String token) {
@@ -62,7 +60,7 @@ public class JwtTokenParser {
     }
 
     public boolean validateRefreshToken(final String token) {
-        return refreshTokenRepository.existsByValue(token) && validateToken(token, TokenType.REFRESH);
+        return refreshTokenQuery.existsByValue(token) && validateToken(token, TokenType.REFRESH);
     }
 
     private boolean validateToken(

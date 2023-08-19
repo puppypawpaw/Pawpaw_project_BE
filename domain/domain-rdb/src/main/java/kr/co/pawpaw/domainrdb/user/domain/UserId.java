@@ -18,7 +18,7 @@ public class UserId implements Serializable {
     @Column(name = "user_id")
     private String value;
 
-    private UserId(String value) {
+    private UserId(final String value) {
         this.value = value;
     }
 
@@ -26,7 +26,7 @@ public class UserId implements Serializable {
         return new UserId(UUID.randomUUID().toString());
     }
 
-    public static UserId of(String uuid) {
+    public static UserId of(final String uuid) {
         return new UserId(uuid);
     }
 

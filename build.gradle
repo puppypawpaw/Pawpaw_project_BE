@@ -29,6 +29,12 @@ subprojects {
         annotationProcessor 'org.projectlombok:lombok'
         testImplementation 'org.projectlombok:lombok'
         testAnnotationProcessor 'org.projectlombok:lombok'
+
+        //anotationProcessor
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+        //test
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
     }
 
     repositories {

@@ -1,8 +1,10 @@
 package kr.co.pawpaw.api.config.auth.repository;
 
 
+import kr.co.pawpaw.api.config.property.CookieProperties;
+import kr.co.pawpaw.api.config.property.OAuth2Properties;
 import kr.co.pawpaw.common.util.CookieUtil;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Component;
@@ -11,27 +13,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Component
+@RequiredArgsConstructor
 public class CookieAuthorizationRequestRepository implements AuthorizationRequestRepository {
-    private final String oauth2AuthorizationRequest;
-    private final int cookieExpireSeconds;
-    private final String cookieDomain;
-    private final String sameSite;
-
-    public CookieAuthorizationRequestRepository(
-        @Value("${spring.security.oauth2.cookie-name}") final String oauth2AuthorizationRequest,
-        @Value("${spring.security.oauth2.cookie-expire-seconds}") final int cookieExpireSeconds,
-        @Value("${custom.cookieDomain}") final String cookieDomain,
-        @Value("${custom.sameSite}") final String sameSite
-    ) {
-        this.oauth2AuthorizationRequest = oauth2AuthorizationRequest;
-        this.cookieExpireSeconds = cookieExpireSeconds;
-        this.cookieDomain = cookieDomain;
-        this.sameSite = sameSite;
-    }
+    private final CookieProperties cookieProperties;
+    private final OAuth2Properties oAuth2Properties;
 
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(final HttpServletRequest request) {
-        return CookieUtil.getCookie(request, oauth2AuthorizationRequest)
+        return CookieUtil.getCookie(request, oAuth2Properties.getCookieName())
             .map(cookie -> CookieUtil.deserialize(cookie, OAuth2AuthorizationRequest.class))
             .orElse(null);
     }
@@ -43,11 +32,17 @@ public class CookieAuthorizationRequestRepository implements AuthorizationReques
         final HttpServletResponse response
     ) {
         if (authorizationRequest == null) {
-            CookieUtil.deleteCookie(request, response, oauth2AuthorizationRequest, cookieDomain, sameSite);
+            CookieUtil.deleteCookie(request, response, oAuth2Properties.getCookieName());
             return;
         }
 
-        CookieUtil.addCookie(response, oauth2AuthorizationRequest, authorizationRequest, cookieExpireSeconds, cookieDomain, sameSite);
+        CookieUtil.addCookie(
+            response,
+            oAuth2Properties.getCookieName(),
+            authorizationRequest,
+            oAuth2Properties.getCookieExpireSeconds(),
+            cookieProperties.getDomain()
+        );
     }
 
     @Override
@@ -59,6 +54,6 @@ public class CookieAuthorizationRequestRepository implements AuthorizationReques
         final HttpServletRequest request,
         final HttpServletResponse response
     ) {
-        CookieUtil.deleteCookie(request, response, oauth2AuthorizationRequest, cookieDomain, sameSite);
+        CookieUtil.deleteCookie(request, response, oAuth2Properties.getCookieName());
     }
 }
