@@ -1,78 +1,53 @@
 package kr.co.pawpaw.domainrdb.board.domain;
 
-import kr.co.pawpaw.domainrdb.board.dto.BoardDto;
+import kr.co.pawpaw.domainrdb.common.BaseTimeEntity;
 import kr.co.pawpaw.domainrdb.user.domain.User;
-import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-public final class Board {
+@Where(clause = "is_Removed = false")
+public final class Board extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
-    private Long id;
+    private long id;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false)
     private String content;
 
+    @Column(nullable = false)
     private String writer;
-
-    private int commentCount;
 
     private boolean isRemoved = false;
 
-    @ColumnDefault("0")
-    @Column(name = "view_count",nullable = false)
-    private int viewCount;
-
-    @ColumnDefault("0")
     @Column(name = "liked_count")
     private int likedCount;
-
-    @CreationTimestamp // INSERT, UPDATE 등의 쿼리가 발생할 때, 현재 시간을 자동으로 저장
-    @Column(updatable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @UpdateTimestamp
-    @Column
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @OneToMany(mappedBy = "board", orphanRemoval = true)
-    private Set<BoardLikes> boardLikes = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
     @Builder
-    public Board(String title, String content, User user) {
+    public Board(String title, String content, User user, String writer) {
         this.title = title;
         this.content = content;
         this.user = user;
+        this.writer = writer;
+        this.isRemoved = false;
     }
 
-    public static Board createBoard(BoardDto.BoardRegisterDto registerDto, User user){
-        Board board = Board.builder()
-                .id(registerDto.getId())
-                .title(registerDto.getTitle())
-                .content(registerDto.getContent())
-                .writer(user.getNickname())
-                .user(user)
-                .isRemoved(false)
-                .build();
-        return board;
-    }
 
     public void plusLikedCount(){
         this.likedCount = likedCount +1;
