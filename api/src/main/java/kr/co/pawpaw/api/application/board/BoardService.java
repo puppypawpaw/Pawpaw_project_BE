@@ -3,7 +3,6 @@ package kr.co.pawpaw.api.application.board;
 import kr.co.pawpaw.api.dto.board.BoardDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.RegisterResponseDto;
 import kr.co.pawpaw.common.exception.board.BoardException;
-import kr.co.pawpaw.common.exception.board.BoardException.BoardDeleteException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardUpdateException;
 import kr.co.pawpaw.common.exception.common.PermissionRequiredException;
@@ -85,9 +84,6 @@ public class BoardService {
         Board board = boardQuery.findById(id).orElseThrow(BoardNotFoundException::new);
         if (user.getUserId() != board.getUser().getUserId()) {
             throw new PermissionRequiredException();
-        }
-        if (board.isRemoved()) {
-            throw new BoardDeleteException();
         }
         board.remove();
         return true;
