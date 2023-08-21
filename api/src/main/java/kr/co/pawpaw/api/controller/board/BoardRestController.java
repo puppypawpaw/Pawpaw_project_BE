@@ -1,14 +1,18 @@
 package kr.co.pawpaw.api.controller.board;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import kr.co.pawpaw.api.application.board.BoardService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
-import kr.co.pawpaw.api.response.BaseResponse;
+import kr.co.pawpaw.api.dto.board.BoardDto;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import kr.co.pawpaw.domainrdb.board.dto.BoardDto.*;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -19,26 +23,48 @@ public class BoardRestController {
 
     private final BoardService boardService;
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = "게시글 등록에 실패했습니다")
+    })
+    @Operation(
+            method = "POST",
+            summary = "게시글 등록",
+            description = "게시글을 작성한다."
+    )
     @PostMapping("/register")
-    public BaseResponse<BoardResponseDto> register(@AuthenticatedUserId UserId userId, @RequestBody BoardRegisterDto registerDto){
-
-        BoardResponseDto boardResponseDto = boardService.register(userId, registerDto);
-        return BaseResponse.of("등록이 완료되었습니다.", boardResponseDto);
+    public ResponseEntity<BoardDto.RegisterResponseDto> register(@AuthenticatedUserId UserId userId, @RequestBody BoardDto.BoardRegisterDto registerDto){
+        BoardDto.RegisterResponseDto boardResponseDto = boardService.register(userId, registerDto);
+        return ResponseEntity.ok(boardResponseDto);
     }
 
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = "게시글 수정에 실패했습니다")
+    })
+    @Operation(
+            method = "POST",
+            summary = "게시글 수정",
+            description = "게시글을 수정한다."
+    )
     @PostMapping("/update")
-    public BaseResponse<BoardUpdateDto> updateBoard(@AuthenticatedUserId UserId userId, @RequestParam Long boardId, @RequestBody BoardUpdateDto updateDto){
-        BoardUpdateDto boardUpdateDto = boardService.update(userId, boardId, updateDto);
-        return BaseResponse.of("정보 수정이 완료되었습니다.", boardUpdateDto);
+    public ResponseEntity<BoardDto.BoardUpdateDto> updateBoard(@AuthenticatedUserId UserId userId, @RequestParam Long boardId, @RequestBody BoardDto.BoardUpdateDto updateDto){
+        BoardDto.BoardUpdateDto boardUpdateDto = boardService.update(userId, boardId, updateDto);
+        return ResponseEntity.ok(boardUpdateDto);
     }
 
-
-    @DeleteMapping("/remove")
-    public BaseResponse<?> removeBoard(@AuthenticatedUserId UserId userId, @RequestParam Long boardId){
-        boardService.removeBoard(userId, boardId);
-
-
-        return BaseResponse.of("삭제가 완료되었습니다.");
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = "게시글 삭제에 실패했습니다")
+    })
+    @Operation(
+            method = "PATCH",
+            summary = "게시글 삭제",
+            description = "게시글을 삭제한다."
+    )
+    @PatchMapping("/remove")
+    public ResponseEntity<Boolean> removeBoard(@AuthenticatedUserId UserId userId, @RequestParam Long boardId){
+        return ResponseEntity.ok(boardService.removeBoard(userId, boardId));
     }
 
 
