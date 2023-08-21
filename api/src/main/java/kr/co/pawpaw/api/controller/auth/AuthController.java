@@ -5,13 +5,20 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.pawpaw.api.application.auth.AuthService;
+import kr.co.pawpaw.api.application.auth.SignInService;
+import kr.co.pawpaw.api.application.auth.SignOutService;
+import kr.co.pawpaw.api.application.auth.SignUpService;
+import kr.co.pawpaw.api.application.sms.SmsService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.auth.SignInRequest;
 import kr.co.pawpaw.api.dto.auth.SignUpRequest;
+import kr.co.pawpaw.api.dto.auth.SocialSignUpInfoResponse;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpRequest;
-import kr.co.pawpaw.api.dto.user.UserResponse;
+import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;
+import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeResponse;
+import kr.co.pawpaw.domainrdb.sms.domain.SmsUsagePurpose;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.feignClient.dto.Recipient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +34,10 @@ import javax.validation.Valid;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
+    private final SignOutService signOutService;
+    private final SignUpService signUpService;
+    private final SignInService signInService;
+    private final SmsService smsService;
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
@@ -52,8 +62,8 @@ public class AuthController {
             content = @Content
         ),
         @ApiResponse(
-            responseCode = "400",
-            description = "중복된 아이디 입니다.",
+            responseCode = "409",
+            description = "이미 가입된 이메일 입니다.",
             content = @Content
         )
     })
@@ -70,7 +80,7 @@ public class AuthController {
         @RequestPart(required = false) final MultipartFile image,
         @RequestPart @Valid final SignUpRequest body
     ) {
-        authService.signUp(body, image);
+        signUpService.signUp(body, image);
 
         return ResponseEntity.noContent().build();
     }
@@ -89,14 +99,14 @@ public class AuthController {
         ),
         @ApiResponse(
             responseCode = "400",
-            description = "유효하지 않는 소셜 회원가입 임시 키입니다.",
+            description = "유효하지 않은 소셜 회원가입 임시 키입니다.",
             content = @Content
         )
     })
     @Operation(
         method = "POST",
         summary = "소셜 회원가입",
-        description = "소셜회원가입, form-data 타입으로 body는 application/json으로 image는 contentType 지정 안해도 됨 추후 mediaType 제한될 수 있음"
+        description = "소셜회원가입, 회원가입 성공 시 자동 로그인됨, form-data 타입으로 body는 application/json으로 image는 contentType 지정 안해도 됨 추후 mediaType 제한될 수 있음"
     )
     @PostMapping(value = "/sign-up/social", consumes = {
         MediaType.APPLICATION_JSON_VALUE,
@@ -104,9 +114,10 @@ public class AuthController {
     })
     public ResponseEntity<Void> socialSignUp(
         @RequestPart(required = false) final MultipartFile image,
-        @RequestPart @Valid final SocialSignUpRequest body
+        @RequestPart @Valid final SocialSignUpRequest body,
+        final HttpServletResponse response
     ) {
-        authService.socialSignUp(body, image);
+        signInService.socialSignIn(response, signUpService.socialSignUp(body, image));
 
         return ResponseEntity.noContent().build();
     }
@@ -130,11 +141,12 @@ public class AuthController {
         description = "로그인"
     )
     @PostMapping
-    public ResponseEntity<UserResponse> signIn(
+    public ResponseEntity<Void> signIn(
         @RequestBody @Valid final SignInRequest request,
         final HttpServletResponse response
     ) {
-        return ResponseEntity.ok(authService.signIn(response, request));
+        signInService.signIn(response, request);
+        return ResponseEntity.noContent().build();
     }
 
     @ApiResponses(value = {
@@ -156,27 +168,58 @@ public class AuthController {
         final HttpServletResponse response,
         @AuthenticatedUserId final UserId userId
     ) {
-        authService.signOut(userId, request, response);
+        signOutService.signOut(userId, request, response);
         return ResponseEntity.noContent().build();
     }
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200"),
         @ApiResponse(
-            responseCode = "404",
-            description = "존재하지 않는 유저입니다.",
+            responseCode = "400",
+            description = "유효하지 않은 소셜 회원가입 임시 키입니다.",
             content = @Content
         )
     })
     @Operation(
         method = "GET",
-        summary = "회원정보 가져오기",
-        description = "회원정보 가져오기"
+        summary = "소셜 회원가입 이름, 이미지 url 가져오기",
+        description = "소셜 회원가입 이름, 이미지 url 가져오기"
     )
-    @GetMapping
-    public ResponseEntity<UserResponse> whoAmI(
-        @AuthenticatedUserId final UserId userId
+    @GetMapping("/sign-up/social/info")
+    public ResponseEntity<SocialSignUpInfoResponse> getOAuth2SignUpTempInfo(
+        @RequestParam final String key
     ) {
-        return ResponseEntity.ok(authService.whoAmI(userId));
+        return ResponseEntity.ok(signUpService.getOAuth2SignUpTempInfo(key));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+    })
+    @Operation(
+        method = "POST",
+        summary = "일반 회원가입 인증번호 전송",
+        description = "일반 회원가입 인증번호 전송"
+    )
+    @PostMapping("/sign-up/verification")
+    public ResponseEntity<Void> sendVerificationCodeForSignUp(
+        @RequestBody final Recipient recipient
+    ) {
+        smsService.sendVerificationCode(recipient, SmsUsagePurpose.SIGN_UP);
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+    })
+    @Operation(
+        method = "POST",
+        summary = "일반 회원가입 인증번호 확인",
+        description = "일반 회원가입 인증번호 확인"
+    )
+    @PostMapping("/sign-up/verification/check")
+    public ResponseEntity<CheckVerificationCodeResponse> checkVerificationCode(
+        @RequestBody final CheckVerificationCodeRequest request
+    ) {
+        return ResponseEntity.ok(smsService.checkVerificationCode(request, SmsUsagePurpose.SIGN_UP));
     }
 }

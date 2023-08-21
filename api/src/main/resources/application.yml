@@ -10,6 +10,7 @@ spring:
         - secret
         - server
         - oauth2
+        - feign
       dev:
         - rdb
         - redis
@@ -19,6 +20,7 @@ spring:
         - server
         - docs
         - oauth2
+        - feign
       local:
         - rdb
         - redis
@@ -28,3 +30,4 @@ spring:
         - server
         - docs
         - oauth2
+        - feign

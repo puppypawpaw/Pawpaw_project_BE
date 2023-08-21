@@ -1,5 +1,5 @@
 custom:
   jwt:
-    secret-key: ${properties.jwt.secret-key}
-    access-token-life-time: 10800
-    refresh-token-life-time: 604800
+    secretKey: ${properties.jwt.secret-key}
+    accessTokenLifeTime: 10800
+    refreshTokenLifeTime: 604800

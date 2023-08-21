@@ -39,7 +39,26 @@ class OAuth2TempAttributesCommandTest {
         OAuth2TempAttributes result = oAuth2TempAttributesCommand.save(input);
 
         //then
-        verify(oAuth2TempAttributesRepository).save(input);
+        verify(oAuth2TempAttributesRepository, times(1)).save(input);
         assertThat(result).isEqualTo(input);
+    }
+
+    @Test
+    @DisplayName("deleteById 메소드 테스트")
+    void deleteById() {
+        //given
+        OAuth2TempAttributes input = OAuth2TempAttributes.builder()
+            .key(UUID.randomUUID().toString())
+            .email("email")
+            .name("name")
+            .profileImageUrl("profileImageUrl")
+            .provider("GOOGLE")
+            .build();
+
+        //when
+        oAuth2TempAttributesCommand.deleteById(input.getKey());
+
+        //then
+        verify(oAuth2TempAttributesRepository, times(1)).deleteById(input.getKey());
     }
 }

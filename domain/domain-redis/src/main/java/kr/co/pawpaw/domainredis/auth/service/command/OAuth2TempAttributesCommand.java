@@ -13,4 +13,8 @@ public class OAuth2TempAttributesCommand {
     public OAuth2TempAttributes save(final OAuth2TempAttributes entity) {
         return oAuth2TempAttributesRepository.save(entity);
     }
+
+    public void deleteById(final String id) {
+        oAuth2TempAttributesRepository.deleteById(id);
+    }
 }

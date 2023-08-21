@@ -3,9 +3,7 @@ package kr.co.pawpaw.api.dto.term;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.domainrdb.term.domain.Term;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -13,6 +11,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateTermRequest {
     @NotBlank
     @Schema(description = "약관 제목")

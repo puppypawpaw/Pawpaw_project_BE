@@ -90,17 +90,14 @@ class OAuth2AttributesTest {
         assertThat(naverUser.getEmail()).isEqualTo(naverEmail);
         assertThat(naverUser.getNickname()).isEqualTo(naverNickname);
         assertThat(naverUser.getPassword()).isEqualTo(naverPassword);
-        assertThat(naverUser.getImageUrl()).isEqualTo(naverProfileImage);
         assertThat(naverUser.getProvider()).isEqualTo(OAuth2Provider.NAVER);
         assertThat(kakaoUser.getEmail()).isEqualTo(kakaoEmail);
         assertThat(kakaoUser.getNickname()).isEqualTo(kakaoNickname);
         assertThat(kakaoUser.getPassword()).isEqualTo(kakaoPassword);
-        assertThat(kakaoUser.getImageUrl()).isEqualTo(kakaoProfileImageUrl);
         assertThat(kakaoUser.getProvider()).isEqualTo(OAuth2Provider.KAKAO);
         assertThat(googleUser.getEmail()).isEqualTo(googleEmail);
         assertThat(googleUser.getNickname()).isEqualTo(googleName);
         assertThat(googleUser.getPassword()).isEqualTo(googlePassword);
-        assertThat(googleUser.getImageUrl()).isEqualTo(googlePicture);
         assertThat(googleUser.getProvider()).isEqualTo(OAuth2Provider.GOOGLE);
     }
 }

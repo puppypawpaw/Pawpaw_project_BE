@@ -22,6 +22,10 @@ public class TermQuery {
         return termRepository.findAllByOrderIsIn(termOrders);
     }
 
+    public List<Term> findAll() {
+        return termRepository.findAll();
+    }
+
     public List<Term> findByOrderNotNullOrderByOrder() {
         return termRepository.findByOrderNotNullOrderByOrder();
     }

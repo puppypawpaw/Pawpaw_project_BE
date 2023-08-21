@@ -96,7 +96,6 @@ public class OAuth2Attributes {
         return User.builder()
             .email(email)
             .nickname(name)
-            .imageUrl(profileImageUrl)
             .password(oauth2Password)
             .provider(provider)
             .build();

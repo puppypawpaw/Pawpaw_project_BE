@@ -33,12 +33,26 @@ class UserQueryTest {
         //given
         when(userRepository.existsByEmail(eq(user.getEmail()))).thenReturn(true);
         //when
-        boolean result = userQuery.existsById(user.getEmail());
+        boolean result = userQuery.existsByEmail(user.getEmail());
 
         //then
         verify(userRepository).existsByEmail(user.getEmail());
         assertThat(result).isTrue();
     }
+
+    @Test
+    @DisplayName("existsByEmailAndProvider 메소드 테스트")
+    void existsByEmailAndProvider() {
+        //given
+        when(userRepository.existsByEmailAndProvider(eq(user.getEmail()), eq(user.getProvider()))).thenReturn(true);
+        //when
+        boolean result = userQuery.existsByEmailAndProvider(user.getEmail(), user.getProvider());
+
+        //then
+        verify(userRepository).existsByEmailAndProvider(user.getEmail(), user.getProvider());
+        assertThat(result).isTrue();
+    }
+
 
     @Test
     @DisplayName("existsByUserIdAndRole 메소드 테스트")
@@ -82,8 +96,8 @@ class UserQueryTest {
     }
 
     @Test
-    @DisplayName("findByIdAndProvider 메소드 테스트")
-    void findByIdAndProvider() {
+    @DisplayName("findByEmailAndProvider 메소드 테스트")
+    void findByEmailAndProvider() {
         //given
         when(userRepository.findByEmailAndProvider(eq(user.getEmail()), eq(user.getProvider()))).thenReturn(Optional.of(user));
         //when
@@ -93,5 +107,19 @@ class UserQueryTest {
         verify(userRepository).findByEmailAndProvider(user.getEmail(), user.getProvider());
         assertThat(result.isPresent()).isTrue();
         assertThat(result.get()).isEqualTo(user);
+    }
+
+    @Test
+    @DisplayName("existsByPhoneNumber 메소드 테스트")
+    void existsByPhoneNumber() {
+        //given
+        when(userRepository.existsByPhoneNumber(eq(user.getPhoneNumber()))).thenReturn(true);
+
+        //when
+        boolean result = userQuery.existsByPhoneNumber(user.getPhoneNumber());
+
+        //then
+        verify(userRepository).existsByPhoneNumber(user.getPhoneNumber());
+        assertThat(result).isTrue();
     }
 }

@@ -14,7 +14,6 @@ class UserResponseTest {
         User user = User.builder()
             .email("userId")
             .nickname("username")
-            .imageUrl("userImageUrl")
             .position("userPosition")
             .build();
 
