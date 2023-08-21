@@ -15,8 +15,12 @@ import java.util.Optional;
 public class UserQuery {
     private final UserRepository userRepository;
 
-    public boolean existsById(final String email) {
+    public boolean existsByEmail(final String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    public boolean existsByEmailAndProvider(final String email, final OAuth2Provider provider) {
+        return userRepository.existsByEmailAndProvider(email, provider);
     }
 
     public boolean existsByUserIdAndRole(
@@ -39,5 +43,9 @@ public class UserQuery {
         final OAuth2Provider oAuth2Provider
     ) {
         return userRepository.findByEmailAndProvider(email, oAuth2Provider);
+    }
+
+    public boolean existsByPhoneNumber(final String phoneNumber) {
+        return userRepository.existsByPhoneNumber(phoneNumber);
     }
 }

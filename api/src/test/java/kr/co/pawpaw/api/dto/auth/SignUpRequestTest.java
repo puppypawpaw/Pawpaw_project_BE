@@ -171,4 +171,25 @@ class SignUpRequestTest {
         assertThat(pets.stream().map(Pet::getPetType).collect(Collectors.toList()).contains(petInfos.get(1).getPetType())).isTrue();
         assertThat(pets.stream().map(Pet::getPetType).collect(Collectors.toList()).contains(other.getPetType())).isFalse();
     }
+
+    @Test
+    @DisplayName("deletePhoneNumberHyphen 메소드 테스트")
+    void deletePhoneNumberHyphen() {
+        //given
+        SignUpRequest request = SignUpRequest.builder()
+            .termAgrees(List.of(1L, 2L, 3L))
+            .email("email")
+            .password("password")
+            .passwordConfirm("password")
+            .nickname("nickname")
+            .phoneNumber("010-1234-5678")
+            .position("position")
+            .build();
+
+        //when
+        request.deletePhoneNumberHyphen();
+
+        //then
+        assertThat(request.getPhoneNumber()).isEqualTo("01012345678");
+    }
 }

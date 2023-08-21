@@ -52,6 +52,28 @@ class UserRepositoryTest {
     }
 
     @Test
+    @DisplayName("existsByEmailAndProvider 메소드 테스트")
+    void existsByEmailAndProvider() {
+        //given
+        User user1 = User.builder()
+            .email("user1")
+            .provider(OAuth2Provider.KAKAO)
+            .build();
+
+        userRepository.save(user1);
+
+        //when
+        boolean result1 = userRepository.existsByEmailAndProvider(user1.getEmail(), OAuth2Provider.KAKAO);
+        boolean result2 = userRepository.existsByEmailAndProvider(user1.getEmail(), OAuth2Provider.GOOGLE);
+        boolean result3 = userRepository.existsByEmailAndProvider(user1.getEmail(), OAuth2Provider.NAVER);
+
+        //then
+        assertThat(result1).isTrue();
+        assertThat(result2).isFalse();
+        assertThat(result3).isFalse();
+    }
+
+    @Test
     @DisplayName("existsByUserIdAndRole 메소드 테스트")
     void existsByUserIdAndRole() {
         //given

@@ -4,11 +4,10 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import kr.co.pawpaw.api.config.auth.provider.JwtTokenProvider;
-import kr.co.pawpaw.domainredis.auth.service.query.RefreshTokenQuery;
+import kr.co.pawpaw.api.config.property.JwtProperties;
 import kr.co.pawpaw.domainredis.auth.domain.TokenType;
-import org.springframework.beans.factory.annotation.Value;
+import kr.co.pawpaw.domainredis.auth.service.query.RefreshTokenQuery;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,15 +24,15 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenParser {
-    private final JwtParser jwtParser;
     private final RefreshTokenQuery refreshTokenQuery;
+    private final JwtParser jwtParser;
 
     public JwtTokenParser(
-        @Value("${custom.jwt.secret-key}") final String secretKey,
+        final JwtProperties jwtProperties,
         final RefreshTokenQuery refreshTokenQuery
     ) {
         this.refreshTokenQuery = refreshTokenQuery;
-        this.jwtParser = Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes())).build();
+        this.jwtParser = Jwts.parserBuilder().setSigningKey(jwtProperties.getSecretKey()).build();
     }
 
     public Authentication extractAuthentication(final String token) {

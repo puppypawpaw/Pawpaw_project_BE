@@ -6,7 +6,7 @@ import kr.co.pawpaw.api.config.auth.repository.CookieAuthorizationRequestReposit
 import kr.co.pawpaw.api.config.property.CookieProperties;
 import kr.co.pawpaw.api.config.property.JwtProperties;
 import kr.co.pawpaw.api.config.property.OAuth2Properties;
-import kr.co.pawpaw.common.util.CookieUtil;
+import kr.co.pawpaw.api.util.CookieUtil;
 import kr.co.pawpaw.domainredis.auth.domain.OAuth2TempAttributes;
 import kr.co.pawpaw.domainredis.auth.domain.RefreshToken;
 import kr.co.pawpaw.domainredis.auth.domain.TokenType;
@@ -74,16 +74,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 response,
                 TokenType.ACCESS.name(),
                 accessTokenValue,
-                (int) ((jwtProperties.getAccessTokenLifeTime() / 1000)),
-                cookieProperties.getDomain()
+                jwtProperties.getAccessTokenLifeTime(),
+                cookieProperties.getDomain(),
+                cookieProperties.getSameSite()
             );
 
             CookieUtil.addCookie(
                 response,
                 TokenType.REFRESH.name(),
                 refreshTokenValue,
-                (int) ((jwtProperties.getRefreshTokenLifeTime() / 1000)),
-                cookieProperties.getDomain()
+                jwtProperties.getRefreshTokenLifeTime(),
+                cookieProperties.getDomain(),
+                cookieProperties.getSameSite()
             );
         }
 

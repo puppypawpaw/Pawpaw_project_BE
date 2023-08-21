@@ -22,7 +22,6 @@ public class User extends BaseTimeEntity {
     private String password;
     private String nickname;
     private String phoneNumber;
-    private String imageUrl;
     private String position;
     @Enumerated(value = EnumType.STRING)
     private Role role;
@@ -35,7 +34,6 @@ public class User extends BaseTimeEntity {
         final String password,
         final String nickname,
         final String phoneNumber,
-        final String imageUrl,
         final String position,
         final OAuth2Provider provider
     ) {
@@ -45,7 +43,6 @@ public class User extends BaseTimeEntity {
         this.role = Role.USER;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
-        this.imageUrl = imageUrl;
         this.position = position;
         this.provider = provider;
     }

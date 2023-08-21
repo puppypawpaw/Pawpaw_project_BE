@@ -11,6 +11,7 @@ import kr.co.pawpaw.api.config.property.ServerProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -50,13 +51,18 @@ public class SecurityConfig {
             .logout(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests((authorizeHttpRequests) -> authorizeHttpRequests
-                .antMatchers("/api/auth/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/auth/sign-up/social/info").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/sign-up").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/sign-up/social").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/sign-up/verification").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/auth/sign-up/verification/check").permitAll()
                 .antMatchers("/swagger-ui.html").permitAll()
                 .antMatchers("/oauth2/**").permitAll()
                 .anyRequest().authenticated())
             .oauth2Login(oauth2 -> oauth2
                 .authorizationEndpoint()
-                .baseUri("/oauth2/authorization")
+                .baseUri("/oauth2/authorize")
                 .authorizationRequestRepository(cookieAuthorizationRequestRepository)
                 .and()
                 .redirectionEndpoint()

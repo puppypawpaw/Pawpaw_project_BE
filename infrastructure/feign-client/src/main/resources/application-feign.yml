@@ -1,0 +1,7 @@
+feign:
+  sms:
+    naver:
+      service-id: ${properties.feign.sms.naver.service-id}
+      access-key: ${properties.feign.sms.naver.access-key}
+      secret-key:  ${properties.feign.sms.naver.secret-key}
+      from: ${properties.feign.sms.naver.from}

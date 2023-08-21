@@ -68,11 +68,24 @@ project(':common') {
 
 }
 
+project(':infrastructure') {
+
+}
+
+project(':infrastructure:object-storage') {
+
+}
+
+project(':infrastructure:feign-client') {
+
+}
+
 project(':api') {
     dependencies {
         implementation project(path: ':domain:domain-rdb', configuration: 'default')
         implementation project(path: ':domain:domain-redis', configuration: 'default')
         implementation project(path: ':common', configuration: 'default')
+        implementation project(path: ':infrastructure:feign-client', configuration: 'default')
     }
 }
 

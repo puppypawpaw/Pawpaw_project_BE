@@ -5,9 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.domainrdb.pet.domain.Pet;
 import kr.co.pawpaw.domainrdb.user.domain.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -19,6 +17,7 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SignUpRequest {
     @NotNull
     @Schema(description = "유저의 약관 동의 여부, 1, 2, 3번이 필수, 4번이 필수아님")
@@ -64,5 +63,9 @@ public class SignUpRequest {
                 .parent(user)
                 .build()
             ).collect(Collectors.toList());
+    }
+
+    public void deletePhoneNumberHyphen() {
+        this.phoneNumber = this.phoneNumber.replaceAll("-", "");
     }
 }

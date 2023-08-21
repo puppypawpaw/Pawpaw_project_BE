@@ -71,4 +71,26 @@ class OAuth2TempAttributesRepositoryTest {
         assertThat(newOAuth2TempAttributes.get().getProfileImageUrl()).isNotEqualTo(oAuth2TempAttributes2.getProfileImageUrl());
         assertThat(newOAuth2TempAttributes.get().getProvider()).isNotEqualTo(oAuth2TempAttributes2.getProvider());
     }
+
+    @Test
+    @DisplayName("deleteById 메서드 테스트")
+    void deleteById() {
+        //given
+        OAuth2TempAttributes oAuth2TempAttributes = OAuth2TempAttributes.builder()
+            .key(UUID.randomUUID().toString())
+            .email("email")
+            .name("name")
+            .profileImageUrl("profileImageUrl")
+            .provider("GOOGLE")
+            .build();
+
+        oAuth2TempAttributesRepository.save(oAuth2TempAttributes);
+
+        //when
+        oAuth2TempAttributesRepository.deleteById(oAuth2TempAttributes.getKey());
+        boolean result = oAuth2TempAttributesRepository.existsById(oAuth2TempAttributes.getKey());
+
+        //then
+        assertThat(result).isFalse();
+    }
 }
