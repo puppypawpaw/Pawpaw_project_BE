@@ -70,14 +70,15 @@ class SignUpServiceTest {
         String alreadyExistEmail = "aee";
         SignUpRequest request = SignUpRequest.builder()
             .email(alreadyExistEmail)
+            .phoneNumber("01012345678")
             .build();
 
-        when(userQuery.existsByEmail(eq(alreadyExistEmail))).thenReturn(true);
+        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(true);
         //when
         assertThatThrownBy(() -> signUpService.signUp(request, file)).isInstanceOf(DuplicateEmailException.class);
 
         //then
-        verify(userQuery, times(1)).existsByEmail(alreadyExistEmail);
+        verify(userQuery, times(1)).existsByEmailAndProvider(request.getEmail(), null);
     }
 
     @Test
@@ -89,15 +90,16 @@ class SignUpServiceTest {
         SignUpRequest request = SignUpRequest.builder()
             .email("email")
             .termAgrees(termAgrees)
+            .phoneNumber("01012345678")
             .build();
 
-        when(userQuery.existsByEmail(any(String.class))).thenReturn(false);
+        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
         when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(false);
         //when
         assertThatThrownBy(() -> signUpService.signUp(request, file)).isInstanceOf(NotAgreeAllRequiredTermException.class);
 
         //then
-        verify(userQuery, times(1)).existsByEmail(request.getEmail());
+        verify(userQuery, times(1)).existsByEmailAndProvider(request.getEmail(), null);
         verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesSet);
     }
 
@@ -112,16 +114,17 @@ class SignUpServiceTest {
             .email("email")
             .termAgrees(termAgrees)
             .password(password)
+            .phoneNumber("01012345678")
             .passwordConfirm(password + "password")
             .build();
 
-        when(userQuery.existsByEmail(any(String.class))).thenReturn(false);
+        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
         when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(true);
         //when
         assertThatThrownBy(() -> signUpService.signUp(request, file)).isInstanceOf(NotEqualPasswordConfirmException.class);
 
         //then
-        verify(userQuery, times(1)).existsByEmail(request.getEmail());
+        verify(userQuery, times(1)).existsByEmailAndProvider(request.getEmail(), null);
         verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesSet);
     }
 
@@ -149,7 +152,7 @@ class SignUpServiceTest {
             .build();
 
 
-        when(userQuery.existsByEmail(any(String.class))).thenReturn(false);
+        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
         when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(true);
         when(userQuery.existsByPhoneNumber(eq(request1.getPhoneNumber()))).thenReturn(true);
         when(userQuery.existsByPhoneNumber(eq(request2.getPhoneNumber()))).thenReturn(false);
@@ -159,7 +162,7 @@ class SignUpServiceTest {
         assertThatThrownBy(() -> signUpService.signUp(request2, file)).isInstanceOf(NotVerifiedPhoneNumberException.class);
 
         //then
-        verify(userQuery, times(2)).existsByEmail(email);
+        verify(userQuery, times(2)).existsByEmailAndProvider(email, null);
         verify(termQuery, times(2)).isAllRequiredTermIds(termAgreesSet);
         verify(userQuery, times(1)).existsByPhoneNumber(request1.getPhoneNumber());
         verify(userQuery, times(1)).existsByPhoneNumber(request2.getPhoneNumber());
@@ -216,7 +219,7 @@ class SignUpServiceTest {
 
         User savedUser = request.toUser(passwordEncoded);
 
-        when(userQuery.existsByEmail(any(String.class))).thenReturn(false);
+        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
         when(termQuery.isAllRequiredTermIds(eq(termAgreesOrderSet))).thenReturn(true);
         when(userQuery.existsByPhoneNumber(eq(request.getPhoneNumber()))).thenReturn(false);
         when(verifiedPhoneNumberQuery.existsByPhoneNumberAndUsagePurpose(eq(request.getPhoneNumber()), eq(SmsUsagePurpose.SIGN_UP.name()))).thenReturn(true);
@@ -227,7 +230,7 @@ class SignUpServiceTest {
         signUpService.signUp(request, file);
 
         //then
-        verify(userQuery, times(1)).existsByEmail(request.getEmail());
+        verify(userQuery, times(1)).existsByEmailAndProvider(email, null);
         verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesOrderSet);
         verify(userQuery, times(1)).existsByPhoneNumber(request.getPhoneNumber());
         verify(verifiedPhoneNumberQuery, times(1)).existsByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name());
