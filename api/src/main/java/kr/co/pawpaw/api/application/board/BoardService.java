@@ -6,6 +6,7 @@ import kr.co.pawpaw.common.exception.board.BoardException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardDeleteException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardUpdateException;
+import kr.co.pawpaw.common.exception.common.PermissionRequiredException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.board.domain.Board;
 import kr.co.pawpaw.domainrdb.board.service.command.BoardCommand;
@@ -62,7 +63,7 @@ public class BoardService {
         User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
         Board board = boardQuery.findById(id).orElseThrow(BoardNotFoundException::new);
         if (user.getUserId() != board.getUser().getUserId()) {
-            throw new NotFoundUserException();
+            throw new PermissionRequiredException();
         }
 
         if (updateDto.getTitle() != null || updateDto.getContent() != null) {
@@ -83,9 +84,9 @@ public class BoardService {
         User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
         Board board = boardQuery.findById(id).orElseThrow(BoardNotFoundException::new);
         if (user.getUserId() != board.getUser().getUserId()) {
-            throw new NotFoundUserException();
+            throw new PermissionRequiredException();
         }
-        if (board == null) {
+        if (board.isRemoved()) {
             throw new BoardDeleteException();
         }
         board.remove();
