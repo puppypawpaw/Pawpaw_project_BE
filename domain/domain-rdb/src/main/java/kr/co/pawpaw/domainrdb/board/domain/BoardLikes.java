@@ -1,5 +1,6 @@
 package kr.co.pawpaw.domainrdb.board.domain;
 
+import kr.co.pawpaw.domainrdb.common.BaseTimeEntity;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor
-public class BoardLikes {
+public class BoardLikes extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
