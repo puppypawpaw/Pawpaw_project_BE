@@ -1,6 +1,7 @@
 package kr.co.pawpaw.api.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.co.pawpaw.api.dto.position.PositionResponse;
 import kr.co.pawpaw.domainrdb.user.domain.Role;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import lombok.Getter;
@@ -14,14 +15,14 @@ public class UserResponse {
     @Schema(description = "유저 닉네임", type = "STRING")
     private String nickname;
     @Schema(description = "유저 위치", type = "STRING")
-    private String position;
+    private PositionResponse position;
 
 
     private UserResponse(
         final String email,
         final Role role,
         final String nickname,
-        final String position
+        final PositionResponse position
     ) {
         this.email = email;
         this.role = role;
@@ -34,7 +35,7 @@ public class UserResponse {
             user.getEmail(),
             user.getRole(),
             user.getNickname(),
-            user.getPosition()
+            PositionResponse.of(user.getPosition())
         );
     }
 }

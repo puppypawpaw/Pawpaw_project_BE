@@ -2,6 +2,7 @@ package kr.co.pawpaw.api.application.auth;
 
 import kr.co.pawpaw.api.dto.auth.SignUpRequest;
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
+import kr.co.pawpaw.api.dto.position.PositionRequest;
 import kr.co.pawpaw.common.exception.auth.DuplicateEmailException;
 import kr.co.pawpaw.common.exception.auth.DuplicatePhoneNumberException;
 import kr.co.pawpaw.common.exception.auth.NotEqualPasswordConfirmException;
@@ -198,7 +199,11 @@ class SignUpServiceTest {
         String password = "password";
         String email = "email";
         String nickname = "nickname";
-        String position = "position";
+        PositionRequest position = PositionRequest.builder()
+            .latitude(36.8)
+            .longitude(36.8)
+            .name("36.8")
+            .build();
         SignUpRequest request = SignUpRequest.builder()
             .email(email)
             .termAgrees(termAgreeOrders)
@@ -242,7 +247,9 @@ class SignUpServiceTest {
         assertThat(capturedUser.getPassword()).isEqualTo(passwordEncoded);
         assertThat(capturedUser.getNickname()).isEqualTo(request.getNickname());
         assertThat(capturedUser.getEmail()).isEqualTo(request.getEmail());
-        assertThat(capturedUser.getPosition()).isEqualTo(request.getPosition());
+        assertThat(capturedUser.getPosition().getLatitude()).isEqualTo(request.getPosition().getLatitude());
+        assertThat(capturedUser.getPosition().getLongitude()).isEqualTo(request.getPosition().getLongitude());
+        assertThat(capturedUser.getPosition().getName()).isEqualTo(request.getPosition().getName());
         assertThat(capturedUser.getPhoneNumber()).isEqualTo(request.getPhoneNumber());
 
         ArgumentCaptor<List<Pet>> petListCaptor = ArgumentCaptor.forClass(List.class);

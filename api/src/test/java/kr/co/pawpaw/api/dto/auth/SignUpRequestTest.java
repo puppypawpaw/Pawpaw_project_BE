@@ -1,6 +1,7 @@
 package kr.co.pawpaw.api.dto.auth;
 
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
+import kr.co.pawpaw.api.dto.position.PositionRequest;
 import kr.co.pawpaw.domainrdb.pet.domain.Pet;
 import kr.co.pawpaw.domainrdb.pet.domain.PetType;
 import kr.co.pawpaw.domainrdb.user.domain.User;
@@ -22,6 +23,12 @@ class SignUpRequestTest {
     private final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
 
+    private static final PositionRequest positionRequest = PositionRequest.builder()
+        .latitude(36.8)
+        .longitude(36.8)
+        .name("36.8")
+        .build();
+
     @Test
     @DisplayName("유효성 검증 테스트")
     void validationTest() {
@@ -36,7 +43,7 @@ class SignUpRequestTest {
             .nickname("nickname")
             .phoneNumber("phoneNumber")
             .petInfos(List.of())
-            .position("position")
+            .position(positionRequest)
             .build();
         List<String> violationPropertyPaths2 = List.of("petInfos");
         SignUpRequest request3 = SignUpRequest.builder()
@@ -51,7 +58,7 @@ class SignUpRequestTest {
                     .petName("petName")
                     .petType(PetType.DOG)
                     .build()))
-            .position("position")
+            .position(positionRequest)
             .build();
         List<String> violationPropertyPaths3 = List.of();
         SignUpRequest request4 = SignUpRequest.builder()
@@ -64,7 +71,7 @@ class SignUpRequestTest {
             .petInfos(List.of(
                 CreatePetRequest.builder().build()
             ))
-            .position("position")
+            .position(positionRequest)
             .build();
         List<String> violationPropertyPaths4 = List.of("petInfos[0].petType", "petInfos[0].petName");
 
@@ -109,7 +116,7 @@ class SignUpRequestTest {
                     .petName("petName")
                     .petType(PetType.CAT)
                     .build()))
-            .position("position")
+            .position(positionRequest)
             .build();
 
         String password = UUID.randomUUID().toString();
@@ -121,7 +128,9 @@ class SignUpRequestTest {
         assertThat(user.getEmail()).isEqualTo(request.getEmail());
         assertThat(user.getNickname()).isEqualTo(request.getNickname());
         assertThat(user.getPhoneNumber()).isEqualTo(request.getPhoneNumber());
-        assertThat(user.getPosition()).isEqualTo(request.getPosition());
+        assertThat(user.getPosition().getLongitude()).isEqualTo(request.getPosition().getLongitude());
+        assertThat(user.getPosition().getLatitude()).isEqualTo(request.getPosition().getLatitude());
+        assertThat(user.getPosition().getName()).isEqualTo(request.getPosition().getName());
         assertThat(user.getPassword()).isEqualTo(password);
     }
 
@@ -152,7 +161,7 @@ class SignUpRequestTest {
             .nickname("nickname")
             .phoneNumber("phoneNumber")
             .petInfos(petInfos)
-            .position("position")
+            .position(positionRequest)
             .build();
 
         User user = User.builder().build();
@@ -183,7 +192,7 @@ class SignUpRequestTest {
             .passwordConfirm("password")
             .nickname("nickname")
             .phoneNumber("010-1234-5678")
-            .position("position")
+            .position(positionRequest)
             .build();
 
         //when

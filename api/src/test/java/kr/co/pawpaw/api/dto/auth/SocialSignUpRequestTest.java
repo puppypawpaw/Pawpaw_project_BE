@@ -1,6 +1,7 @@
 package kr.co.pawpaw.api.dto.auth;
 
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
+import kr.co.pawpaw.api.dto.position.PositionRequest;
 import kr.co.pawpaw.domainrdb.pet.domain.Pet;
 import kr.co.pawpaw.domainrdb.pet.domain.PetType;
 import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
@@ -22,6 +23,12 @@ class SocialSignUpRequestTest {
     private final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private final Validator validator = factory.getValidator();
 
+    private static final PositionRequest positionRequest = PositionRequest.builder()
+        .latitude(36.8)
+        .longitude(36.8)
+        .name("36.8")
+        .build();
+
     @Test
     @DisplayName("유효성 검증 테스트")
     void validationTest() {
@@ -32,7 +39,7 @@ class SocialSignUpRequestTest {
         SocialSignUpRequest request2 = SocialSignUpRequest.builder()
             .key("key")
             .termAgrees(List.of(1L, 2L, 3L))
-            .position("position")
+            .position(positionRequest)
             .noImage(false)
             .nickname("nick")
             .build();
@@ -40,7 +47,7 @@ class SocialSignUpRequestTest {
         SocialSignUpRequest request3 = SocialSignUpRequest.builder()
             .key("key")
             .termAgrees(List.of(1L, 2L, 3L))
-            .position("position")
+            .position(positionRequest)
             .noImage(false)
             .nickname("nick")
             .petInfos(List.of(
@@ -51,7 +58,7 @@ class SocialSignUpRequestTest {
         SocialSignUpRequest request4 = SocialSignUpRequest.builder()
             .key("key")
             .termAgrees(List.of(1L, 2L, 3L))
-            .position("position")
+            .position(positionRequest)
             .noImage(false)
             .nickname("nick")
             .petInfos(List.of(
@@ -102,7 +109,7 @@ class SocialSignUpRequestTest {
                     .petName("petName")
                     .petType(PetType.CAT)
                     .build()))
-            .position("position")
+            .position(positionRequest)
             .build();
 
         String email = "email";
@@ -115,7 +122,9 @@ class SocialSignUpRequestTest {
         assertThat(user.getEmail()).isEqualTo(email);
         assertThat(user.getNickname()).isEqualTo(request.getNickname());
         assertThat(user.getPhoneNumber()).isNull();
-        assertThat(user.getPosition()).isEqualTo(request.getPosition());
+        assertThat(user.getPosition().getLatitude()).isEqualTo(request.getPosition().getLatitude());
+        assertThat(user.getPosition().getLongitude()).isEqualTo(request.getPosition().getLongitude());
+        assertThat(user.getPosition().getName()).isEqualTo(request.getPosition().getName());
         assertThat(user.getProvider()).isEqualTo(provider);
         assertThat(user.getPassword()).isEqualTo("");
     }
@@ -143,7 +152,7 @@ class SocialSignUpRequestTest {
             .termAgrees(List.of(1L, 2L, 3L))
             .key("key")
             .petInfos(petInfos)
-            .position("position")
+            .position(positionRequest)
             .build();
 
         User user = User.builder().build();

@@ -1,5 +1,7 @@
 package kr.co.pawpaw.api;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -17,6 +19,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @EnableFeignClients(basePackages = "kr.co.pawpaw.feignClient.*")
 @ConfigurationPropertiesScan(basePackages = { "kr.co.pawpaw.api.*", "kr.co.pawpaw.domainredis.*" } )
+@OpenAPIDefinition(
+    servers = @Server(url = "/", description = "defaultServer")
+)
 @SpringBootApplication(scanBasePackages = {
     "kr.co.pawpaw.api",
     "kr.co.pawpaw.domainrdb.*",

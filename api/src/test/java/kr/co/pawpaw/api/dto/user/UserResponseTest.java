@@ -1,12 +1,18 @@
 package kr.co.pawpaw.api.dto.user;
 
+import kr.co.pawpaw.domainrdb.position.Position;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class UserResponseTest {
+    private static final Position position = Position.builder()
+        .latitude(36.8)
+        .longitude(36.8)
+        .name("36.8")
+        .build();
     @Test
     @DisplayName("of 메소드 테스트")
     void of() {
@@ -14,7 +20,7 @@ class UserResponseTest {
         User user = User.builder()
             .email("userId")
             .nickname("username")
-            .position("userPosition")
+            .position(position)
             .build();
 
         //when
@@ -24,6 +30,8 @@ class UserResponseTest {
         assertThat(response.getEmail()).isEqualTo(user.getEmail());
         assertThat(response.getNickname()).isEqualTo(user.getNickname());
         assertThat(response.getRole()).isEqualTo(user.getRole());
-        assertThat(response.getPosition()).isEqualTo(user.getPosition());
+        assertThat(response.getPosition().getName()).isEqualTo(user.getPosition().getName());
+        assertThat(response.getPosition().getLongitude()).isEqualTo(user.getPosition().getLongitude());
+        assertThat(response.getPosition().getLatitude()).isEqualTo(user.getPosition().getLatitude());
     }
 }

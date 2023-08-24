@@ -14,7 +14,7 @@ public class TermCustomRepository {
     private static final QTerm qTerm = QTerm.term;
 
     public List<Long> findIdByOrderNotNullAndRequiredIsTrue() {
-        return queryFactory.select(qTerm.id)
+        return queryFactory.select(qTerm.order)
             .from(qTerm)
             .where(qTerm.order.isNotNull().and(qTerm.required.isTrue()))
             .fetch();

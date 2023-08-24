@@ -3,6 +3,7 @@ package kr.co.pawpaw.api.dto.auth;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
+import kr.co.pawpaw.api.dto.position.PositionRequest;
 import kr.co.pawpaw.domainrdb.pet.domain.Pet;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import lombok.*;
@@ -36,9 +37,10 @@ public class SignUpRequest {
     private String passwordConfirm;
     @Schema(description = "유저의 핸드폰 번호")
     private String phoneNumber;
-    @NotBlank
+    @NotNull
+    @Valid
     @Schema(description = "유저의 초기 설정 위치")
-    private String position;
+    private PositionRequest position;
     @Valid
     @NotNull
     @Size(min=1)
@@ -51,7 +53,7 @@ public class SignUpRequest {
             .password(passwordEncoded)
             .nickname(nickname)
             .phoneNumber(phoneNumber)
-            .position(position)
+            .position(position.toEntity())
             .build();
     }
 
