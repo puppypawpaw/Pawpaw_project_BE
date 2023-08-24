@@ -1,43 +1,54 @@
 package kr.co.pawpaw.api.application.board;
 
+import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
+import kr.co.pawpaw.common.exception.board.BoardLikeException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.board.domain.Board;
 import kr.co.pawpaw.domainrdb.board.domain.BoardLikes;
-import kr.co.pawpaw.domainrdb.board.repository.BoardLikesRepository;
-import kr.co.pawpaw.domainrdb.board.repository.BoardRepository;
-import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import kr.co.pawpaw.domainrdb.board.service.query.BoardQuery;
+import kr.co.pawpaw.domainrdb.board.service.query.BoardLikeQuery;
+import kr.co.pawpaw.domainrdb.board.service.command.BoardLikeCommand;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityNotFoundException;
 
 @Service
 @RequiredArgsConstructor
 public class BoardLikeService {
 
-    private final BoardLikesRepository likesRepository;
+    private final BoardLikeQuery boardLikeQuery;
+    private final BoardLikeCommand boardLikeCommand;
+    private final BoardQuery boardQuery;
     private final UserQuery userQuery;
-    private final BoardRepository boardRepository;
 
     @Transactional
-    public boolean addOrDeleteLike(Long boardId, UserId userId){
-        Board board = boardRepository.findById(boardId).orElseThrow(EntityNotFoundException::new);
+    public boolean addLike(Long boardId, UserId userId) {
+        Board board = boardQuery.findById(boardId).orElseThrow(BoardNotFoundException::new);
         User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
-        if (likesNotExist(user, board)){
-           likesRepository.save(new BoardLikes(user, board));
-           board.plusLikedCount();
+        if (!checkLikeExist(user, board)) {
+            boardLikeCommand.save(new BoardLikes(user, board));
+            board.plusLikedCount();
             return true;
-        }else {
-            likesRepository.deleteBoardLikesByUserAndBoard(user, board);
-            board.minusLikedCount();
-            return false;
         }
+        throw new BoardLikeException.BoardLikeFailException();
     }
 
-    private boolean likesNotExist(User user, Board board){
-        return likesRepository.findByUserAndBoard(user, board).isEmpty();  // 좋아요가 없으면 true
+    @Transactional
+    public boolean deleteLike(Long boardId, UserId userId) {
+        Board board = boardQuery.findById(boardId).orElseThrow(BoardNotFoundException::new);
+        User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
+        if (checkLikeExist(user, board)) {
+            boardLikeQuery.deleteBoardLikesByUserAndBoard(user, board);
+            board.minusLikedCount();
+            return true;
+        }
+        throw new BoardLikeException.BoardDeleteLikeFailException();
+    }
+
+    public boolean checkLikeExist(User user, Board board) {
+        return boardLikeQuery.existsByUserAndBoard(user, board);
     }
 }
