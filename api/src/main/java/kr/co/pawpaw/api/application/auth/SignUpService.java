@@ -1,5 +1,6 @@
 package kr.co.pawpaw.api.application.auth;
 
+import kr.co.pawpaw.api.dto.auth.DuplicateEmailResponse;
 import kr.co.pawpaw.api.dto.auth.SignUpRequest;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpInfoResponse;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpRequest;
@@ -69,6 +70,11 @@ public class SignUpService {
         saveUserTermAgreements(request.getTermAgrees(), user);
         deleteOAuth2TempAttributes(oAuth2TempAttributes);
         return user.getUserId();
+    }
+
+    @Transactional(readOnly = true)
+    public DuplicateEmailResponse checkDuplicateEmail(final String email) {
+        return DuplicateEmailResponse.of(userQuery.existsByEmailAndProvider(email, null));
     }
 
     public SocialSignUpInfoResponse getOAuth2SignUpTempInfo(final String key) {

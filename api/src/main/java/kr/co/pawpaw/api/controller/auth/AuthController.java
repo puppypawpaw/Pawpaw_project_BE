@@ -10,10 +10,7 @@ import kr.co.pawpaw.api.application.auth.SignOutService;
 import kr.co.pawpaw.api.application.auth.SignUpService;
 import kr.co.pawpaw.api.application.sms.SmsService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
-import kr.co.pawpaw.api.dto.auth.SignInRequest;
-import kr.co.pawpaw.api.dto.auth.SignUpRequest;
-import kr.co.pawpaw.api.dto.auth.SocialSignUpInfoResponse;
-import kr.co.pawpaw.api.dto.auth.SocialSignUpRequest;
+import kr.co.pawpaw.api.dto.auth.*;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeResponse;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsUsagePurpose;
@@ -83,6 +80,20 @@ public class AuthController {
         signUpService.signUp(body, image);
 
         return ResponseEntity.noContent().build();
+    }
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200")
+    })
+    @Operation(
+        method = "GET",
+        summary = "회원가입 시 이메일 중복확인",
+        description = "이메일 중복 확인"
+    )
+    @GetMapping("/sign-up/check/duplicate/email")
+    public ResponseEntity<DuplicateEmailResponse> checkDuplicateEmail(
+        @RequestParam final String email
+    ) {
+        return ResponseEntity.ok(signUpService.checkDuplicateEmail(email));
     }
 
     @ApiResponses(value = {
