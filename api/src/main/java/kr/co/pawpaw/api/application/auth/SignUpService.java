@@ -89,7 +89,6 @@ public class SignUpService {
         validatePhoneNumber(request.getPhoneNumber());
     }
 
-
     private void saveUserImage(
         final boolean noImage,
         final MultipartFile image,

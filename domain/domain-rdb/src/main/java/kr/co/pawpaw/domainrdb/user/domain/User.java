@@ -1,15 +1,13 @@
 package kr.co.pawpaw.domainrdb.user.domain;
 
 import kr.co.pawpaw.domainrdb.common.BaseTimeEntity;
+import kr.co.pawpaw.domainrdb.position.Position;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -22,7 +20,8 @@ public class User extends BaseTimeEntity {
     private String password;
     private String nickname;
     private String phoneNumber;
-    private String position;
+    @Embedded
+    private Position position;
     @Enumerated(value = EnumType.STRING)
     private Role role;
     @Enumerated(value = EnumType.STRING)
@@ -34,7 +33,7 @@ public class User extends BaseTimeEntity {
         final String password,
         final String nickname,
         final String phoneNumber,
-        final String position,
+        final Position position,
         final OAuth2Provider provider
     ) {
         this.userId = UserId.create();
