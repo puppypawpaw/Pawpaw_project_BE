@@ -39,7 +39,6 @@ class SignUpRequestTest {
             .termAgrees(List.of(1L, 2L, 3L))
             .email("email")
             .password("password")
-            .passwordConfirm("password")
             .nickname("nickname")
             .phoneNumber("phoneNumber")
             .petInfos(List.of())
@@ -50,7 +49,6 @@ class SignUpRequestTest {
             .termAgrees(List.of(1L, 2L, 3L))
             .email("email")
             .password("password")
-            .passwordConfirm("password")
             .nickname("nickname")
             .phoneNumber("phoneNumber")
             .petInfos(List.of(
@@ -65,7 +63,6 @@ class SignUpRequestTest {
             .termAgrees(List.of(1L, 2L, 3L))
             .email("email")
             .password("password")
-            .passwordConfirm("password")
             .nickname("nickname")
             .phoneNumber("phoneNumber")
             .petInfos(List.of(
@@ -108,7 +105,6 @@ class SignUpRequestTest {
             .termAgrees(List.of(1L, 2L, 3L))
             .email("email")
             .password("password")
-            .passwordConfirm("password")
             .nickname("nickname")
             .phoneNumber("phoneNumber")
             .petInfos(List.of(
@@ -157,7 +153,6 @@ class SignUpRequestTest {
             .termAgrees(List.of(1L, 2L, 3L))
             .email("email")
             .password("password")
-            .passwordConfirm("password")
             .nickname("nickname")
             .phoneNumber("phoneNumber")
             .petInfos(petInfos)
@@ -189,7 +184,6 @@ class SignUpRequestTest {
             .termAgrees(List.of(1L, 2L, 3L))
             .email("email")
             .password("password")
-            .passwordConfirm("password")
             .nickname("nickname")
             .phoneNumber("010-1234-5678")
             .position(positionRequest)

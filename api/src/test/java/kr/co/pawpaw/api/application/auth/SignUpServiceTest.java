@@ -5,7 +5,6 @@ import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.api.dto.position.PositionRequest;
 import kr.co.pawpaw.common.exception.auth.DuplicateEmailException;
 import kr.co.pawpaw.common.exception.auth.DuplicatePhoneNumberException;
-import kr.co.pawpaw.common.exception.auth.NotEqualPasswordConfirmException;
 import kr.co.pawpaw.common.exception.auth.NotVerifiedPhoneNumberException;
 import kr.co.pawpaw.common.exception.term.NotAgreeAllRequiredTermException;
 import kr.co.pawpaw.domainrdb.pet.domain.Pet;
@@ -105,31 +104,6 @@ class SignUpServiceTest {
     }
 
     @Test
-    @DisplayName("일반 회원가입 메소드 비밀번호 유효성 테스트")
-    void 일반_회원가입_메소드_비밀번호_유효성_테스트() {
-        //given
-        List<Long> termAgrees = List.of(1L, 2L, 3L);
-        Set<Long> termAgreesSet = new HashSet<>(termAgrees);
-        String password = "password";
-        SignUpRequest request = SignUpRequest.builder()
-            .email("email")
-            .termAgrees(termAgrees)
-            .password(password)
-            .phoneNumber("01012345678")
-            .passwordConfirm(password + "password")
-            .build();
-
-        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
-        when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(true);
-        //when
-        assertThatThrownBy(() -> signUpService.signUp(request, file)).isInstanceOf(NotEqualPasswordConfirmException.class);
-
-        //then
-        verify(userQuery, times(1)).existsByEmailAndProvider(request.getEmail(), null);
-        verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesSet);
-    }
-
-    @Test
     @DisplayName("일반 회원가입 메소드 핸드폰 번호 유효성 테스트")
     void 일반_회원가입_메소드_핸드폰_번호_유효성_테스트() {
         //given
@@ -142,14 +116,12 @@ class SignUpServiceTest {
             .termAgrees(termAgrees)
             .password(password)
             .phoneNumber("01012345678")
-            .passwordConfirm(password)
             .build();
         SignUpRequest request2 = SignUpRequest.builder()
             .email(email)
             .termAgrees(termAgrees)
             .password(password)
             .phoneNumber("01087654321")
-            .passwordConfirm(password)
             .build();
 
 
@@ -211,7 +183,6 @@ class SignUpServiceTest {
             .nickname(nickname)
             .position(position)
             .phoneNumber("01087654321")
-            .passwordConfirm(password)
             .petInfos(List.of(
                 CreatePetRequest.builder()
                     .petName("루이")

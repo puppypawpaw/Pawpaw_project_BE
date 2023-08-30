@@ -32,9 +32,6 @@ public class SignUpRequest {
     @NotBlank
     @Schema(description = "유저의 비밀번호")
     private String password;
-    @NotBlank
-    @Schema(description = "유저의 비밀번호 확인")
-    private String passwordConfirm;
     @Schema(description = "유저의 핸드폰 번호")
     private String phoneNumber;
     @NotNull

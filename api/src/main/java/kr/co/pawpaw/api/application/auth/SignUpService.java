@@ -91,7 +91,6 @@ public class SignUpService {
         request.deletePhoneNumberHyphen();
         validateDuplicateEmail(request.getEmail());
         validateRequiredTermAgreed(request.getTermAgrees());
-        validatePassword(request.getPassword(), request.getPasswordConfirm());
         validatePhoneNumber(request.getPhoneNumber());
     }
 
@@ -158,15 +157,6 @@ public class SignUpService {
 
     private User createUser(final SignUpRequest request) {
         return userCommand.save(request.toUser(passwordEncoder.encode(request.getPassword())));
-    }
-
-    private static void validatePassword(
-        final String password,
-        final String passwordConfirm
-    ) {
-        if (!password.equals(passwordConfirm)) {
-            throw new NotEqualPasswordConfirmException();
-        }
     }
 
     private void validateRequiredTermAgreed(final Collection<Long> termAgreed) {
