@@ -39,7 +39,6 @@ class OAuth2TempAttributesRepositoryTest {
     void saveAndFindByIdTest() {
         //given
         OAuth2TempAttributes oAuth2TempAttributes = OAuth2TempAttributes.builder()
-            .key(UUID.randomUUID().toString())
             .email("email")
             .name("name")
             .profileImageUrl("profileImageUrl")
@@ -47,7 +46,6 @@ class OAuth2TempAttributesRepositoryTest {
             .build();
 
         OAuth2TempAttributes oAuth2TempAttributes2 = OAuth2TempAttributes.builder()
-            .key(UUID.randomUUID().toString())
             .email("email2")
             .name("name2")
             .profileImageUrl("profileImageUrl2")
@@ -77,7 +75,6 @@ class OAuth2TempAttributesRepositoryTest {
     void deleteById() {
         //given
         OAuth2TempAttributes oAuth2TempAttributes = OAuth2TempAttributes.builder()
-            .key(UUID.randomUUID().toString())
             .email("email")
             .name("name")
             .profileImageUrl("profileImageUrl")

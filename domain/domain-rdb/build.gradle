@@ -31,7 +31,6 @@ dependencies {
     //queryDsl
     implementation "com.querydsl:querydsl-jpa:5.0.0"
     implementation "com.querydsl:querydsl-apt:5.0.0"
-//    testImplementation "com.querydsl:querydsl-jpa:5.0.0"
 }
 
 //queryDsl

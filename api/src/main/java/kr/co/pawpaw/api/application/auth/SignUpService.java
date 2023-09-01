@@ -1,20 +1,28 @@
 package kr.co.pawpaw.api.application.auth;
 
+import kr.co.pawpaw.api.application.file.FileService;
 import kr.co.pawpaw.api.dto.auth.DuplicateEmailResponse;
 import kr.co.pawpaw.api.dto.auth.SignUpRequest;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpInfoResponse;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpRequest;
-import kr.co.pawpaw.common.exception.auth.*;
+import kr.co.pawpaw.api.util.FileUtil;
+import kr.co.pawpaw.common.exception.auth.DuplicateEmailException;
+import kr.co.pawpaw.common.exception.auth.DuplicatePhoneNumberException;
+import kr.co.pawpaw.common.exception.auth.InvalidOAuth2TempKeyException;
+import kr.co.pawpaw.common.exception.auth.NotVerifiedPhoneNumberException;
 import kr.co.pawpaw.common.exception.term.NotAgreeAllRequiredTermException;
 import kr.co.pawpaw.domainrdb.pet.service.command.PetCommand;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsUsagePurpose;
+import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.term.domain.UserTermAgree;
 import kr.co.pawpaw.domainrdb.term.service.command.TermCommand;
 import kr.co.pawpaw.domainrdb.term.service.query.TermQuery;
 import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.domainrdb.user.domain.UserImage;
 import kr.co.pawpaw.domainrdb.user.service.command.UserCommand;
+import kr.co.pawpaw.domainrdb.user.service.command.UserImageCommand;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import kr.co.pawpaw.domainredis.auth.domain.OAuth2TempAttributes;
 import kr.co.pawpaw.domainredis.auth.service.command.OAuth2TempAttributesCommand;
@@ -44,6 +52,8 @@ public class SignUpService {
     private final PasswordEncoder passwordEncoder;
     private final OAuth2TempAttributesQuery oAuth2TempAttributesQuery;
     private final OAuth2TempAttributesCommand oAuth2TempAttributesCommand;
+    private final FileService fileService;
+    private final UserImageCommand userImageCommand;
 
     @Transactional
     public void signUp(
@@ -52,7 +62,11 @@ public class SignUpService {
     ) {
         validateRequest(request);
         User user = createUser(request);
-        saveUserImage(image, user);
+
+        if (Objects.nonNull(image)) {
+            saveUserImageByMultipartFile(image, user);
+        }
+
         petCommand.saveAll(request.toPet(user));
         saveUserTermAgreements(request.getTermAgrees(), user);
     }
@@ -64,11 +78,17 @@ public class SignUpService {
     ) {
         validateRequiredTermAgreed(request.getTermAgrees());
         OAuth2TempAttributes oAuth2TempAttributes = getOAuth2TempAttributes(request.getKey());
+
         User user = createUser(request, oAuth2TempAttributes);
-        saveUserImage(request.getNoImage(), image, oAuth2TempAttributes.getProfileImageUrl(), user);
+
+        if (!request.getNoImage()) {
+            saveUserImageByMultipartFileOrUrl(image, oAuth2TempAttributes.getProfileImageUrl(), user);
+        }
+
         petCommand.saveAll(request.toPet(user));
         saveUserTermAgreements(request.getTermAgrees(), user);
         deleteOAuth2TempAttributes(oAuth2TempAttributes);
+
         return user.getUserId();
     }
 
@@ -83,6 +103,18 @@ public class SignUpService {
             .orElseThrow(InvalidOAuth2TempKeyException::new);
     }
 
+    private void saveUserImageByMultipartFileOrUrl(
+        final MultipartFile image,
+        final String url,
+        final User user
+    ) {
+        if (image != null && FileUtil.getByteLength(image) > 0) {
+            saveUserImageByMultipartFile(image, user);
+        } else {
+            saveUserImageByUrl(url, user);
+        }
+    }
+
     private void deleteOAuth2TempAttributes(final OAuth2TempAttributes oAuth2TempAttributes) {
         oAuth2TempAttributesCommand.deleteById(oAuth2TempAttributes.getKey());
     }
@@ -94,21 +126,28 @@ public class SignUpService {
         validatePhoneNumber(request.getPhoneNumber());
     }
 
-    private void saveUserImage(
-        final boolean noImage,
+    private void saveUserImageByMultipartFile(
         final MultipartFile image,
-        final String imageUrl,
         final User user
     ) {
-        if (noImage) {
-            return;
-        }
+        File file = fileService.saveFileByMultipartFile(image, user.getUserId());
 
-        if (Objects.nonNull(image)) {
-            saveUserImage(image, user);
-        } else {
-            saveUserImage(imageUrl, user);
-        }
+        userImageCommand.save(UserImage.builder()
+            .file(file)
+            .user(user)
+            .build());
+    }
+
+    private void saveUserImageByUrl(
+        final String url,
+        final User user
+    ) {
+        File file = fileService.saveFileByUrl(url, user.getUserId());
+
+        userImageCommand.save(UserImage.builder()
+            .file(file)
+            .user(user)
+            .build());
     }
 
     private User createUser(
@@ -139,20 +178,6 @@ public class SignUpService {
             .collect(Collectors.toList());
 
         termCommand.saveAllUserTermAgrees(userTermAgrees);
-    }
-
-    private void saveUserImage(
-        final MultipartFile image,
-        final User user
-    ) {
-        // TODO 객체 스토리지에 저장 및 File 엔티티 생성 및 UserImage 엔티티 생성
-    }
-
-    private void saveUserImage(
-        final String imageFileUrl,
-        final User user
-    ) {
-        // TODO 객체 스토리지에 저장 및 File 엔티티 생성 및 UserImage 엔티티 생성
     }
 
     private User createUser(final SignUpRequest request) {

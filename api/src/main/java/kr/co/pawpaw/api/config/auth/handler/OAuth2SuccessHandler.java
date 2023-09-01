@@ -48,10 +48,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             .get("oAuth2Attributes"));
 
         if (Objects.nonNull(attributes)) {
-            String key = UUID.randomUUID().toString();
             OAuth2TempAttributes tempAttributes = oAuth2TempAttributesCommand.save(
                 OAuth2TempAttributes.builder()
-                    .key(key)
                     .email(attributes.getEmail())
                     .name(attributes.getName())
                     .provider(attributes.getProvider().name())
@@ -65,7 +63,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             RefreshToken refreshToken = RefreshToken.builder()
                 .userId(authentication.getName())
                 .value(refreshTokenValue)
-                .timeout(jwtProperties.getRefreshTokenLifeTime() / 1000)
+                .timeout(jwtProperties.getRefreshTokenLifeTime())
                 .build();
 
             refreshTokenCommand.save(refreshToken);

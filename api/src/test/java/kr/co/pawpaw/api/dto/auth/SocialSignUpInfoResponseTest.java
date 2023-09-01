@@ -14,7 +14,6 @@ class SocialSignUpInfoResponseTest {
             .provider(OAuth2Provider.GOOGLE.name())
             .profileImageUrl("OAuth2ProfileImageUrl")
             .email("OAuth2Email")
-            .key("123")
             .name("OAuth2Name")
             .build();
 

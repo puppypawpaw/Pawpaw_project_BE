@@ -34,7 +34,7 @@ class SignUpRequestTest {
     void validationTest() {
         //given
         SignUpRequest request1 = SignUpRequest.builder().build();
-        List<String> violationPropertyPaths1 = List.of("termAgrees", "nickname", "email", "password", "passwordConfirm", "position", "petInfos");
+        List<String> violationPropertyPaths1 = List.of("termAgrees", "nickname", "email", "password", "position", "petInfos");
         SignUpRequest request2 = SignUpRequest.builder()
             .termAgrees(List.of(1L, 2L, 3L))
             .email("email")

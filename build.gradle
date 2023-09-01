@@ -86,6 +86,7 @@ project(':api') {
         implementation project(path: ':domain:domain-redis', configuration: 'default')
         implementation project(path: ':common', configuration: 'default')
         implementation project(path: ':infrastructure:feign-client', configuration: 'default')
+        implementation project(path: ':infrastructure:object-storage', configuration: 'default')
     }
 }
 
