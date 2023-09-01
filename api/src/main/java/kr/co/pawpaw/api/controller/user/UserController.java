@@ -11,9 +11,8 @@ import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "user")
 @RestController
@@ -40,5 +39,23 @@ public class UserController {
         @AuthenticatedUserId final UserId userId
     ) {
         return ResponseEntity.ok(userService.whoAmI(userId));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+    })
+    @Operation(
+        method = "PUT",
+        summary = "유저 유저 이미지 생성 또는 업데이트",
+        description = "유저 유저 이미지 생성 또는 업데이트"
+    )
+    @PutMapping("/image")
+    public ResponseEntity<Void> updateUserImage(
+        @AuthenticatedUserId final UserId userId,
+        @RequestParam final MultipartFile file
+    ) {
+        userService.updateUserImage(userId, file);
+
+        return ResponseEntity.noContent().build();
     }
 }

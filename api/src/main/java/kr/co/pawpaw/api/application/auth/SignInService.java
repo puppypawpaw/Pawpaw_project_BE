@@ -89,7 +89,7 @@ public class SignInService {
         refreshTokenCommand.save(RefreshToken.builder()
             .userId(userId)
             .value(tokenValue)
-            .timeout(jwtProperties.getRefreshTokenLifeTime() / 1000)
+            .timeout(jwtProperties.getRefreshTokenLifeTime())
             .build());
     }
 
