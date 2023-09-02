@@ -23,8 +23,10 @@ class UserResponseTest {
             .position(position)
             .build();
 
+        String imageUrl = "imageUrl";
+
         //when
-        UserResponse response = UserResponse.of(user);
+        UserResponse response = UserResponse.of(user, imageUrl);
 
         //then
         assertThat(response.getEmail()).isEqualTo(user.getEmail());
@@ -33,5 +35,6 @@ class UserResponseTest {
         assertThat(response.getPosition().getName()).isEqualTo(user.getPosition().getName());
         assertThat(response.getPosition().getLongitude()).isEqualTo(user.getPosition().getLongitude());
         assertThat(response.getPosition().getLatitude()).isEqualTo(user.getPosition().getLatitude());
+        assertThat(response.getImageUrl()).isEqualTo(imageUrl);
     }
 }

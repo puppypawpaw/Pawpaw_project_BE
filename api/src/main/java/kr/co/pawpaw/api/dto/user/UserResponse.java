@@ -16,26 +16,31 @@ public class UserResponse {
     private String nickname;
     @Schema(description = "유저 위치", type = "STRING")
     private PositionResponse position;
+    @Schema(description = "유저 이미지 URL", type = "STRING")
+    private String imageUrl;
 
 
     private UserResponse(
         final String email,
         final Role role,
         final String nickname,
-        final PositionResponse position
+        final PositionResponse position,
+        final String imageUrl
     ) {
         this.email = email;
         this.role = role;
         this.nickname = nickname;
         this.position = position;
+        this.imageUrl = imageUrl;
     }
 
-    public static UserResponse of(final User user) {
+    public static UserResponse of(final User user, final String imageUrl) {
         return new UserResponse(
             user.getEmail(),
             user.getRole(),
             user.getNickname(),
-            PositionResponse.of(user.getPosition())
+            PositionResponse.of(user.getPosition()),
+            imageUrl
         );
     }
 }

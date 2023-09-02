@@ -1,3 +1,11 @@
 bootJar {
     enabled = false
 }
+
+dependencies {
+    //s3
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.470'
+
+    //service annotation
+    implementation 'org.springframework:spring-context:5.3.29'
+}

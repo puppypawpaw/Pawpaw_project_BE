@@ -13,5 +13,6 @@ public interface SmsClient {
     @PostMapping("/sms/v2/services/{serviceId}/messages")
     SendSmsResponse sendMessage(
         @PathVariable("serviceId") final String serviceId,
-        @RequestBody final SendSmsRequest request);
+        @RequestBody final SendSmsRequest request
+    );
 }

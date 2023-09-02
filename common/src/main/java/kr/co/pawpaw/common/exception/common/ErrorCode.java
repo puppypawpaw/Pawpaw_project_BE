@@ -11,7 +11,6 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(409, "SU001", "이미 가입된 이메일 입니다."),
     DUPLICATE_PHONE_NUMBER(409, "SU002", "이미 가입된 핸드폰 번호입니다."),
     NOT_VERIFIED_PHONE_NUMBER(404, "SU003", "인증되지 않은 핸드폰 번호입니다."),
-    NOT_EQUAL_PASSWORD_CONFIRM(400, "SU004", "비밀번호와 비밀번호 확인이 일치하지 않습니다."),
     // 유저
     NOT_FOUND_USER(404, "U001", "존재하지 않는 유저입니다."),
     NOT_SIGNED_IN(400, "U002", "로그인 상태가 아닙니다."),

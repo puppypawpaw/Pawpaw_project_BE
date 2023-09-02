@@ -26,7 +26,6 @@ class OAuth2TempAttributesCommandTest {
     void save() {
         //given
         OAuth2TempAttributes input = OAuth2TempAttributes.builder()
-            .key(UUID.randomUUID().toString())
             .email("email")
             .name("name")
             .profileImageUrl("profileImageUrl")
@@ -48,7 +47,6 @@ class OAuth2TempAttributesCommandTest {
     void deleteById() {
         //given
         OAuth2TempAttributes input = OAuth2TempAttributes.builder()
-            .key(UUID.randomUUID().toString())
             .email("email")
             .name("name")
             .profileImageUrl("profileImageUrl")
