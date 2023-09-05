@@ -80,6 +80,7 @@ class FileServiceTest {
     }
 
     @Test
+    @DisplayName("saveFileByUrl 메서드 테스트")
     void saveFileByUrl() {
         //given
         User user = User.builder()
@@ -100,5 +101,34 @@ class FileServiceTest {
         verify(fileCommand).save(any(File.class));
         verify(storageRepository).putObject(eq(file.getFileName()), any(InputStream.class), any(ObjectMetadata.class));
         assertThat(savedFile).usingRecursiveComparison().isEqualTo(file);
+    }
+
+    @Test
+    @DisplayName("deleteFileByName 메서드 테스트")
+    void deleteFileByName() {
+        //given
+        String fileName = "fileName";
+
+        //when
+        fileService.deleteFileByName(fileName);
+
+        //then
+        verify(fileCommand).deleteById(fileName);
+        verify(storageRepository).deleteObject(fileName);
+    }
+
+    @Test
+    @DisplayName("getUrl 메서드 테스트")
+    void getUrl() {
+        //given
+        String fileName = "fileName";
+        String urlExpected = "okay";
+        when(storageRepository.getUrl(fileName)).thenReturn(urlExpected);
+        //when
+        String url = fileService.getUrl(fileName);
+
+        //then
+        verify(storageRepository).getUrl(fileName);
+        assertThat(url).isEqualTo(urlExpected);
     }
 }

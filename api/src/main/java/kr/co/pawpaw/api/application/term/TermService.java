@@ -25,7 +25,6 @@ public class TermService {
         termCommand.save(request.toEntity());
     }
 
-    @Transactional(readOnly = true)
     public List<TermResponse> getAllTerms() {
         return termQuery.findByOrderNotNullOrderByOrder()
             .stream()
@@ -33,7 +32,6 @@ public class TermService {
             .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
     public TermResponse getTerm(final Long id) {
         return termQuery.findById(id)
             .map(TermResponse::of)

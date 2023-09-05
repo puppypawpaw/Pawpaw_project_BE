@@ -1,0 +1,5 @@
+custom:
+  sms:
+    verification:
+      code-length: 6
+      limit-per-day: 3

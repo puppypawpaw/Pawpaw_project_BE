@@ -28,7 +28,9 @@ public enum ErrorCode {
     BOARD_UPDATE_EXCEPTION(400, "BOARD_UPDATE_EXCEPTION", "게시글 수정에 실패했습니다"),
     BOARD_DELETE_EXCEPTION(400, "BOARD_DELETE_EXCEPTION", "게시글 삭제에 실패했습니다"),
     BOARD_LIKE_FAIL_EXCEPTION(400, "BOARD_LIKE_FAIL_EXCEPTION", "좋아요 추가에 실패했습니다."),
-    BOARD_DELETE_LIKE_FAIL_EXCEPTION(400, "BOARD_DELETE_LIKE_FAIL_EXCEPTION", "좋아요 취소에 실패했습니다.");
+    BOARD_DELETE_LIKE_FAIL_EXCEPTION(400, "BOARD_DELETE_LIKE_FAIL_EXCEPTION", "좋아요 취소에 실패했습니다."),
+    // SMS
+    OUT_OF_SMS_LIMIT(429, "SM001", "일일 SMS 발송 허용량을 초과하였습니다.");
 
     private final int status;
     private final String code;

@@ -6,16 +6,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.constraints.NotNull;
-import java.util.List;
-
 @Getter
 @Validated
 @ConstructorBinding
-@ConfigurationProperties(prefix = "server")
+@ConfigurationProperties(prefix = "custom.sms.verification")
 @AllArgsConstructor
-public class ServerProperties {
-    @NotNull
-    private final List<String> allowedOrigins;
-    private final int port;
+public class VerificationProperties {
+    private final int codeLength;
+    private final int limitPerDay;
 }

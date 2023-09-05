@@ -22,6 +22,5 @@ public class OAuth2Properties {
     private final String redirectUriFailure;
     @NotNull
     private final String redirectUriSignUp;
-    @NotNull
-    private final Integer cookieExpireSeconds;
+    private final int cookieExpireSeconds;
 }

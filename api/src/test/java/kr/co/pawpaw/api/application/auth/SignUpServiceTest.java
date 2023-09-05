@@ -42,6 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -511,7 +512,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("소셜 회원가입 메소드 MultipartFile 이미지 저장 테스트")
-    void 소셜_회원가입_메소드_MultipartFile_이미지_저장_테스트() {
+    void 소셜_회원가입_메소드_MultipartFile_이미지_저장_테스트() throws IOException {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
@@ -568,6 +569,7 @@ class SignUpServiceTest {
         when(oAuth2TempAttributesQuery.findById(request.getKey())).thenReturn(Optional.of(oAuth2TempAttributes));
         when(userCommand.save(any(User.class))).thenReturn(user);
         when(termQuery.findAllByOrderIsIn(eq(termAgreeOrders))).thenReturn(termAgrees);
+        when(multipartFile.getBytes()).thenReturn(new byte[12]);
         //when
         UserId userId = signUpService.socialSignUp(request, multipartFile);
 

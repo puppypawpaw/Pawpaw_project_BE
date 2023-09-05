@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class CheckVerificationCodeResponse {
-    private boolean success;
+    private final boolean success;
 
     private CheckVerificationCodeResponse(final boolean success) {
         this.success = success;
