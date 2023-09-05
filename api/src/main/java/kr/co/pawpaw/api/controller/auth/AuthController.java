@@ -13,9 +13,9 @@ import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.auth.*;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeResponse;
+import kr.co.pawpaw.api.dto.sms.SendVerificationCodeRequest;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsUsagePurpose;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import kr.co.pawpaw.feignClient.dto.Recipient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -213,9 +213,9 @@ public class AuthController {
     )
     @PostMapping("/sign-up/verification")
     public ResponseEntity<Void> sendVerificationCodeForSignUp(
-        @RequestBody final Recipient recipient
+        @RequestBody final SendVerificationCodeRequest request
     ) {
-        smsService.sendVerificationCode(recipient, SmsUsagePurpose.SIGN_UP);
+        smsService.sendVerificationCode(request, SmsUsagePurpose.SIGN_UP);
         return ResponseEntity.noContent().build();
     }
 
