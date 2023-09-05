@@ -12,6 +12,7 @@ spring:
         - oauth2
         - feign
         - storage
+        - sms
       dev:
         - rdb
         - redis
@@ -23,6 +24,7 @@ spring:
         - oauth2
         - feign
         - storage
+        - sms
       local:
         - rdb
         - redis
@@ -34,3 +36,4 @@ spring:
         - oauth2
         - feign
         - storage
+        - sms

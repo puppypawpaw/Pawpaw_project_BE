@@ -14,16 +14,14 @@ import java.security.Key;
 @ConstructorBinding
 @ConfigurationProperties(prefix = "custom.jwt")
 public class JwtProperties {
-    @NotNull
-    private final Long accessTokenLifeTime;
-    @NotNull
-    private final Long refreshTokenLifeTime;
+    private final long accessTokenLifeTime;
+    private final long refreshTokenLifeTime;
     @NotNull
     private final Key secretKey;
 
     public JwtProperties(
-        final Long accessTokenLifeTime,
-        final Long refreshTokenLifeTime,
+        final long accessTokenLifeTime,
+        final long refreshTokenLifeTime,
         final String secretKey
     ) {
         this.accessTokenLifeTime = accessTokenLifeTime;

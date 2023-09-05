@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -30,7 +29,6 @@ class OAuth2TempAttributesQueryTest {
     void findById() {
         //given
         OAuth2TempAttributes input = OAuth2TempAttributes.builder()
-            .key(UUID.randomUUID().toString())
             .email("email")
             .name("name")
             .profileImageUrl("profileImageUrl")
