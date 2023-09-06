@@ -3,6 +3,7 @@ package kr.co.pawpaw.api.application.sms;
 import kr.co.pawpaw.api.config.property.VerificationProperties;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeResponse;
+import kr.co.pawpaw.api.dto.sms.SendVerificationCodeRequest;
 import kr.co.pawpaw.common.exception.sms.OutOfSmsLimitException;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsLog;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsUsagePurpose;
@@ -51,6 +52,12 @@ class SmsServiceTest {
         .to("01012345678")
         .build();
 
+    SendVerificationCodeRequest request = SendVerificationCodeRequest.builder()
+        .birthday("birthday")
+        .name("name")
+        .recipient(recipient)
+        .build();
+
     SmsUsagePurpose smsUsagePurpose = SmsUsagePurpose.SIGN_UP;
 
     @Test
@@ -60,7 +67,7 @@ class SmsServiceTest {
         when(smsLogQuery.getTodaySendCountByRecipientAndUsagePurpose(recipient.getTo(), smsUsagePurpose)).thenReturn(3L);
 
         //when
-        assertThatThrownBy(() -> smsService.sendVerificationCode(recipient, smsUsagePurpose)).isInstanceOf(OutOfSmsLimitException.class);
+        assertThatThrownBy(() -> smsService.sendVerificationCode(request, smsUsagePurpose)).isInstanceOf(OutOfSmsLimitException.class);
 
         //then
         verify(smsLogQuery).getTodaySendCountByRecipientAndUsagePurpose(recipient.getTo(), smsUsagePurpose);
@@ -70,12 +77,12 @@ class SmsServiceTest {
     @DisplayName("인증 코드 발송 정상 작동 테스트")
     void sendVerificationCode() {
         //given
-        when(smsLogQuery.getTodaySendCountByRecipientAndUsagePurpose(recipient.getTo(), smsUsagePurpose)).thenReturn(3L);
+        when(smsLogQuery.getTodaySendCountByRecipientAndUsagePurpose(recipient.getTo(), smsUsagePurpose)).thenReturn(2L);
         SendSmsResponse sendSmsResponse = new SendSmsResponse("requestId", "requestTime", "statusCode", "statusName");
         when(smsFeignService.sendSmsMessage(anyString(), eq(recipient))).thenReturn(sendSmsResponse);
         when(verificationProperties.getCodeLength()).thenReturn(6);
         //when
-        smsService.sendVerificationCode(recipient, smsUsagePurpose);
+        smsService.sendVerificationCode(request, smsUsagePurpose);
 
         //then
         verify(smsLogQuery).getTodaySendCountByRecipientAndUsagePurpose(recipient.getTo(), smsUsagePurpose);

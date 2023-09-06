@@ -5,16 +5,19 @@ import kr.co.pawpaw.domainrdb.position.Position;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PositionRequest {
+    @NotNull
     @Schema(description = "위도")
-    private double latitude;
+    private Double latitude;
+    @NotNull
     @Schema(description = "경도")
-    private double longitude;
+    private Double longitude;
     @NotBlank
     @Schema(description = "장소 이름")
     private String name;
