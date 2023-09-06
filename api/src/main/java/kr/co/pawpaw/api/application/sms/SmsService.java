@@ -4,6 +4,7 @@ import kr.co.pawpaw.api.config.property.VerificationProperties;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeResponse;
 import kr.co.pawpaw.api.dto.sms.SendVerificationCodeRequest;
+import kr.co.pawpaw.common.exception.sms.InvalidVerificationCodeException;
 import kr.co.pawpaw.common.exception.sms.OutOfSmsLimitException;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsCloudPlatform;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsLog;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +47,7 @@ public class SmsService {
 
         checkSmsLimitPerDay(recipient, usagePurpose);
         recipient.deleteToHyphen();
-        VerificationCode code = getVerificationCode(recipient.getTo(), usagePurpose);
+        VerificationCode code = getVerificationCode(request, usagePurpose);
         String content = getVerificationContent(code.getCode());
 
         SendSmsResponse response = smsFeignService.sendSmsMessage(content, recipient);
@@ -59,12 +61,11 @@ public class SmsService {
         final CheckVerificationCodeRequest request,
         final SmsUsagePurpose usagePurpose
     ) {
-        if (notExist(request, usagePurpose)) {
-            return CheckVerificationCodeResponse.of(false);
-        }
+        VerificationCode vCode = getVerificationCode(request, usagePurpose)
+            .orElseThrow(InvalidVerificationCodeException::new);
 
-        deleteVerificationCode(request, usagePurpose);
-        saveVerifiedPhoneNumber(request.getPhoneNumber(), usagePurpose.name());
+        saveVerifiedPhoneNumber(vCode);
+        verificationCodeCommand.deleteById(vCode.getId());
 
         return CheckVerificationCodeResponse.of(true);
     }
@@ -83,12 +84,11 @@ public class SmsService {
         }
     }
 
-    private void deleteVerificationCode(CheckVerificationCodeRequest request, SmsUsagePurpose usagePurpose) {
-        verificationCodeCommand.deleteByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), usagePurpose.name());
-    }
-
-    private boolean notExist(final CheckVerificationCodeRequest request, final SmsUsagePurpose usagePurpose) {
-        return !verificationCodeQuery.existsByPhoneNumberAndUsagePurposeAndCode(
+    private Optional<VerificationCode> getVerificationCode(
+        final CheckVerificationCodeRequest request,
+        final SmsUsagePurpose usagePurpose
+    ) {
+        return verificationCodeQuery.findByPhoneNumberAndUsagePurposeAndCode(
             request.getPhoneNumber(),
             usagePurpose.name(),
             request.getCode()
@@ -114,16 +114,19 @@ public class SmsService {
             .build();
     }
 
-    private void saveVerifiedPhoneNumber(final String phoneNumber, final String usagePurpose) {
+    private void saveVerifiedPhoneNumber(
+        final VerificationCode vCode
+    ) {
         VerifiedPhoneNumber verifiedPhoneNumber = VerifiedPhoneNumber.builder()
-            .phoneNumber(phoneNumber)
-            .usagePurpose(usagePurpose)
+            .phoneNumber(vCode.getPhoneNumber())
+            .userName(vCode.getName())
+            .usagePurpose(vCode.getUsagePurpose())
             .build();
         verifiedPhoneNumberCommand.save(verifiedPhoneNumber);
     }
 
     private VerificationCode getVerificationCode(
-        final String phoneNumber,
+        final SendVerificationCodeRequest request,
         final SmsUsagePurpose usagePurpose
     ) {
         SecureRandom random = new SecureRandom();
@@ -134,7 +137,8 @@ public class SmsService {
         }
 
         return VerificationCode.builder()
-            .phoneNumber(phoneNumber)
+            .phoneNumber(request.getRecipient().getTo())
+            .name(request.getName())
             .usagePurpose(usagePurpose.name())
             .code(sb.toString())
             .build();

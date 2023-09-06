@@ -60,4 +60,17 @@ class VerificationCodeCommandTest {
         //then
         verify(verificationCodeRepository).deleteById(input.getId());
     }
+
+    @Test
+    @DisplayName("deleteById 메소드 verificationCodeRepository deleteById 메서드 호출 테스트")
+    void deleteById() {
+        //given
+        String id = "id";
+
+        //when
+        verificationCodeCommand.deleteById(id);
+
+        //then
+        verify(verificationCodeRepository).deleteById(id);
+    }
 }

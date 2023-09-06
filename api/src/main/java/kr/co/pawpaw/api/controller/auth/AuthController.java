@@ -221,6 +221,11 @@ public class AuthController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "유효하지 않은 인증 코드입니다.",
+            content = @Content
+        )
     })
     @Operation(
         method = "POST",

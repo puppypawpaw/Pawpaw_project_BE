@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class UserRepositoryTest {
@@ -148,5 +148,26 @@ class UserRepositoryTest {
         assertThat(result1.isPresent()).isTrue();
         assertThat(result2.isPresent()).isFalse();
         assertThat(result3.isPresent()).isFalse();
+    }
+
+    @Test
+    @DisplayName("findByNameAndPhoneNumber 메소드 테스트")
+    void findByNameAndPhoneNumber() {
+        //given
+        User user1 = User.builder()
+            .email("user1")
+            .name("user1-name")
+            .phoneNumber("user1-phoneNumber")
+            .provider(OAuth2Provider.KAKAO)
+            .build();
+
+        userRepository.save(user1);
+
+        //when
+        Optional<User> result = userRepository.findByNameAndPhoneNumber(user1.getName(), user1.getPhoneNumber());
+
+        //then
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get()).usingRecursiveComparison().isEqualTo(user1);
     }
 }

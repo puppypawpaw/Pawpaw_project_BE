@@ -18,5 +18,10 @@ public interface UserRepository extends JpaRepository<User, UserId> {
         final OAuth2Provider provider
     );
 
+    Optional<User> findByNameAndPhoneNumber(
+        final String name,
+        final String phoneNumber
+    );
+
     boolean existsByPhoneNumber(final String phoneNumber);
 }

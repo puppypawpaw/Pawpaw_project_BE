@@ -116,12 +116,14 @@ class SignUpRequestTest {
             .build();
 
         String password = UUID.randomUUID().toString();
+        String name = "userName";
 
         //when
-        User user = request.toUser(password);
+        User user = request.toUser(password, name);
 
         //then
         assertThat(user.getEmail()).isEqualTo(request.getEmail());
+        assertThat(user.getName()).isEqualTo(name);
         assertThat(user.getNickname()).isEqualTo(request.getNickname());
         assertThat(user.getPhoneNumber()).isEqualTo(request.getPhoneNumber());
         assertThat(user.getPosition().getLongitude()).isEqualTo(request.getPosition().getLongitude());

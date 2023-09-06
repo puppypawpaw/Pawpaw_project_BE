@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,6 +19,8 @@ public class User extends BaseTimeEntity {
 
     private String email;
     private String password;
+    @Column(name="real_name")
+    private String name;
     private String nickname;
     private String phoneNumber;
     @Embedded
@@ -31,15 +34,21 @@ public class User extends BaseTimeEntity {
     public User(
         final String email,
         final String password,
+        final String name,
         final String nickname,
         final String phoneNumber,
         final Position position,
-        final OAuth2Provider provider
+        final OAuth2Provider provider,
+        final LocalDateTime createdDate,
+        final LocalDateTime modifiedDate
     ) {
+        this.createdDate = createdDate;
+        this.modifiedDate = modifiedDate;
         this.userId = UserId.create();
         this.email = email;
         this.password = password;
         this.role = Role.USER;
+        this.name = name;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.position = position;

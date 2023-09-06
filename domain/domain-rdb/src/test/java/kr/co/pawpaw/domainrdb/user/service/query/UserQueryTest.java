@@ -23,22 +23,10 @@ class UserQueryTest {
 
     private static User user = User.builder()
         .email("user-email")
+        .name("user-name")
         .nickname("user-nickname")
         .password("123")
         .build();
-
-    @Test
-    @DisplayName("existsById 메소드 테스트")
-    void existsById() {
-        //given
-        when(userRepository.existsByEmail(eq(user.getEmail()))).thenReturn(true);
-        //when
-        boolean result = userQuery.existsByEmail(user.getEmail());
-
-        //then
-        verify(userRepository).existsByEmail(user.getEmail());
-        assertThat(result).isTrue();
-    }
 
     @Test
     @DisplayName("existsByEmailAndProvider 메소드 테스트")
@@ -65,20 +53,6 @@ class UserQueryTest {
         //then
         verify(userRepository).existsByUserIdAndRole(user.getUserId(), user.getRole());
         assertThat(result).isTrue();
-    }
-
-    @Test
-    @DisplayName("findById 메소드 테스트")
-    void findById() {
-        //given
-        when(userRepository.findByEmail(eq(user.getEmail()))).thenReturn(Optional.of(user));
-        //when
-        Optional<User> result = userQuery.findByEmail(user.getEmail());
-
-        //then
-        verify(userRepository).findByEmail(user.getEmail());
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result.get()).isEqualTo(user);
     }
 
     @Test
@@ -121,5 +95,20 @@ class UserQueryTest {
         //then
         verify(userRepository).existsByPhoneNumber(user.getPhoneNumber());
         assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("findByNameAndPhoneNumber 메소드 테스트")
+    void findByNameAndPhoneNumber() {
+        //given
+        when(userRepository.findByNameAndPhoneNumber(user.getName(), user.getPhoneNumber())).thenReturn(Optional.of(user));
+
+        //when
+        Optional<User> result = userQuery.findByNameAndPhoneNumber(user.getName(), user.getPhoneNumber());
+
+        //then
+        verify(userRepository).findByNameAndPhoneNumber(user.getName(), user.getPhoneNumber());
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get()).isEqualTo(user);
     }
 }

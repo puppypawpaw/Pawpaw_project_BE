@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pawpaw.api.application.user.UserService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
+import kr.co.pawpaw.api.dto.user.UserEmailResponse;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
@@ -57,5 +58,26 @@ public class UserController {
         userService.updateUserImage(userId, file);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 유저입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "GET",
+        summary = "유저 이메일 찾기",
+        description = "유저 이메일 찾기"
+    )
+    @GetMapping("/email")
+    public ResponseEntity<UserEmailResponse> getUserEmail(
+        @RequestParam final String name,
+        @RequestParam final String phoneNumber
+    ) {
+        return ResponseEntity.ok(userService.getUserEmail(name, phoneNumber));
     }
 }

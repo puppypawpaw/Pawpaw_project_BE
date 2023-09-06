@@ -1,7 +1,10 @@
 package kr.co.pawpaw.api.application.user;
 
 import kr.co.pawpaw.api.application.file.FileService;
+import kr.co.pawpaw.api.dto.user.UserEmailResponse;
 import kr.co.pawpaw.api.dto.user.UserResponse;
+import kr.co.pawpaw.api.util.EmailUtil;
+import kr.co.pawpaw.api.util.TimeUtil;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
@@ -26,10 +29,15 @@ public class UserService {
     private final FileService fileService;
     private final EntityManager em;
 
-    @Transactional(readOnly = true)
     public UserResponse whoAmI(final UserId userId) {
         return userQuery.findByUserId(userId)
             .map(this::getUserResponse)
+            .orElseThrow(NotFoundUserException::new);
+    }
+
+    public UserEmailResponse getUserEmail(final String name, final String phoneNumber) {
+        return userQuery.findByNameAndPhoneNumber(name, phoneNumber)
+            .map(this::getUserEmailResponse)
             .orElseThrow(NotFoundUserException::new);
     }
 
@@ -48,6 +56,13 @@ public class UserService {
         } else {
             createNewUserImage(userId, newFile);
         }
+    }
+
+    private UserEmailResponse getUserEmailResponse(final User user) {
+        return UserEmailResponse.of(
+            EmailUtil.getMaskedEmail(user.getEmail()),
+            TimeUtil.getYearMonthDay(user.getCreatedDate())
+        );
     }
 
     private void updateExistingUserImage(final UserImage userImage, final File newFile) {

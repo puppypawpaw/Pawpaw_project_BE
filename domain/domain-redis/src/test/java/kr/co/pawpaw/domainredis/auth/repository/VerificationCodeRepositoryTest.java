@@ -86,15 +86,17 @@ class VerificationCodeRepositoryTest {
 
         verificationCodeRepository.saveAll(List.of(input1, input2));
         //when
-        boolean result1 = verificationCodeRepository.existsByIdAndCode(input2.getId(), input2.getCode());
-        boolean result2 = verificationCodeRepository.existsByIdAndCode(input1.getId(), input1.getCode());
-        boolean result3 = verificationCodeRepository.existsByIdAndCode(input1.getId(), input2.getCode());
-        boolean result4 = verificationCodeRepository.existsByIdAndCode(input2.getId(), input1.getCode());
+        Optional<VerificationCode> result1 = verificationCodeRepository.findByIdAndCode(input2.getId(), input2.getCode());
+        Optional<VerificationCode> result2 = verificationCodeRepository.findByIdAndCode(input1.getId(), input1.getCode());
+        Optional<VerificationCode> result3 = verificationCodeRepository.findByIdAndCode(input1.getId(), input2.getCode());
+        Optional<VerificationCode> result4 = verificationCodeRepository.findByIdAndCode(input2.getId(), input1.getCode());
 
         //then
-        assertThat(result1).isTrue();
-        assertThat(result2).isTrue();
-        assertThat(result3).isFalse();
-        assertThat(result4).isFalse();
+        assertThat(result1.isPresent()).isTrue();
+        assertThat(result1.get()).usingRecursiveComparison().isEqualTo(input2);
+        assertThat(result2.isPresent()).isTrue();
+        assertThat(result2.get()).usingRecursiveComparison().isEqualTo(input1);
+        assertThat(result3.isPresent()).isFalse();
+        assertThat(result4.isPresent()).isFalse();
     }
 }

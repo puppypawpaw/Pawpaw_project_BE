@@ -25,6 +25,7 @@ import kr.co.pawpaw.domainrdb.user.service.command.UserCommand;
 import kr.co.pawpaw.domainrdb.user.service.command.UserImageCommand;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import kr.co.pawpaw.domainredis.auth.domain.OAuth2TempAttributes;
+import kr.co.pawpaw.domainredis.auth.domain.VerifiedPhoneNumber;
 import kr.co.pawpaw.domainredis.auth.service.command.OAuth2TempAttributesCommand;
 import kr.co.pawpaw.domainredis.auth.service.query.OAuth2TempAttributesQuery;
 import kr.co.pawpaw.domainredis.auth.service.query.VerifiedPhoneNumberQuery;
@@ -181,7 +182,15 @@ public class SignUpService {
     }
 
     private User createUser(final SignUpRequest request) {
-        return userCommand.save(request.toUser(passwordEncoder.encode(request.getPassword())));
+        VerifiedPhoneNumber vPhoneNo = verifiedPhoneNumberQuery.findByPhoneNumberAndUsagePurpose(
+            request.getPhoneNumber(),
+            SmsUsagePurpose.SIGN_UP.name()
+        ).orElseThrow(NotVerifiedPhoneNumberException::new);
+
+        return userCommand.save(request.toUser(
+            passwordEncoder.encode(request.getPassword()),
+            vPhoneNo.getUserName()
+        ));
     }
 
     private void validateRequiredTermAgreed(final Collection<Long> termAgreed) {

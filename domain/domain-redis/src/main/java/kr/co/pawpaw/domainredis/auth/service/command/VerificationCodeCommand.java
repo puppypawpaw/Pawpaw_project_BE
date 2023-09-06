@@ -20,4 +20,8 @@ public class VerificationCodeCommand {
     public void deleteByPhoneNumberAndUsagePurpose(final String phoneNumber, final String usagePurpose) {
         verificationCodeRepository.deleteById(VerificationCode.getCompositeKey(phoneNumber, usagePurpose));
     }
+
+    public void deleteById(final String compositeKey) {
+        verificationCodeRepository.deleteById(compositeKey);
+    }
 }

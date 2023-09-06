@@ -1,7 +1,9 @@
 package kr.co.pawpaw.api.application.user;
 
 import kr.co.pawpaw.api.application.file.FileService;
+import kr.co.pawpaw.api.dto.user.UserEmailResponse;
 import kr.co.pawpaw.api.dto.user.UserResponse;
+import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.position.Position;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
@@ -19,9 +21,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -77,6 +81,55 @@ class UserServiceTest {
         assertThat(userResponse.getEmail()).isEqualTo(user.getEmail());
         assertThat(userResponse.getRole()).isEqualTo(user.getRole());
         assertThat(userResponse.getPosition()).usingRecursiveComparison().isEqualTo(user.getPosition());
+    }
+
+    @Test
+    @DisplayName("getUserEmail 메소드 예외 테스트")
+    void getUserEmailException() {
+        //given
+        LocalDateTime now = LocalDateTime.now();
+        User user = User.builder()
+            .name("user-name")
+            .phoneNumber("user-phoneNumber")
+            .email("email@liame.com")
+            .createdDate(now)
+            .createdDate(now)
+            .build();
+
+        String invalidName = "invalid-name";
+
+        when(userQuery.findByNameAndPhoneNumber(invalidName, user.getPhoneNumber())).thenReturn(Optional.empty());
+
+        //when
+        assertThatThrownBy(() -> userService.getUserEmail(invalidName, user.getPhoneNumber())).isInstanceOf(NotFoundUserException.class);
+
+        //then
+        verify(userQuery).findByNameAndPhoneNumber(invalidName, user.getPhoneNumber());
+    }
+
+    @Test
+    @DisplayName("getUserEmail 메소드 정상작동 테스트")
+    void getUserEmail() {
+        //given
+        LocalDateTime now = LocalDateTime.now();
+        User user = User.builder()
+            .name("user-name")
+            .phoneNumber("user-phoneNumber")
+            .email("email@liame.com")
+            .createdDate(now)
+            .createdDate(now)
+            .build();
+
+        UserEmailResponse resultExpected = UserEmailResponse.of("em***@liame.com", now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
+        when(userQuery.findByNameAndPhoneNumber(user.getName(), user.getPhoneNumber())).thenReturn(Optional.of(user));
+
+        //when
+        UserEmailResponse result = userService.getUserEmail(user.getName(), user.getPhoneNumber());
+
+        //then
+        verify(userQuery).findByNameAndPhoneNumber(user.getName(), user.getPhoneNumber());
+        assertThat(result).usingRecursiveComparison().isEqualTo(resultExpected);
     }
 
     @Test
