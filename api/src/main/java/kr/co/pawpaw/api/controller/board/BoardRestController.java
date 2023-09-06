@@ -6,10 +6,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import kr.co.pawpaw.api.application.board.BoardService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.board.BoardDto;
+import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,6 +69,23 @@ public class BoardRestController {
     @PatchMapping("/remove")
     public ResponseEntity<Boolean> removeBoard(@AuthenticatedUserId UserId userId, @RequestParam Long boardId){
         return ResponseEntity.ok(boardService.removeBoard(userId, boardId));
+    }
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200"),
+            @ApiResponse(responseCode = "400", description = "게시글 리스트 조회에 실패한다.")
+    })
+
+    @Operation(
+            method = "GET",
+            summary = "게시글 리스트 조회",
+            description = "게시글 리스트를 가지고 온다."
+    )
+    @GetMapping("/list")
+    public ResponseEntity<Slice<BoardListDto>> getList(@AuthenticatedUserId UserId userId,
+                                                    @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+                                                    @RequestParam(value = "pageSize", defaultValue = "2") int pageSize){
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return ResponseEntity.ok(boardService.getBoardListWithReplies(userId, pageable));
     }
 
 
