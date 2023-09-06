@@ -1,13 +1,17 @@
 package kr.co.pawpaw.api.application.board;
 
+import kr.co.pawpaw.api.application.reply.ReplyService;
 import kr.co.pawpaw.api.dto.board.BoardDto;
+import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.RegisterResponseDto;
+import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
 import kr.co.pawpaw.common.exception.board.BoardException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardUpdateException;
 import kr.co.pawpaw.common.exception.common.PermissionRequiredException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.board.domain.Board;
+import kr.co.pawpaw.domainrdb.board.repository.BoardRepository;
 import kr.co.pawpaw.domainrdb.board.service.command.BoardCommand;
 import kr.co.pawpaw.domainrdb.board.service.query.BoardQuery;
 import kr.co.pawpaw.domainrdb.user.domain.User;
@@ -15,11 +19,17 @@ import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +39,8 @@ public class BoardService {
     private final UserQuery userQuery;
     private final BoardQuery boardQuery;
     private final BoardCommand boardCommand;
+    private final BoardRepository boardRepository;
+    private final ReplyService replyService;
 
     @Transactional
     public RegisterResponseDto register(UserId userId, BoardDto.BoardRegisterDto registerDto) {
@@ -89,4 +101,39 @@ public class BoardService {
         return true;
     }
 
+    @Transactional(readOnly = true)
+    public Slice<BoardListDto> getBoardListWithReplies(UserId userId, Pageable pageable) {
+        userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
+        Slice<Board> boardListWithReplies = boardRepository.getBoardListWithRepliesBy(pageable);
+        // 게시글 리스트를 DTO로 변환
+        List<BoardListDto> boardListDtos = boardListWithReplies.stream()
+                .map(board -> convertBoardToDto(board))
+                .collect(Collectors.toList());
+
+        // 각 게시글에 대한 댓글 리스트를 가져와서 설정
+        boardListDtos.forEach(boardDto -> {
+            List<ReplyListDto> replyList = replyService.findReplyListByBoardId(userId, boardDto.getId(), pageable).getContent();
+            boardDto.setReplyListDto(replyList);
+        });
+        return new SliceImpl<>(boardListDtos, pageable, boardListWithReplies.hasNext());
+    }
+
+    private BoardListDto convertBoardToDto(Board board) {
+        List<ReplyListDto> replyListDtos = board.getReply().stream().map(reply -> {
+            ReplyListDto replyListDto = new ReplyListDto(reply.getId(), reply.getContent(), reply.getWriter());
+            return replyListDto;
+        }).collect(Collectors.toList());
+
+        return BoardListDto.builder()
+                .id(board.getId())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .replyListDto(replyListDtos)
+                .likedCount(board.getLikedCount())
+                .replyCount(board.getReplyCount())
+                .writer(board.getWriter())
+                .createdDate(board.getCreatedDate())
+                .modifiedDate(board.getModifiedDate())
+                .build();
+    }
 }
