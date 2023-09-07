@@ -64,8 +64,4 @@ public class Reply extends BaseTimeEntity {
             child.remove();
         }
     }
-
-//    public void removeParent(){
-//        this.parent = null;
-//    }
 }
