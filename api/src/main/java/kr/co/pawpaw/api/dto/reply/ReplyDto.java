@@ -8,7 +8,6 @@ import java.util.List;
 public class ReplyDto {
 
     @Getter
-    @Setter
     public static class ReplyRegisterDto {
         private Long boardId;
         private Long parentId;
@@ -16,14 +15,12 @@ public class ReplyDto {
     }
 
     @Getter
-    @Setter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReplyUpdateDto {
         private String content;
     }
 
     @Getter
-    @Setter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReplyResponseDto {
         private String writer;
@@ -43,7 +40,6 @@ public class ReplyDto {
     }
 
     @Getter
-    @Setter
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class ReplyListDto {
         private Long id;
@@ -55,6 +51,9 @@ public class ReplyDto {
             this.id = id;
             this.content = content;
             this.nickname = nickname;
+        }
+        public void setChildToParentReply(List<ReplyListDto> children){
+            this.children = children;
         }
     }
 }
