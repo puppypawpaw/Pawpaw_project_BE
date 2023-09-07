@@ -64,8 +64,9 @@ public class ReplyController {
             description = "댓글을 삭제한다."
     )
     @PatchMapping("/remove")
-    public ResponseEntity<Boolean> remove(@AuthenticatedUserId UserId userId, @RequestParam Long replyId, @RequestParam Long boardId){
-        return ResponseEntity.ok(replyService.remove(userId, replyId, boardId));
+    public ResponseEntity<Void> remove(@AuthenticatedUserId UserId userId, @RequestParam Long replyId, @RequestParam Long boardId){
+        replyService.remove(userId, replyId, boardId);
+        return ResponseEntity.noContent().build();
     }
 
     @ApiResponses(value = {
