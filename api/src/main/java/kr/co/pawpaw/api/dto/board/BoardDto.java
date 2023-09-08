@@ -3,7 +3,6 @@ package kr.co.pawpaw.api.dto.board;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +11,6 @@ import java.util.List;
 public class BoardDto {
 
     @Getter
-    @Setter
     public static class BoardRegisterDto {
         private String title;
         private String content;
@@ -24,7 +22,6 @@ public class BoardDto {
     }
 
     @Getter
-    @Setter
     public static class RegisterResponseDto {
 
         private String title;
@@ -44,12 +41,9 @@ public class BoardDto {
     }
 
     @Getter
-    @Setter
     public static class BoardUpdateDto {
         private String title;
         private String content;
-//        private List<String> fileNames;
-
         @Builder
         public BoardUpdateDto(String title, String content) {
             this.title = title;
@@ -58,7 +52,6 @@ public class BoardDto {
     }
 
     @Getter
-    @Setter
     public static class BoardListDto {
         private Long id;
         private String title;
@@ -80,6 +73,10 @@ public class BoardDto {
             this.replyCount = replyCount;
             this.createdDate = createdDate;
             this.modifiedDate = modifiedDate;
+            this.replyListDto = replyListDto;
+        }
+
+        public void setReplyListToBoard(List<ReplyListDto> replyListDto){
             this.replyListDto = replyListDto;
         }
     }

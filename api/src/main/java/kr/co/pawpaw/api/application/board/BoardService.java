@@ -111,21 +111,16 @@ public class BoardService {
         // 각 게시글에 대한 댓글 리스트를 가져와서 설정
         boardListDtos.forEach(boardDto -> {
             List<ReplyListDto> replyList = replyService.findReplyListByBoardId(userId, boardDto.getId(), pageable).getContent();
-            boardDto.setReplyListDto(replyList);
+            boardDto.setReplyListToBoard(replyList);
         });
         return new SliceImpl<>(boardListDtos, pageable, boardListWithReplies.hasNext());
     }
 
     private BoardListDto convertBoardToDto(Board board) {
-        List<ReplyListDto> replyListDtos = board.getReply().stream()
-                .map(reply -> new ReplyListDto(reply.getId(), reply.getContent(), reply.getWriter()))
-                .collect(Collectors.toList());
-
         return BoardListDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
-                .replyListDto(replyListDtos)
                 .likedCount(board.getLikedCount())
                 .replyCount(board.getReplyCount())
                 .writer(board.getWriter())
