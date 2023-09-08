@@ -103,7 +103,7 @@ public class ReplyService {
 
     @Transactional
     public ReplyResponseDto update(ReplyDto.ReplyUpdateDto updateDto, UserId userId, Long replyId) {
-        Reply reply = replyQuery.findReplyByIdAndUser_UserId(replyId, userId).orElseThrow(ReplyNotFoundException::new);
+        Reply reply = replyQuery.findReplyByIdWithParentAndUser_UserId(replyId, userId).orElseThrow(ReplyNotFoundException::new);
 
         if (updateDto.getContent() == null)
             throw new ReplyException.ReplyUpdaterException();
@@ -143,7 +143,7 @@ public class ReplyService {
         List<Reply> replies = replyQuery.findRepliesWithChildren(parentReply);
         replies.forEach(Reply::remove);
 
-        replyQuery.updateReplyById(replyId);
+        replyQuery.removeReplyById(replyId);
         board.minusReplyCount();
     }
 
