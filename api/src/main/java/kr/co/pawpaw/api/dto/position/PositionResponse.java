@@ -2,18 +2,17 @@ package kr.co.pawpaw.api.dto.position;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.domainrdb.position.Position;
-import lombok.*;
-
-import javax.validation.constraints.NotBlank;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PositionResponse {
     @Schema(description = "위도")
-    private double latitude;
+    private Double latitude;
     @Schema(description = "경도")
-    private double longitude;
-    @NotBlank
+    private Double longitude;
     @Schema(description = "장소 이름")
     private String name;
 
