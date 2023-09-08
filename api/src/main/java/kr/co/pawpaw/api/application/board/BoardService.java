@@ -11,7 +11,6 @@ import kr.co.pawpaw.common.exception.board.BoardException.BoardUpdateException;
 import kr.co.pawpaw.common.exception.common.PermissionRequiredException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.board.domain.Board;
-import kr.co.pawpaw.domainrdb.board.repository.BoardRepository;
 import kr.co.pawpaw.domainrdb.board.service.command.BoardCommand;
 import kr.co.pawpaw.domainrdb.board.service.query.BoardQuery;
 import kr.co.pawpaw.domainrdb.user.domain.User;
@@ -39,7 +38,6 @@ public class BoardService {
     private final UserQuery userQuery;
     private final BoardQuery boardQuery;
     private final BoardCommand boardCommand;
-    private final BoardRepository boardRepository;
     private final ReplyService replyService;
 
     @Transactional
@@ -104,10 +102,10 @@ public class BoardService {
     @Transactional(readOnly = true)
     public Slice<BoardListDto> getBoardListWithReplies(UserId userId, Pageable pageable) {
         userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
-        Slice<Board> boardListWithReplies = boardRepository.getBoardListWithRepliesBy(pageable);
+        Slice<Board> boardListWithReplies = boardQuery.getBoardListWithRepliesBy(pageable);
         // 게시글 리스트를 DTO로 변환
         List<BoardListDto> boardListDtos = boardListWithReplies.stream()
-                .map(board -> convertBoardToDto(board))
+                .map(this::convertBoardToDto)
                 .collect(Collectors.toList());
 
         // 각 게시글에 대한 댓글 리스트를 가져와서 설정
@@ -119,10 +117,9 @@ public class BoardService {
     }
 
     private BoardListDto convertBoardToDto(Board board) {
-        List<ReplyListDto> replyListDtos = board.getReply().stream().map(reply -> {
-            ReplyListDto replyListDto = new ReplyListDto(reply.getId(), reply.getContent(), reply.getWriter());
-            return replyListDto;
-        }).collect(Collectors.toList());
+        List<ReplyListDto> replyListDtos = board.getReply().stream()
+                .map(reply -> new ReplyListDto(reply.getId(), reply.getContent(), reply.getWriter()))
+                .collect(Collectors.toList());
 
         return BoardListDto.builder()
                 .id(board.getId())
