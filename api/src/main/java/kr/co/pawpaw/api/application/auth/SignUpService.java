@@ -5,7 +5,7 @@ import kr.co.pawpaw.api.dto.auth.DuplicateEmailResponse;
 import kr.co.pawpaw.api.dto.auth.SignUpRequest;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpInfoResponse;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpRequest;
-import kr.co.pawpaw.api.util.FileUtil;
+import kr.co.pawpaw.api.util.file.FileUtil;
 import kr.co.pawpaw.common.exception.auth.DuplicateEmailException;
 import kr.co.pawpaw.common.exception.auth.DuplicatePhoneNumberException;
 import kr.co.pawpaw.common.exception.auth.InvalidOAuth2TempKeyException;

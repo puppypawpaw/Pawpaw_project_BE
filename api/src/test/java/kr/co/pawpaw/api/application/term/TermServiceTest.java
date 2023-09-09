@@ -86,7 +86,7 @@ class TermServiceTest {
     }
 
     @Test
-    @DisplayName("getTerm 메서드 termQuery findById 메소드 호출 테스트")
+    @DisplayName("getTerm 메서드 termQuery findById 메서드 호출 테스트")
     void getTerm() {
         //given
         Long id = 1L;

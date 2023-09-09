@@ -46,7 +46,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    @DisplayName("whoAmI 메소드 테스트")
+    @DisplayName("whoAmI 메서드 테스트")
     void whoAmI() {
         //given
         Position position = Position.builder()
@@ -84,7 +84,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("getUserEmail 메소드 예외 테스트")
+    @DisplayName("getUserEmail 메서드 예외 테스트")
     void getUserEmailException() {
         //given
         LocalDateTime now = LocalDateTime.now();
@@ -108,7 +108,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("getUserEmail 메소드 정상작동 테스트")
+    @DisplayName("getUserEmail 메서드 정상작동 테스트")
     void getUserEmail() {
         //given
         LocalDateTime now = LocalDateTime.now();

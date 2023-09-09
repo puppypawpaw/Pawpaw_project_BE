@@ -80,6 +80,10 @@ project(':infrastructure:feign-client') {
 
 }
 
+project(':infrastructure:mail') {
+
+}
+
 project(':api') {
     dependencies {
         implementation project(path: ':domain:domain-rdb', configuration: 'default')
@@ -87,6 +91,7 @@ project(':api') {
         implementation project(path: ':common', configuration: 'default')
         implementation project(path: ':infrastructure:feign-client', configuration: 'default')
         implementation project(path: ':infrastructure:object-storage', configuration: 'default')
+        implementation project(path: ':infrastructure:mail', configuration: 'default')
     }
 }
 

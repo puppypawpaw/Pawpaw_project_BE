@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.util;
+package kr.co.pawpaw.api.util.time;
 
 import lombok.experimental.UtilityClass;
 

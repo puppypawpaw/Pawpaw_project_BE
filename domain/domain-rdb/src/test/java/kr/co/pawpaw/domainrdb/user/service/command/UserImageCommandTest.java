@@ -22,7 +22,7 @@ class UserImageCommandTest {
     UserImageCommand userImageCommand;
 
     @Test
-    @DisplayName("save 메소드 테스트")
+    @DisplayName("save 메서드 테스트")
     void save() {
         //given
         UserImage userImage = UserImage.builder()

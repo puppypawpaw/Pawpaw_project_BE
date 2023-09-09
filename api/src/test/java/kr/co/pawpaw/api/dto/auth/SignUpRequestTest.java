@@ -98,7 +98,7 @@ class SignUpRequestTest {
     }
 
     @Test
-    @DisplayName("toUser 메소드 테스트")
+    @DisplayName("toUser 메서드 테스트")
     void toUser() {
         //given
         SignUpRequest request = SignUpRequest.builder()
@@ -133,7 +133,7 @@ class SignUpRequestTest {
     }
 
     @Test
-    @DisplayName("toPet 메소드 테스트")
+    @DisplayName("toPet 메서드 테스트")
     void toPet() {
         //given
         List<CreatePetRequest> petInfos = List.of(
@@ -179,7 +179,7 @@ class SignUpRequestTest {
     }
 
     @Test
-    @DisplayName("deletePhoneNumberHyphen 메소드 테스트")
+    @DisplayName("deletePhoneNumberHyphen 메서드 테스트")
     void deletePhoneNumberHyphen() {
         //given
         SignUpRequest request = SignUpRequest.builder()

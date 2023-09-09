@@ -1,9 +1,9 @@
-package kr.co.pawpaw.api.util;
+package kr.co.pawpaw.api.util.mask;
 
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class EmailUtil {
+public class MaskUtil {
     public String getMaskedEmail(final String email) {
         String[] emailSplit = email.split("@");
         String front = emailSplit[0];

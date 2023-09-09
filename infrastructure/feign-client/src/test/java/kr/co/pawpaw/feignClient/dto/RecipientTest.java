@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.*;
 
 class RecipientTest {
     @Test
-    @DisplayName("deleteToHyphen 메소드 테스트")
+    @DisplayName("deleteToHyphen 메서드 테스트")
     void deleteToHyphen() {
         //given
         String noHyphen = "01012332112";

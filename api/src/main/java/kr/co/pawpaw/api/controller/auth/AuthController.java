@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pawpaw.api.application.auth.ChangePasswordService;
 import kr.co.pawpaw.api.application.auth.SignInService;
 import kr.co.pawpaw.api.application.auth.SignOutService;
 import kr.co.pawpaw.api.application.auth.SignUpService;
@@ -35,6 +36,7 @@ public class AuthController {
     private final SignUpService signUpService;
     private final SignInService signInService;
     private final SmsService smsService;
+    private final ChangePasswordService changePasswordService;
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
@@ -141,7 +143,7 @@ public class AuthController {
             content = @Content
         ),
         @ApiResponse(
-            responseCode = "400",
+            responseCode = "404",
             description = "존재하지 않는 유저입니다.",
             content = @Content
         )
@@ -237,5 +239,49 @@ public class AuthController {
         @RequestBody final CheckVerificationCodeRequest request
     ) {
         return ResponseEntity.ok(smsService.checkVerificationCode(request, SmsUsagePurpose.SIGN_UP));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 유저입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "POST",
+        summary = "비밀번호 변경 url 전송",
+        description = "비밀번호 변경 url 전송"
+    )
+    @PostMapping("/change/password/mail")
+    public ResponseEntity<Void> sendChangePasswordMail(
+        @RequestBody final ChangePasswordMailRequest request
+    ) {
+        changePasswordService.sendChangePasswordMail(request);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 비밀번호 변경 임시키입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "POST",
+        summary = "비밀번호 변경",
+        description = "비밀번호 변경"
+    )
+    @PostMapping("/change/password")
+    public ResponseEntity<Void> changePassword(
+        @RequestBody final ChangePasswordRequest request
+    ) {
+        changePasswordService.changePassword(request);
+
+        return ResponseEntity.noContent().build();
     }
 }

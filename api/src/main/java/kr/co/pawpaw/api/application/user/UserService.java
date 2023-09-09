@@ -3,8 +3,8 @@ package kr.co.pawpaw.api.application.user;
 import kr.co.pawpaw.api.application.file.FileService;
 import kr.co.pawpaw.api.dto.user.UserEmailResponse;
 import kr.co.pawpaw.api.dto.user.UserResponse;
-import kr.co.pawpaw.api.util.EmailUtil;
-import kr.co.pawpaw.api.util.TimeUtil;
+import kr.co.pawpaw.api.util.mask.MaskUtil;
+import kr.co.pawpaw.api.util.time.TimeUtil;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
@@ -60,7 +60,7 @@ public class UserService {
 
     private UserEmailResponse getUserEmailResponse(final User user) {
         return UserEmailResponse.of(
-            EmailUtil.getMaskedEmail(user.getEmail()),
+            MaskUtil.getMaskedEmail(user.getEmail()),
             TimeUtil.getYearMonthDay(user.getCreatedDate())
         );
     }

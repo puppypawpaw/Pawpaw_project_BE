@@ -2,7 +2,7 @@ package kr.co.pawpaw.domainredis.auth.service.command;
 
 import kr.co.pawpaw.domainredis.auth.domain.VerificationCode;
 import kr.co.pawpaw.domainredis.auth.repository.VerificationCodeRepository;
-import kr.co.pawpaw.domainredis.config.properties.VerificationLifeTimeProperties;
+import kr.co.pawpaw.domainredis.config.property.TtlProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,12 +18,12 @@ class VerificationCodeCommandTest {
     @Mock
     private VerificationCodeRepository verificationCodeRepository;
     @Mock
-    private VerificationLifeTimeProperties verificationLifeTimeProperties;
+    private TtlProperties ttlProperties;
     @InjectMocks
     private VerificationCodeCommand verificationCodeCommand;
 
     @Test
-    @DisplayName("save 메소드 테스트")
+    @DisplayName("save 메서드 테스트")
     void save() {
         //given
         VerificationCode input = VerificationCode.builder()
@@ -33,7 +33,7 @@ class VerificationCodeCommandTest {
             .build();
         Long ttl = 360L;
 
-        when(verificationLifeTimeProperties.getCode()).thenReturn(ttl);
+        when(ttlProperties.getVerificationLifeTimeCode()).thenReturn(ttl);
         when(verificationCodeRepository.save(eq(input))).thenReturn(input);
         //when
         VerificationCode result = verificationCodeCommand.save(input);
@@ -45,7 +45,7 @@ class VerificationCodeCommandTest {
     }
 
     @Test
-    @DisplayName("deleteByPhoneNumberAndUsagePurpose 메소드 테스트")
+    @DisplayName("deleteByPhoneNumberAndUsagePurpose 메서드 테스트")
     void deleteByPhoneNumberAndUsagePurpose() {
         //given
         VerificationCode input = VerificationCode.builder()
@@ -62,7 +62,7 @@ class VerificationCodeCommandTest {
     }
 
     @Test
-    @DisplayName("deleteById 메소드 verificationCodeRepository deleteById 메서드 호출 테스트")
+    @DisplayName("deleteById 메서드 verificationCodeRepository deleteById 메서드 호출 테스트")
     void deleteById() {
         //given
         String id = "id";

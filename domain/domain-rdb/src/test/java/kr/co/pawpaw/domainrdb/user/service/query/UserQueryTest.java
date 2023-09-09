@@ -1,5 +1,6 @@
 package kr.co.pawpaw.domainrdb.user.service.query;
 
+import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -26,10 +27,11 @@ class UserQueryTest {
         .name("user-name")
         .nickname("user-nickname")
         .password("123")
+        .provider(OAuth2Provider.GOOGLE)
         .build();
 
     @Test
-    @DisplayName("existsByEmailAndProvider 메소드 테스트")
+    @DisplayName("existsByEmailAndProvider 메서드 테스트")
     void existsByEmailAndProvider() {
         //given
         when(userRepository.existsByEmailAndProvider(eq(user.getEmail()), eq(user.getProvider()))).thenReturn(true);
@@ -43,7 +45,7 @@ class UserQueryTest {
 
 
     @Test
-    @DisplayName("existsByUserIdAndRole 메소드 테스트")
+    @DisplayName("existsByUserIdAndRole 메서드 테스트")
     void existsByUserIdAndRole() {
         //given
         when(userRepository.existsByUserIdAndRole(eq(user.getUserId()), eq(user.getRole()))).thenReturn(true);
@@ -56,7 +58,7 @@ class UserQueryTest {
     }
 
     @Test
-    @DisplayName("findByUserId 메소드 테스트")
+    @DisplayName("findByUserId 메서드 테스트")
     void findByUserId() {
         //given
         when(userRepository.findById(eq(user.getUserId()))).thenReturn(Optional.of(user));
@@ -70,10 +72,11 @@ class UserQueryTest {
     }
 
     @Test
-    @DisplayName("findByEmailAndProvider 메소드 테스트")
+    @DisplayName("findByEmailAndProvider 메서드 테스트")
     void findByEmailAndProvider() {
         //given
-        when(userRepository.findByEmailAndProvider(eq(user.getEmail()), eq(user.getProvider()))).thenReturn(Optional.of(user));
+        when(userRepository.findByEmailAndProvider(user.getEmail(), user.getProvider())).thenReturn(Optional.of(user));
+
         //when
         Optional<User> result = userQuery.findByEmailAndProvider(user.getEmail(), user.getProvider());
 
@@ -84,7 +87,22 @@ class UserQueryTest {
     }
 
     @Test
-    @DisplayName("existsByPhoneNumber 메소드 테스트")
+    @DisplayName("findByNameAndEmailAndProvider 메서드 테스트")
+    void findByNameAndEmailAndProvider() {
+        //given
+        when(userRepository.findByNameAndEmailAndProvider(user.getName(), user.getEmail(), user.getProvider())).thenReturn(Optional.of(user));
+
+        //when
+        Optional<User> result = userQuery.findByNameAndEmailAndProvider(user.getName(), user.getEmail(), user.getProvider());
+
+        //then
+        verify(userRepository).findByNameAndEmailAndProvider(user.getName(), user.getEmail(), user.getProvider());
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get()).isEqualTo(user);
+    }
+
+    @Test
+    @DisplayName("existsByPhoneNumber 메서드 테스트")
     void existsByPhoneNumber() {
         //given
         when(userRepository.existsByPhoneNumber(eq(user.getPhoneNumber()))).thenReturn(true);
@@ -98,7 +116,7 @@ class UserQueryTest {
     }
 
     @Test
-    @DisplayName("findByNameAndPhoneNumber 메소드 테스트")
+    @DisplayName("findByNameAndPhoneNumber 메서드 테스트")
     void findByNameAndPhoneNumber() {
         //given
         when(userRepository.findByNameAndPhoneNumber(user.getName(), user.getPhoneNumber())).thenReturn(Optional.of(user));

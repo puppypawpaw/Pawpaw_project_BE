@@ -25,7 +25,7 @@ class UserImageQueryTest {
     UserImageQuery userImageQuery;
 
     @Test
-    @DisplayName("findByUserId 메소드 테스트")
+    @DisplayName("findByUserId 메서드 테스트")
     void findByUserId() {
         //given
         UserId userId = UserId.create();

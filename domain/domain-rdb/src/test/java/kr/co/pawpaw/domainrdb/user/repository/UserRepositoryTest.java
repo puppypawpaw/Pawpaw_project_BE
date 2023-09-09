@@ -25,7 +25,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsById 메소드 테스트")
+    @DisplayName("existsById 메서드 테스트")
     void existsById() {
         //given
         User user1 = User.builder()
@@ -52,7 +52,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsByEmailAndProvider 메소드 테스트")
+    @DisplayName("existsByEmailAndProvider 메서드 테스트")
     void existsByEmailAndProvider() {
         //given
         User user1 = User.builder()
@@ -74,7 +74,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsByUserIdAndRole 메소드 테스트")
+    @DisplayName("existsByUserIdAndRole 메서드 테스트")
     void existsByUserIdAndRole() {
         //given
         User user1 = User.builder().build();
@@ -95,7 +95,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("findById 메소드 테스트")
+    @DisplayName("findById 메서드 테스트")
     void findById() {
         //given
         User user1 = User.builder()
@@ -151,7 +151,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("findByNameAndPhoneNumber 메소드 테스트")
+    @DisplayName("findByNameAndPhoneNumber 메서드 테스트")
     void findByNameAndPhoneNumber() {
         //given
         User user1 = User.builder()
@@ -169,5 +169,26 @@ class UserRepositoryTest {
         //then
         assertThat(result.isPresent()).isTrue();
         assertThat(result.get()).usingRecursiveComparison().isEqualTo(user1);
+    }
+
+    @Test
+    @DisplayName("findByNameAndEmailAndProvider 메서드 테스트")
+    void findByNameAndEmailAndProvider() {
+        //given
+        User user = User.builder()
+            .email("user1@gmail.com")
+            .name("user1-name")
+            .phoneNumber("user1-phoneNumber")
+            .provider(OAuth2Provider.NAVER)
+            .build();
+
+        userRepository.save(user);
+
+        //when
+        Optional<User> result = userRepository.findByNameAndEmailAndProvider(user.getName(), user.getEmail(), user.getProvider());
+
+        //then
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get()).usingRecursiveComparison().isEqualTo(user);
     }
 }

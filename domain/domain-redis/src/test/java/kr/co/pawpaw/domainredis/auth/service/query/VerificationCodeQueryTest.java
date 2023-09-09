@@ -22,7 +22,7 @@ class VerificationCodeQueryTest {
     private VerificationCodeQuery verificationCodeQuery;
 
     @Test
-    @DisplayName("findByIdAndCode 메소드 테스트")
+    @DisplayName("findByIdAndCode 메서드 테스트")
     void findByIdAndCode() {
         //given
         String phoneNumber = "123321";

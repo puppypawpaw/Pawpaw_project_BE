@@ -20,7 +20,7 @@ class UserCommandTest {
     private UserCommand userCommand;
 
     @Test
-    @DisplayName("save 메소드 테스트")
+    @DisplayName("save 메서드 테스트")
     void save() {
         //given
         User user = User.builder()

@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.*;
 
 class TermResponseTest {
     @Test
-    @DisplayName("of 메소드 테스트")
+    @DisplayName("of 메서드 테스트")
     void of() {
         //given
         Term term = Term.builder()

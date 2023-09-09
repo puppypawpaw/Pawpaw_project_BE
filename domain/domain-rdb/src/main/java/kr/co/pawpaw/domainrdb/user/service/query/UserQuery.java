@@ -37,6 +37,14 @@ public class UserQuery {
         return userRepository.findByNameAndPhoneNumber(name, phoneNumber);
     }
 
+    public Optional<User> findByNameAndEmailAndProvider(
+        final String name,
+        final String email,
+        final OAuth2Provider provider
+    ) {
+        return userRepository.findByNameAndEmailAndProvider(name, email, provider);
+    }
+
     public Optional<User> findByEmailAndProvider(
         final String email,
         final OAuth2Provider oAuth2Provider

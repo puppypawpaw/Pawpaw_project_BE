@@ -1,6 +1,0 @@
-custom:
-  verification:
-    lifetime:
-      code: 600
-      signup: 86400
-      defaultTtl: 86400

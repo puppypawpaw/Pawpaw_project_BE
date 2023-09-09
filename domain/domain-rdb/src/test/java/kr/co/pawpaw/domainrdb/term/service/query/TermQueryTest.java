@@ -37,7 +37,7 @@ class TermQueryTest {
     private Long inputId = 1L;
 
     @Test
-    @DisplayName("findById 메소드 테스트")
+    @DisplayName("findById 메서드 테스트")
     void findById() {
         //given
         when(termRepository.findById(eq(inputId))).thenReturn(Optional.of(input));

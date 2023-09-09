@@ -69,7 +69,7 @@ class VerificationCodeRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsByIdAndCode 메소드 테스트")
+    @DisplayName("existsByIdAndCode 메서드 테스트")
     void existsByIdAndCode() {
         //given
         VerificationCode input1 = VerificationCode.builder()
