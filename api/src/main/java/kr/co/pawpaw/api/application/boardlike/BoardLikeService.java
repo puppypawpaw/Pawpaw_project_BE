@@ -1,13 +1,13 @@
-package kr.co.pawpaw.api.application.board;
+package kr.co.pawpaw.api.application.boardlike;
 
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.board.BoardLikeException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.board.domain.Board;
-import kr.co.pawpaw.domainrdb.board.domain.BoardLikes;
+import kr.co.pawpaw.domainrdb.boardlike.domain.BoardLikes;
 import kr.co.pawpaw.domainrdb.board.service.query.BoardQuery;
-import kr.co.pawpaw.domainrdb.board.service.query.BoardLikeQuery;
-import kr.co.pawpaw.domainrdb.board.service.command.BoardLikeCommand;
+import kr.co.pawpaw.domainrdb.boardlike.service.query.BoardLikeQuery;
+import kr.co.pawpaw.domainrdb.boardlike.service.command.BoardLikeCommand;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
