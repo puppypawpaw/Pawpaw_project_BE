@@ -1,10 +1,7 @@
 package kr.co.pawpaw.api.application.user;
 
 import kr.co.pawpaw.api.application.file.FileService;
-import kr.co.pawpaw.api.dto.user.UserEmailResponse;
 import kr.co.pawpaw.api.dto.user.UserResponse;
-import kr.co.pawpaw.api.util.mask.MaskUtil;
-import kr.co.pawpaw.api.util.time.TimeUtil;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
@@ -35,12 +32,6 @@ public class UserService {
             .orElseThrow(NotFoundUserException::new);
     }
 
-    public UserEmailResponse getUserEmail(final String name, final String phoneNumber) {
-        return userQuery.findByNameAndPhoneNumber(name, phoneNumber)
-            .map(this::getUserEmailResponse)
-            .orElseThrow(NotFoundUserException::new);
-    }
-
     @Transactional
     public void updateUserImage(
         final UserId userId,
@@ -56,13 +47,6 @@ public class UserService {
         } else {
             createNewUserImage(userId, newFile);
         }
-    }
-
-    private UserEmailResponse getUserEmailResponse(final User user) {
-        return UserEmailResponse.of(
-            MaskUtil.getMaskedEmail(user.getEmail()),
-            TimeUtil.getYearMonthDay(user.getCreatedDate())
-        );
     }
 
     private void updateExistingUserImage(final UserImage userImage, final File newFile) {

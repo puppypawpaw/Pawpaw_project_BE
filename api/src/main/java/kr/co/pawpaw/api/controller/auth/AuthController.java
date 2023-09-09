@@ -5,16 +5,14 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.pawpaw.api.application.auth.ChangePasswordService;
-import kr.co.pawpaw.api.application.auth.SignInService;
-import kr.co.pawpaw.api.application.auth.SignOutService;
-import kr.co.pawpaw.api.application.auth.SignUpService;
+import kr.co.pawpaw.api.application.auth.*;
 import kr.co.pawpaw.api.application.sms.SmsService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.auth.*;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeResponse;
 import kr.co.pawpaw.api.dto.sms.SendVerificationCodeRequest;
+import kr.co.pawpaw.api.dto.user.UserEmailResponse;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsUsagePurpose;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +35,7 @@ public class AuthController {
     private final SignInService signInService;
     private final SmsService smsService;
     private final ChangePasswordService changePasswordService;
+    private final FindEmailService findEmailService;
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
@@ -283,5 +282,26 @@ public class AuthController {
         changePasswordService.changePassword(request);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 유저입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "GET",
+        summary = "유저 이메일 찾기",
+        description = "유저 이메일 찾기"
+    )
+    @GetMapping("/email")
+    public ResponseEntity<UserEmailResponse> getUserEmail(
+        @RequestParam final String name,
+        @RequestParam final String phoneNumber
+    ) {
+        return ResponseEntity.ok(findEmailService.getUserEmail(name, phoneNumber));
     }
 }

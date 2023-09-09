@@ -59,25 +59,4 @@ public class UserController {
 
         return ResponseEntity.noContent().build();
     }
-
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200"),
-        @ApiResponse(
-            responseCode = "404",
-            description = "존재하지 않는 유저입니다.",
-            content = @Content
-        )
-    })
-    @Operation(
-        method = "GET",
-        summary = "유저 이메일 찾기",
-        description = "유저 이메일 찾기"
-    )
-    @GetMapping("/email")
-    public ResponseEntity<UserEmailResponse> getUserEmail(
-        @RequestParam final String name,
-        @RequestParam final String phoneNumber
-    ) {
-        return ResponseEntity.ok(userService.getUserEmail(name, phoneNumber));
-    }
 }
