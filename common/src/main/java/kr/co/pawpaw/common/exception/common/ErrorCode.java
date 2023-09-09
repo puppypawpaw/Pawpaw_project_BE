@@ -30,7 +30,13 @@ public enum ErrorCode {
     BOARD_LIKE_FAIL_EXCEPTION(400, "BOARD_LIKE_FAIL_EXCEPTION", "좋아요 추가에 실패했습니다."),
     BOARD_DELETE_LIKE_FAIL_EXCEPTION(400, "BOARD_DELETE_LIKE_FAIL_EXCEPTION", "좋아요 취소에 실패했습니다."),
     // SMS
-    OUT_OF_SMS_LIMIT(429, "SM001", "일일 SMS 발송 허용량을 초과하였습니다.");
+    OUT_OF_SMS_LIMIT(429, "SM001", "일일 SMS 발송 허용량을 초과하였습니다."),
+
+    REPLY_NOTFOUND_EXCEPTION(400, "REPLY_NOTFOUND_EXCEPTION", "댓글을 찾지 못했습니다"),
+    REPLY_REGISTRATION_EXCEPTION(400, "REPLY_REGISTRATION_EXCEPTION", "댓글 등록에 실패했습니다"),
+    REPLY_UPDATE_EXCEPTION(400, "REPLY_UPDATE_EXCEPTION", "댓글 수정에 실패했습니다");
+
+
 
     private final int status;
     private final String code;

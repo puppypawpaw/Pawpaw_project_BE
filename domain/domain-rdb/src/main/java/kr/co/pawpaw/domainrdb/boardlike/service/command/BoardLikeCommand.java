@@ -1,7 +1,7 @@
-package kr.co.pawpaw.domainrdb.board.service.command;
+package kr.co.pawpaw.domainrdb.boardlike.service.command;
 
-import kr.co.pawpaw.domainrdb.board.domain.BoardLikes;
-import kr.co.pawpaw.domainrdb.board.repository.BoardLikesRepository;
+import kr.co.pawpaw.domainrdb.boardlike.domain.BoardLikes;
+import kr.co.pawpaw.domainrdb.boardlike.repository.BoardLikesRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

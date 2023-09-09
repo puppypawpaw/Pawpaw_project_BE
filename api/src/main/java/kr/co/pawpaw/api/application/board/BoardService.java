@@ -1,7 +1,10 @@
 package kr.co.pawpaw.api.application.board;
 
+import kr.co.pawpaw.api.application.reply.ReplyService;
 import kr.co.pawpaw.api.dto.board.BoardDto;
+import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.RegisterResponseDto;
+import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
 import kr.co.pawpaw.common.exception.board.BoardException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardUpdateException;
@@ -15,11 +18,17 @@ import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +38,7 @@ public class BoardService {
     private final UserQuery userQuery;
     private final BoardQuery boardQuery;
     private final BoardCommand boardCommand;
+    private final ReplyService replyService;
 
     @Transactional
     public RegisterResponseDto register(UserId userId, BoardDto.BoardRegisterDto registerDto) {
@@ -89,4 +99,33 @@ public class BoardService {
         return true;
     }
 
+    @Transactional(readOnly = true)
+    public Slice<BoardListDto> getBoardListWithReplies(UserId userId, Pageable pageable) {
+        userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
+        Slice<Board> boardListWithReplies = boardQuery.getBoardListWithRepliesBy(pageable);
+        // 게시글 리스트를 DTO로 변환
+        List<BoardListDto> boardListDtos = boardListWithReplies.stream()
+                .map(this::convertBoardToDto)
+                .collect(Collectors.toList());
+
+        // 각 게시글에 대한 댓글 리스트를 가져와서 설정
+        boardListDtos.forEach(boardDto -> {
+            List<ReplyListDto> replyList = replyService.findReplyListByBoardId(userId, boardDto.getId(), pageable).getContent();
+            boardDto.setReplyListToBoard(replyList);
+        });
+        return new SliceImpl<>(boardListDtos, pageable, boardListWithReplies.hasNext());
+    }
+
+    private BoardListDto convertBoardToDto(Board board) {
+        return BoardListDto.builder()
+                .id(board.getId())
+                .title(board.getTitle())
+                .content(board.getContent())
+                .likedCount(board.getLikedCount())
+                .replyCount(board.getReplyCount())
+                .writer(board.getWriter())
+                .createdDate(board.getCreatedDate())
+                .modifiedDate(board.getModifiedDate())
+                .build();
+    }
 }

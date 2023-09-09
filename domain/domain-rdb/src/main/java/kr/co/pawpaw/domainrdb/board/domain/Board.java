@@ -1,6 +1,7 @@
 package kr.co.pawpaw.domainrdb.board.domain;
 
 import kr.co.pawpaw.domainrdb.common.BaseTimeEntity;
+import kr.co.pawpaw.domainrdb.reply.domain.Reply;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,9 +38,15 @@ public final class Board extends BaseTimeEntity {
     @Column(name = "liked_count")
     private int likedCount;
 
+    @Column(name = "reply_count")
+    private int replyCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Reply> reply = new ArrayList<>();
 
     @Builder
     public Board(String title, String content, User user, String writer) {
@@ -47,8 +56,6 @@ public final class Board extends BaseTimeEntity {
         this.writer = writer;
         this.isRemoved = false;
     }
-
-
     public void plusLikedCount(){
         this.likedCount = likedCount +1;
     }
@@ -56,12 +63,18 @@ public final class Board extends BaseTimeEntity {
         this.likedCount = likedCount - 1;
     }
 
+    public void plusReplyCount(){
+        this.replyCount = replyCount +1;
+    }
+    public void minusReplyCount(){
+        this.replyCount = replyCount - 1;
+    }
+
 
     public void updateTitleAndContent(String title, String content){
         this.title = title;
         this.content = content;
     }
-
     public void remove() {
         this.isRemoved = true;
     }
