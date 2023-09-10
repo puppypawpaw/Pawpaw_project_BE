@@ -275,7 +275,7 @@ public class AuthController {
         summary = "비밀번호 변경",
         description = "비밀번호 변경"
     )
-    @PatchMapping("/change/password")
+    @PatchMapping("/password")
     public ResponseEntity<Void> changePassword(
         @RequestBody final ChangePasswordRequest request
     ) {
