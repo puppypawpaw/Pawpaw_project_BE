@@ -253,7 +253,7 @@ public class AuthController {
         summary = "비밀번호 변경 url 전송",
         description = "비밀번호 변경 url 전송"
     )
-    @PostMapping("/change/password/mail")
+    @PostMapping("/password/reset/mail")
     public ResponseEntity<Void> sendChangePasswordMail(
         @RequestBody final ChangePasswordMailRequest request
     ) {
