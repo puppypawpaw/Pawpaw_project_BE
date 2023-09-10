@@ -20,16 +20,18 @@ public class RefreshToken {
     private String value;
 
     @TimeToLive
-    private Long timeout;
+    private Long ttl;
 
     @Builder
     public RefreshToken(
         final String userId,
-        final String value,
-        final Long timeout
+        final String value
     ) {
         this.userId = userId;
         this.value = value;
-        this.timeout = timeout;
+    }
+
+    public void updateTtl(final Long ttl) {
+        this.ttl = ttl;
     }
 }

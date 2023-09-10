@@ -26,7 +26,6 @@ public class UserService {
     private final FileService fileService;
     private final EntityManager em;
 
-    @Transactional(readOnly = true)
     public UserResponse whoAmI(final UserId userId) {
         return userQuery.findByUserId(userId)
             .map(this::getUserResponse)

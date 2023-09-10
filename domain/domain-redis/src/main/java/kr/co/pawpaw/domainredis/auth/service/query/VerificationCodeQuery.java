@@ -5,16 +5,18 @@ import kr.co.pawpaw.domainredis.auth.repository.VerificationCodeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class VerificationCodeQuery {
     private final VerificationCodeRepository verificationCodeRepository;
 
-    public boolean existsByPhoneNumberAndUsagePurposeAndCode(
+    public Optional<VerificationCode> findByPhoneNumberAndUsagePurposeAndCode(
         final String phoneNumber,
         final String usagePurpose,
         final String code
     ) {
-        return verificationCodeRepository.existsByIdAndCode(VerificationCode.getCompositeKey(phoneNumber, usagePurpose), code);
+        return verificationCodeRepository.findByIdAndCode(VerificationCode.getCompositeKey(phoneNumber, usagePurpose), code);
     }
 }

@@ -27,7 +27,7 @@ class VerificationCodeTest {
     }
 
     @Test
-    @DisplayName("updateTtl 메소드 테스트")
+    @DisplayName("updateTtl 메서드 테스트")
     void updateTtl() {
         // given
         VerificationCode verificationCode = VerificationCode.builder()

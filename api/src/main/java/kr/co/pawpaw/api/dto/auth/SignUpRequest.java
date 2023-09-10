@@ -44,10 +44,14 @@ public class SignUpRequest {
     @Schema(description = "반려동물 생성 요청, 1이상의 길이의 array필요")
     private List<CreatePetRequest> petInfos;
 
-    public User toUser(final String passwordEncoded) {
+    public User toUser(
+        final String passwordEncoded,
+        final String name
+    ) {
         return User.builder()
             .email(email)
             .password(passwordEncoded)
+            .name(name)
             .nickname(nickname)
             .phoneNumber(phoneNumber)
             .position(position.toEntity())

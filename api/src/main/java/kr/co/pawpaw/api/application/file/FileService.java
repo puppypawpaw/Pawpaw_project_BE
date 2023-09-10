@@ -1,8 +1,8 @@
 package kr.co.pawpaw.api.application.file;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import kr.co.pawpaw.api.util.FileUtil;
-import kr.co.pawpaw.api.util.UrlUtil;
+import kr.co.pawpaw.api.util.file.FileUtil;
+import kr.co.pawpaw.api.util.url.UrlUtil;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.storage.service.command.FileCommand;
 import kr.co.pawpaw.domainrdb.user.domain.User;

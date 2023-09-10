@@ -29,14 +29,15 @@ public enum ErrorCode {
     BOARD_DELETE_EXCEPTION(400, "BOARD_DELETE_EXCEPTION", "게시글 삭제에 실패했습니다"),
     BOARD_LIKE_FAIL_EXCEPTION(400, "BOARD_LIKE_FAIL_EXCEPTION", "좋아요 추가에 실패했습니다."),
     BOARD_DELETE_LIKE_FAIL_EXCEPTION(400, "BOARD_DELETE_LIKE_FAIL_EXCEPTION", "좋아요 취소에 실패했습니다."),
-    // SMS
-    OUT_OF_SMS_LIMIT(429, "SM001", "일일 SMS 발송 허용량을 초과하였습니다."),
-
+    // 댓글
     REPLY_NOTFOUND_EXCEPTION(400, "REPLY_NOTFOUND_EXCEPTION", "댓글을 찾지 못했습니다"),
     REPLY_REGISTRATION_EXCEPTION(400, "REPLY_REGISTRATION_EXCEPTION", "댓글 등록에 실패했습니다"),
-    REPLY_UPDATE_EXCEPTION(400, "REPLY_UPDATE_EXCEPTION", "댓글 수정에 실패했습니다");
-
-
+    REPLY_UPDATE_EXCEPTION(400, "REPLY_UPDATE_EXCEPTION", "댓글 수정에 실패했습니다"),
+    // SMS
+    OUT_OF_SMS_LIMIT(429, "SM001", "일일 SMS 발송 허용량을 초과하였습니다."),
+    INVALID_VERIFICATION_CODE(400, "SM002", "유효하지 않은 인증 코드입니다."),
+    // 비밀번호 변경
+    NOT_FOUND_CHANGE_PASSWORD_TEMP_KEY(404, "CP001", "존재하지 않는 비밀번호 변경 임시 키입니다.");
 
     private final int status;
     private final String code;

@@ -27,7 +27,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     "kr.co.pawpaw.domainrdb.*",
     "kr.co.pawpaw.domainredis.*",
     "kr.co.pawpaw.feignClient.*",
-    "kr.co.pawpaw.objectStorage.*"
+    "kr.co.pawpaw.objectStorage.*",
+    "kr.co.pawpaw.mail.*"
 })
 public class ApiApplication {
     public static void main(String[] args) {

@@ -2,7 +2,6 @@ package kr.co.pawpaw.domainrdb.storage.service.command;
 
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.storage.repository.FileRepository;
-import kr.co.pawpaw.domainrdb.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,7 @@ class FileCommandTest {
     FileCommand fileCommand;
 
     @Test
-    @DisplayName("save 메소드 테스트")
+    @DisplayName("save 메서드 테스트")
     void saveTest() {
         //given
         File file = File.builder()

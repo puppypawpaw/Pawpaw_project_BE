@@ -15,10 +15,6 @@ import java.util.Optional;
 public class UserQuery {
     private final UserRepository userRepository;
 
-    public boolean existsByEmail(final String email) {
-        return userRepository.existsByEmail(email);
-    }
-
     public boolean existsByEmailAndProvider(final String email, final OAuth2Provider provider) {
         return userRepository.existsByEmailAndProvider(email, provider);
     }
@@ -30,12 +26,23 @@ public class UserQuery {
         return userRepository.existsByUserIdAndRole(userId, role);
     }
 
-    public Optional<User> findByEmail(final String email) {
-        return userRepository.findByEmail(email);
-    }
-
     public Optional<User> findByUserId(final UserId userId) {
         return userRepository.findById(userId);
+    }
+
+    public Optional<User> findByNameAndPhoneNumber(
+        final String name,
+        final String phoneNumber
+    ) {
+        return userRepository.findByNameAndPhoneNumber(name, phoneNumber);
+    }
+
+    public Optional<User> findByNameAndEmailAndProvider(
+        final String name,
+        final String email,
+        final OAuth2Provider provider
+    ) {
+        return userRepository.findByNameAndEmailAndProvider(name, email, provider);
     }
 
     public Optional<User> findByEmailAndProvider(

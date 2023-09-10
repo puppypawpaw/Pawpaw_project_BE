@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class UserRepositoryTest {
@@ -25,7 +25,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsById 메소드 테스트")
+    @DisplayName("existsById 메서드 테스트")
     void existsById() {
         //given
         User user1 = User.builder()
@@ -52,7 +52,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsByEmailAndProvider 메소드 테스트")
+    @DisplayName("existsByEmailAndProvider 메서드 테스트")
     void existsByEmailAndProvider() {
         //given
         User user1 = User.builder()
@@ -74,7 +74,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("existsByUserIdAndRole 메소드 테스트")
+    @DisplayName("existsByUserIdAndRole 메서드 테스트")
     void existsByUserIdAndRole() {
         //given
         User user1 = User.builder().build();
@@ -95,7 +95,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    @DisplayName("findById 메소드 테스트")
+    @DisplayName("findById 메서드 테스트")
     void findById() {
         //given
         User user1 = User.builder()
@@ -148,5 +148,47 @@ class UserRepositoryTest {
         assertThat(result1.isPresent()).isTrue();
         assertThat(result2.isPresent()).isFalse();
         assertThat(result3.isPresent()).isFalse();
+    }
+
+    @Test
+    @DisplayName("findByNameAndPhoneNumber 메서드 테스트")
+    void findByNameAndPhoneNumber() {
+        //given
+        User user1 = User.builder()
+            .email("user1")
+            .name("user1-name")
+            .phoneNumber("user1-phoneNumber")
+            .provider(OAuth2Provider.KAKAO)
+            .build();
+
+        userRepository.save(user1);
+
+        //when
+        Optional<User> result = userRepository.findByNameAndPhoneNumber(user1.getName(), user1.getPhoneNumber());
+
+        //then
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get()).usingRecursiveComparison().isEqualTo(user1);
+    }
+
+    @Test
+    @DisplayName("findByNameAndEmailAndProvider 메서드 테스트")
+    void findByNameAndEmailAndProvider() {
+        //given
+        User user = User.builder()
+            .email("user1@gmail.com")
+            .name("user1-name")
+            .phoneNumber("user1-phoneNumber")
+            .provider(OAuth2Provider.NAVER)
+            .build();
+
+        userRepository.save(user);
+
+        //when
+        Optional<User> result = userRepository.findByNameAndEmailAndProvider(user.getName(), user.getEmail(), user.getProvider());
+
+        //then
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get()).usingRecursiveComparison().isEqualTo(user);
     }
 }

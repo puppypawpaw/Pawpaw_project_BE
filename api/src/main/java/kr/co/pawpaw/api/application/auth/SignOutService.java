@@ -1,6 +1,6 @@
 package kr.co.pawpaw.api.application.auth;
 
-import kr.co.pawpaw.api.util.CookieUtil;
+import kr.co.pawpaw.api.util.cookie.CookieUtil;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainredis.auth.domain.TokenType;
 import kr.co.pawpaw.domainredis.auth.service.command.RefreshTokenCommand;

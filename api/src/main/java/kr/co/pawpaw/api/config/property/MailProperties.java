@@ -1,4 +1,4 @@
-package kr.co.pawpaw.domainredis.config.properties;
+package kr.co.pawpaw.api.config.property;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -6,13 +6,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
+import javax.validation.constraints.NotNull;
+
+
 @Getter
 @Validated
 @ConstructorBinding
-@ConfigurationProperties(prefix = "custom.verification.lifetime")
 @RequiredArgsConstructor
-public class VerificationLifeTimeProperties {
-    private final Long code;
-    private final Long signup;
-    private final Long defaultTtl;
+@ConfigurationProperties(prefix = "custom.mail")
+public class MailProperties {
+    @NotNull
+    private final String changePasswordRedirectUrl;
 }

@@ -2,6 +2,7 @@ package kr.co.pawpaw.domainredis.auth.service.command;
 
 import kr.co.pawpaw.domainredis.auth.domain.RefreshToken;
 import kr.co.pawpaw.domainredis.auth.repository.RefreshTokenRepository;
+import kr.co.pawpaw.domainredis.config.property.TtlProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,25 +21,28 @@ import static org.mockito.Mockito.when;
 class RefreshTokenCommandTest {
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
+    @Mock
+    private TtlProperties ttlProperties;
     @InjectMocks
     private RefreshTokenCommand refreshTokenCommand;
 
     @Test
-    @DisplayName("save 메소드 테스트")
+    @DisplayName("save 메서드 테스트")
     void save() {
         //given
         RefreshToken input = RefreshToken.builder()
             .userId(UUID.randomUUID().toString())
             .value("refreshTokenValue")
-            .timeout(3600L)
             .build();
 
         RefreshToken notInput = RefreshToken.builder()
             .userId(UUID.randomUUID().toString())
             .value("refreshTokenValue2")
-            .timeout(3601L)
             .build();
 
+        Long ttl = 360L;
+
+        when(ttlProperties.getRefreshToken()).thenReturn(ttl);
         when(refreshTokenRepository.save(any(RefreshToken.class))).thenReturn(input);
 
         //when
@@ -46,8 +50,10 @@ class RefreshTokenCommandTest {
 
         //then
         verify(refreshTokenRepository).save(input);
+        verify(ttlProperties).getRefreshToken();
         assertThat(result).isEqualTo(input);
         assertThat(result).isNotEqualTo(notInput);
+        assertThat(result.getTtl()).isEqualTo(ttl);
     }
 
     @Test

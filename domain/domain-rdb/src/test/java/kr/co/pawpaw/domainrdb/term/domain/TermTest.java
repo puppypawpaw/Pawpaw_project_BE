@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.*;
 
 class TermTest {
     @Test
-    @DisplayName("update 메소드 테스트")
+    @DisplayName("update 메서드 테스트")
     void update() {
         //given
         Term term = Term.builder()

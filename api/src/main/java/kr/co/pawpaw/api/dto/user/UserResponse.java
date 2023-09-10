@@ -19,7 +19,6 @@ public class UserResponse {
     @Schema(description = "유저 이미지 URL", type = "STRING")
     private String imageUrl;
 
-
     private UserResponse(
         final String email,
         final Role role,

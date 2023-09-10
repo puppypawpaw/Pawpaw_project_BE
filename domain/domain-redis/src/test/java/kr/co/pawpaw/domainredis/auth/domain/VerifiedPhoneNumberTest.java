@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.*;
 
 class VerifiedPhoneNumberTest {
     @Test
-    @DisplayName("updateTtl 메소드 테스트")
+    @DisplayName("updateTtl 메서드 테스트")
     void updateTtl() {
         //given
         VerifiedPhoneNumber verifiedPhoneNumber = VerifiedPhoneNumber.builder()

@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.util;
+package kr.co.pawpaw.api.util.url;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.experimental.UtilityClass;

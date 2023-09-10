@@ -2,7 +2,7 @@ package kr.co.pawpaw.domainredis.auth.service.command;
 
 import kr.co.pawpaw.domainredis.auth.domain.VerifiedPhoneNumber;
 import kr.co.pawpaw.domainredis.auth.repository.VerifiedPhoneNumberRepository;
-import kr.co.pawpaw.domainredis.config.properties.VerificationLifeTimeProperties;
+import kr.co.pawpaw.domainredis.config.property.TtlProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class VerifiedPhoneNumberCommand {
     private final VerifiedPhoneNumberRepository verifiedPhoneNumberRepository;
-    private final VerificationLifeTimeProperties verificationLifeTimeProperties;
+    private final TtlProperties ttlProperties;
 
     public VerifiedPhoneNumber save(final VerifiedPhoneNumber verifiedPhoneNumber) {
         updateTtl(verifiedPhoneNumber);
@@ -20,10 +20,10 @@ public class VerifiedPhoneNumberCommand {
     private void updateTtl(VerifiedPhoneNumber verifiedPhoneNumber) {
         switch (verifiedPhoneNumber.getUsagePurpose()) {
             case "SIGN_UP":
-                verifiedPhoneNumber.updateTtl(verificationLifeTimeProperties.getSignup());
+                verifiedPhoneNumber.updateTtl(ttlProperties.getVerificationLifeTimeSignUp());
                 break;
             default:
-                verifiedPhoneNumber.updateTtl(verificationLifeTimeProperties.getDefaultTtl());
+                verifiedPhoneNumber.updateTtl(ttlProperties.getVerificationLifeTimeDefault());
                 break;
         }
     }

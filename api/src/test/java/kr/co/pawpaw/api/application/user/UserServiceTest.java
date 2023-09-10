@@ -42,7 +42,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Test
-    @DisplayName("whoAmI 메소드 테스트")
+    @DisplayName("whoAmI 메서드 테스트")
     void whoAmI() {
         //given
         Position position = Position.builder()

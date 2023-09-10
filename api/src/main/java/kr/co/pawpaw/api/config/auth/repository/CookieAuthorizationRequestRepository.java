@@ -3,7 +3,7 @@ package kr.co.pawpaw.api.config.auth.repository;
 
 import kr.co.pawpaw.api.config.property.CookieProperties;
 import kr.co.pawpaw.api.config.property.OAuth2Properties;
-import kr.co.pawpaw.api.util.CookieUtil;
+import kr.co.pawpaw.api.util.cookie.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;

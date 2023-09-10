@@ -25,7 +25,7 @@ class OAuth2TempAttributesQueryTest {
     private OAuth2TempAttributesQuery oAuth2TempAttributesQuery;
 
     @Test
-    @DisplayName("findById 메소드 테스트")
+    @DisplayName("findById 메서드 테스트")
     void findById() {
         //given
         OAuth2TempAttributes input = OAuth2TempAttributes.builder()

@@ -5,7 +5,7 @@ import kr.co.pawpaw.api.config.auth.provider.JwtTokenProvider;
 import kr.co.pawpaw.api.config.property.CookieProperties;
 import kr.co.pawpaw.api.config.property.JwtProperties;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.api.util.CookieUtil;
+import kr.co.pawpaw.api.util.cookie.CookieUtil;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;

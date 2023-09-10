@@ -5,7 +5,7 @@ import kr.co.pawpaw.api.config.auth.provider.JwtTokenProvider;
 import kr.co.pawpaw.api.config.property.CookieProperties;
 import kr.co.pawpaw.api.config.property.JwtProperties;
 import kr.co.pawpaw.api.dto.auth.SignInRequest;
-import kr.co.pawpaw.api.util.CookieUtil;
+import kr.co.pawpaw.api.util.cookie.CookieUtil;
 import kr.co.pawpaw.domainrdb.user.domain.Role;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainredis.auth.domain.RefreshToken;
@@ -89,7 +89,6 @@ public class SignInService {
         refreshTokenCommand.save(RefreshToken.builder()
             .userId(userId)
             .value(tokenValue)
-            .timeout(jwtProperties.getRefreshTokenLifeTime())
             .build());
     }
 

@@ -2,7 +2,7 @@ package kr.co.pawpaw.domainredis.auth.service.command;
 
 import kr.co.pawpaw.domainredis.auth.domain.VerifiedPhoneNumber;
 import kr.co.pawpaw.domainredis.auth.repository.VerifiedPhoneNumberRepository;
-import kr.co.pawpaw.domainredis.config.properties.VerificationLifeTimeProperties;
+import kr.co.pawpaw.domainredis.config.property.TtlProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,7 +18,7 @@ class VerifiedPhoneNumberCommandTest {
     @Mock
     private VerifiedPhoneNumberRepository verifiedPhoneNumberRepository;
     @Mock
-    private VerificationLifeTimeProperties verificationLifeTimeProperties;
+    private TtlProperties ttlProperties;
     @InjectMocks
     private VerifiedPhoneNumberCommand verifiedPhoneNumberCommand;
 
@@ -32,7 +32,7 @@ class VerifiedPhoneNumberCommandTest {
             .build();
         Long ttl = 1234L;
 
-        when(verificationLifeTimeProperties.getSignup()).thenReturn(ttl);
+        when(ttlProperties.getVerificationLifeTimeSignUp()).thenReturn(ttl);
         when(verifiedPhoneNumberRepository.save(eq(input))).thenReturn(input);
         //when
         VerifiedPhoneNumber result = verifiedPhoneNumberCommand.save(input);
