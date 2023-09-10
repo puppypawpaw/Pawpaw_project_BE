@@ -271,11 +271,11 @@ public class AuthController {
         )
     })
     @Operation(
-        method = "POST",
+        method = "PATCH",
         summary = "비밀번호 변경",
         description = "비밀번호 변경"
     )
-    @PostMapping("/change/password")
+    @PatchMapping("/change/password")
     public ResponseEntity<Void> changePassword(
         @RequestBody final ChangePasswordRequest request
     ) {

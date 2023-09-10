@@ -59,7 +59,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.POST, "/api/auth/sign-up/verification/check").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/auth/sign-up/check/duplicate/email").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/auth/change/password/mail").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/auth/change/password").permitAll()
+                .antMatchers(HttpMethod.PATCH, "/api/auth/password").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/auth/email").permitAll()
                 .antMatchers("/swagger-ui.html").permitAll()
                 .antMatchers("/oauth2/**").permitAll()
