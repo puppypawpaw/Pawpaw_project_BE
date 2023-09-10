@@ -5,3 +5,7 @@ spring:
     secret-key: ${properties.storage.secret-key}
     bucket: ${properties.storage.bucket}
     public-url: ${properties.storage.public-url}
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB

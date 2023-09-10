@@ -64,7 +64,7 @@ public class SignUpService {
         validateRequest(request);
         User user = createUser(request);
 
-        if (Objects.nonNull(image)) {
+        if (image != null && FileUtil.getByteLength(image) > 0) {
             saveUserImageByMultipartFile(image, user);
         }
 
