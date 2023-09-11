@@ -17,6 +17,7 @@ public class Chatroom extends BaseTimeEntity {
     private Long id;
 
     private String name;
+    private String description;
     @Column(nullable = false)
     private Boolean searchable;
     @Column(nullable = false)
@@ -25,10 +26,12 @@ public class Chatroom extends BaseTimeEntity {
     @Builder
     public Chatroom(
         final String name,
+        final String description,
         final Boolean searchable,
         final Boolean locationLimit
     ) {
         this.name = name;
+        this.description = description;
         this.searchable = searchable;
         this.locationLimit = locationLimit;
     }

@@ -17,6 +17,8 @@ import java.util.stream.Collectors;
 public class CreateChatroomRequest {
     @NotBlank
     private String name;
+    @NotBlank
+    private String description;
     @NotNull
     private List<String> hashTagList;
     @NotNull
@@ -27,6 +29,7 @@ public class CreateChatroomRequest {
     public Chatroom toChatroom() {
         return Chatroom.builder()
             .name(name)
+            .description(description)
             .searchable(searchable)
             .locationLimit(locationLimit)
             .build();

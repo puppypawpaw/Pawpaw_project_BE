@@ -61,6 +61,7 @@ class ChatroomServiceTest {
     private final User user = User.builder().build();
     private final CreateChatroomRequest request = CreateChatroomRequest.builder()
         .name("chatroom-name")
+        .description("chatroom-description")
         .locationLimit(true)
         .searchable(false)
         .hashTagList(List.of("hashTag1", "hashTag2"))
