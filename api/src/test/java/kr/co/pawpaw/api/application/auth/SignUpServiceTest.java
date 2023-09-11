@@ -82,7 +82,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("일반 회원가입 메서드 유저 중복 테스트")
-    void 일반_회원가입_메소드_유저_중복_테스트() {
+    void 일반_회원가입_메서드_유저_중복_테스트() {
         //given
         String alreadyExistEmail = "aee";
         SignUpRequest request = SignUpRequest.builder()
@@ -100,7 +100,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("일반 회원가입 메서드 필수 약관 동의 테스트")
-    void 일반_회원가입_메소드_필수_약관_동의_테스트() {
+    void 일반_회원가입_메서드_필수_약관_동의_테스트() {
         //given
         List<Long> termAgrees = List.of(1L, 2L, 4L);
         Set<Long> termAgreesSet = new HashSet<>(termAgrees);
@@ -122,7 +122,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("일반 회원가입 메서드 핸드폰 번호 유효성 테스트")
-    void 일반_회원가입_메소드_핸드폰_번호_유효성_테스트() {
+    void 일반_회원가입_메서드_핸드폰_번호_유효성_테스트() {
         //given
         List<Long> termAgrees = List.of(1L, 2L, 3L);
         Set<Long> termAgreesSet = new HashSet<>(termAgrees);
@@ -161,7 +161,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("일반 회원가입 메서드 이미지 없이 작동 테스트")
-    void 일반_회원가입_메소드_이미지_없이_작동_테스트() {
+    void 일반_회원가입_메서드_이미지_없이_작동_테스트() {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
@@ -278,7 +278,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("일반 회원가입 메서드 작동 테스트")
-    void 일반_회원가입_메소드_작동_테스트() {
+    void 일반_회원가입_메서드_작동_테스트() {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
@@ -398,7 +398,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("소셜 회원가입 메서드 필수 약관 동의 테스트")
-    void 소셜_회원가입_메소드_필수_약관_동의_테스트() {
+    void 소셜_회원가입_메서드_필수_약관_동의_테스트() {
         //given
         List<Long> termAgrees = List.of(1L, 2L, 4L);
         Set<Long> termAgreesSet = new HashSet<>(termAgrees);
@@ -416,7 +416,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("소셜 회원가입 메서드 키 유효성 테스트")
-    void 소셜_회원가입_메소드_키_유효성_테스트() {
+    void 소셜_회원가입_메서드_키_유효성_테스트() {
         //given
         List<Long> termAgrees = List.of(1L, 2L, 3L);
         Set<Long> termAgreesSet = new HashSet<>(termAgrees);
@@ -438,7 +438,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("소셜 회원가입 메서드 이미지 저장 안함 테스트")
-    void 소셜_회원가입_메소드_이미지_저장_안함_테스트() {
+    void 소셜_회원가입_메서드_이미지_저장_안함_테스트() {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
@@ -531,7 +531,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("소셜 회원가입 메서드 MultipartFile 이미지 저장 테스트")
-    void 소셜_회원가입_메소드_MultipartFile_이미지_저장_테스트() throws IOException {
+    void 소셜_회원가입_메서드_MultipartFile_이미지_저장_테스트() throws IOException {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
@@ -625,7 +625,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("소셜 회원가입 메서드 URL 이미지 저장 테스트")
-    void 소셜_회원가입_메소드_URL_이미지_저장_테스트() {
+    void 소셜_회원가입_메서드_URL_이미지_저장_테스트() {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
