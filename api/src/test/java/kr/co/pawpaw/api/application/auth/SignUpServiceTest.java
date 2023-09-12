@@ -24,9 +24,7 @@ import kr.co.pawpaw.domainrdb.term.service.query.TermQuery;
 import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import kr.co.pawpaw.domainrdb.user.domain.UserImage;
 import kr.co.pawpaw.domainrdb.user.service.command.UserCommand;
-import kr.co.pawpaw.domainrdb.user.service.command.UserImageCommand;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import kr.co.pawpaw.domainredis.auth.domain.OAuth2TempAttributes;
 import kr.co.pawpaw.domainredis.auth.domain.VerifiedPhoneNumber;
@@ -70,8 +68,6 @@ class SignUpServiceTest {
     private MultipartFile multipartFile;
     @Mock
     private FileService fileService;
-    @Mock
-    private UserImageCommand userImageCommand;
     @Mock
     private OAuth2TempAttributesQuery oAuth2TempAttributesQuery;
     @Mock
@@ -214,6 +210,7 @@ class SignUpServiceTest {
         User savedUser = request.toUser(passwordEncoded, name);
 
         File file = File.builder()
+            .fileName(UUID.randomUUID().toString())
             .contentType("image/png")
             .byteSize(1234L)
             .uploader(savedUser)
@@ -234,10 +231,6 @@ class SignUpServiceTest {
         when(userCommand.save(any(User.class))).thenReturn(savedUser);
         when(termQuery.findAllByOrderIsIn(eq(termAgreeOrders))).thenReturn(termAgrees);
 
-        UserImage userImage = UserImage.builder()
-            .user(savedUser)
-            .file(file)
-            .build();
         //when
         signUpService.signUp(request, null);
 
@@ -255,7 +248,6 @@ class SignUpServiceTest {
         assertThat(capturedUser).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(savedUser);
 
         verify(fileService, times(0)).saveFileByMultipartFile(any(), any());
-        verify(userImageCommand, times(0)).save(any());
 
         ArgumentCaptor<List<Pet>> petListCaptor = ArgumentCaptor.forClass(List.class);
         verify(petCommand, times(1)).saveAll(petListCaptor.capture());
@@ -278,7 +270,7 @@ class SignUpServiceTest {
 
     @Test
     @DisplayName("일반 회원가입 메서드 작동 테스트")
-    void 일반_회원가입_메서드_작동_테스트() {
+    void 일반_회원가입_메서드_작동_테스트() throws IOException {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
@@ -331,6 +323,7 @@ class SignUpServiceTest {
         User savedUser = request.toUser(passwordEncoded, name);
 
         File file = File.builder()
+            .fileName(UUID.randomUUID().toString())
             .contentType("image/png")
             .byteSize(1234L)
             .uploader(savedUser)
@@ -350,12 +343,9 @@ class SignUpServiceTest {
         when(passwordEncoder.encode(request.getPassword())).thenReturn(passwordEncoded);
         when(userCommand.save(any(User.class))).thenReturn(savedUser);
         when(termQuery.findAllByOrderIsIn(eq(termAgreeOrders))).thenReturn(termAgrees);
+        when(multipartFile.getBytes()).thenReturn(new byte[123]);
         when(fileService.saveFileByMultipartFile(eq(multipartFile), eq(savedUser.getUserId()))).thenReturn(file);
 
-        UserImage userImage = UserImage.builder()
-            .user(savedUser)
-            .file(file)
-            .build();
         //when
         signUpService.signUp(request, multipartFile);
 
@@ -370,12 +360,10 @@ class SignUpServiceTest {
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userCommand, times(1)).save(userCaptor.capture());
         User capturedUser = userCaptor.getValue();
+        capturedUser.updateImage(file);
         assertThat(capturedUser).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(savedUser);
 
         verify(fileService).saveFileByMultipartFile(multipartFile, savedUser.getUserId());
-        ArgumentCaptor<UserImage> userImageCaptor = ArgumentCaptor.forClass(UserImage.class);
-        verify(userImageCommand).save(userImageCaptor.capture());
-        assertThat(userImageCaptor.getValue()).usingRecursiveComparison().isEqualTo(userImage);
 
         ArgumentCaptor<List<Pet>> petListCaptor = ArgumentCaptor.forClass(List.class);
         verify(petCommand, times(1)).saveAll(petListCaptor.capture());

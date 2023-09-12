@@ -1,14 +1,12 @@
 package kr.co.pawpaw.api.dto.chatroom;
 
 import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomHashTag;
-import kr.co.pawpaw.domainrdb.user.domain.User;
+import kr.co.pawpaw.domainrdb.storage.domain.File;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -26,21 +24,14 @@ public class CreateChatroomRequest {
     @NotNull
     private Boolean locationLimit;
 
-    public Chatroom toChatroom() {
+    public Chatroom toChatroom(final File coverFile) {
         return Chatroom.builder()
             .name(name)
             .description(description)
             .searchable(searchable)
             .locationLimit(locationLimit)
+            .coverFile(coverFile)
+            .hashTagList(hashTagList)
             .build();
-    }
-
-    public List<ChatroomHashTag> toChatroomHashTags(final Chatroom chatroom) {
-        return hashTagList.stream()
-            .map(hashTag -> ChatroomHashTag.builder()
-                .chatroom(chatroom)
-                .hashTag(hashTag)
-                .build())
-            .collect(Collectors.toList());
     }
 }

@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.dto.chatroom;
 
 import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomHashTag;
+import kr.co.pawpaw.domainrdb.storage.domain.File;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,32 +22,12 @@ class CreateChatroomRequestTest {
     void toChatroom() {
         //given
         //when
-        Chatroom chatroom = request.toChatroom();
+        File file = File.builder().build();
+        Chatroom chatroom = request.toChatroom(file);
 
         //then
         assertThat(chatroom).usingRecursiveComparison()
-            .ignoringFields("id", "modifiedDate", "createdDate")
+            .ignoringFields("id", "modifiedDate", "createdDate", "hashTagList", "coverFile", "manager", "chatroomParticipants")
             .isEqualTo(request);
-    }
-
-    @Test
-    @DisplayName("toChatroomHashTags 메서드는 request의 hashTagList와 chatroom을 사용해서 chatroomHashTagList를 만든다.")
-    void toChatroomHashTags() {
-        //given
-        Chatroom chatroom = Chatroom.builder()
-            .build();
-
-        //when
-        List<ChatroomHashTag> chatroomHashTagList = request.toChatroomHashTags(chatroom);
-
-        //then
-        assertThat(chatroomHashTagList.size()).isEqualTo(request.getHashTagList().size());
-        assertThat(chatroomHashTagList.stream()
-            .filter(chatroomHashTag -> chatroomHashTag.getChatroom().equals(chatroom))
-            .count()).isEqualTo(request.getHashTagList().size());
-        assertThat(chatroomHashTagList.stream()
-            .map(ChatroomHashTag::getHashTag)
-            .filter(hashTag -> request.getHashTagList().contains(hashTag))
-            .count()).isEqualTo(request.getHashTagList().size());
     }
 }

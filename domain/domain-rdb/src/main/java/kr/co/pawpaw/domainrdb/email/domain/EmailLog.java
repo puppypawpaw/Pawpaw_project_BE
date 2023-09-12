@@ -23,7 +23,7 @@ public class EmailLog extends BaseTimeEntity {
     private String text;
     @Enumerated(value = EnumType.STRING)
     private EmailType emailType;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User sender;
 
     @Builder

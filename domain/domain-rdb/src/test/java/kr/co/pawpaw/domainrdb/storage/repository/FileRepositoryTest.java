@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -20,12 +21,6 @@ class FileRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @BeforeEach
-    void setup() {
-        fileRepository.deleteAll();
-        userRepository.deleteAll();
-    }
-
     @Test
     @DisplayName("파일 저장 및 불러오기 테스트")
     void saveAndLoadTest() {
@@ -33,16 +28,18 @@ class FileRepositoryTest {
         User user = User.builder()
             .build();
 
-        userRepository.save(user);
+        user = userRepository.save(user);
 
         File file = File.builder()
+            .fileName(UUID.randomUUID().toString())
+            .fileUrl("fileUrl")
             .byteSize(123456L)
             .uploader(user)
             .contentType("image/png")
             .build();
 
         //when
-        fileRepository.save(file);
+        file = fileRepository.save(file);
         Optional<File> loadFile = fileRepository.findById(file.getFileName());
 
         //then

@@ -37,7 +37,7 @@ class FindEmailServiceTest {
             .phoneNumber("user-phoneNumber")
             .email("email@liame.com")
             .createdDate(now)
-            .createdDate(now)
+            .modifiedDate(now)
             .build();
 
         String invalidName = "invalid-name";
@@ -61,7 +61,7 @@ class FindEmailServiceTest {
             .phoneNumber("user-phoneNumber")
             .email("email@liame.com")
             .createdDate(now)
-            .createdDate(now)
+            .modifiedDate(now)
             .build();
 
         UserEmailResponse resultExpected = UserEmailResponse.of("em***@liame.com", now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));

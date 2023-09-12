@@ -161,7 +161,7 @@ class UserRepositoryTest {
             .provider(OAuth2Provider.KAKAO)
             .build();
 
-        userRepository.save(user1);
+        user1 = userRepository.save(user1);
 
         //when
         Optional<User> result = userRepository.findByNameAndPhoneNumber(user1.getName(), user1.getPhoneNumber());
@@ -182,7 +182,7 @@ class UserRepositoryTest {
             .provider(OAuth2Provider.NAVER)
             .build();
 
-        userRepository.save(user);
+        user = userRepository.save(user);
 
         //when
         Optional<User> result = userRepository.findByNameAndEmailAndProvider(user.getName(), user.getEmail(), user.getProvider());

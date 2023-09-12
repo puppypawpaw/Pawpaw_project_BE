@@ -19,6 +19,7 @@ import javax.persistence.EntityManager;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -51,6 +52,7 @@ class FileServiceTest {
         when(em.getReference(eq(User.class), eq(user.getUserId()))).thenReturn(user);
 
         File file = File.builder()
+            .fileName(UUID.randomUUID().toString())
             .uploader(user)
             .byteSize(123L)
             .contentType("image/png")
@@ -86,6 +88,7 @@ class FileServiceTest {
         User user = User.builder()
             .build();
         File file = File.builder()
+            .fileName(UUID.randomUUID().toString())
             .uploader(user)
             .byteSize(123L)
             .contentType("image/png")

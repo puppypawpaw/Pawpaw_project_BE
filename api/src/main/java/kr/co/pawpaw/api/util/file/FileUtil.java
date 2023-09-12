@@ -6,9 +6,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.UUID;
 
 @UtilityClass
 public class FileUtil {
+    public String createNewFileName() {
+        return UUID.randomUUID().toString();
+    }
+
     public InputStream getInputStream(final MultipartFile file) {
         try {
             return file.getInputStream();

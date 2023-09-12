@@ -10,8 +10,6 @@ import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
-import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCoverCommand;
-import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomHashTagCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomQuery;
@@ -31,6 +29,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -39,10 +38,6 @@ import static org.mockito.Mockito.*;
 class ChatroomServiceTest {
     @Mock
     private ChatroomCommand chatroomCommand;
-    @Mock
-    private ChatroomCoverCommand chatroomCoverCommand;
-    @Mock
-    private ChatroomHashTagCommand chatroomHashTagCommand;
     @Mock
     private ChatroomParticipantCommand chatroomParticipantCommand;
     @Mock
@@ -68,6 +63,7 @@ class ChatroomServiceTest {
         .build();
 
     private final File file = File.builder()
+        .fileName(UUID.randomUUID().toString())
         .uploader(user)
         .byteSize(123L)
         .contentType("contentType")
@@ -91,7 +87,7 @@ class ChatroomServiceTest {
     @DisplayName("createChatroom메서드는 생성된 chatroom의 multipartFile이 null이거나 길이가 0이면 fileService의 saveFileByMultipartFile메서드를 호출하지 않는다.")
     void createChatroomNoMultipartFile() throws IOException {
         //given
-        Chatroom chatroom = request.toChatroom();
+        Chatroom chatroom = request.toChatroom(file);
         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
         when(chatroomCommand.save(any(Chatroom.class))).thenReturn(chatroom);
         when(multipartFile.getBytes()).thenReturn(new byte[0]);
@@ -108,7 +104,7 @@ class ChatroomServiceTest {
     @DisplayName("createChatroom메서드는 생성된 chatroom의 Id를 필드로 가지는 CreateChatroomResponse를 반환한다.")
     void createChatroom() throws IOException, NoSuchFieldException, IllegalAccessException {
         //given
-        Chatroom chatroom = request.toChatroom();
+        Chatroom chatroom = request.toChatroom(file);
         Field idField = chatroom.getClass().getDeclaredField("id");
         idField.setAccessible(true);
         Long id = 1234L;
