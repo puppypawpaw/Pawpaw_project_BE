@@ -58,13 +58,14 @@ public class BoardDto {
         private String content;
         private String writer;
         private List<ReplyListDto> replyListDto;
+        private List<String> fileNames;
         private int likedCount;
         private int replyCount;
         private LocalDateTime createdDate;
         private LocalDateTime modifiedDate;
 
         @Builder
-        public BoardListDto(Long id, String title, String content, String writer, int likedCount, int replyCount, LocalDateTime createdDate, LocalDateTime modifiedDate, List<ReplyListDto> replyListDto) {
+        public BoardListDto(Long id, String title, String content, String writer, int likedCount, int replyCount, LocalDateTime createdDate, LocalDateTime modifiedDate, List<ReplyListDto> replyListDto,  List<String> fileNames) {
             this.id = id;
             this.title = title;
             this.content = content;
@@ -74,6 +75,7 @@ public class BoardDto {
             this.createdDate = createdDate;
             this.modifiedDate = modifiedDate;
             this.replyListDto = replyListDto;
+            this.fileNames = fileNames;
         }
 
         public void setReplyListToBoard(List<ReplyListDto> replyListDto){

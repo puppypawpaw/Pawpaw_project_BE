@@ -13,6 +13,8 @@ import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.board.domain.Board;
 import kr.co.pawpaw.domainrdb.board.service.command.BoardCommand;
 import kr.co.pawpaw.domainrdb.board.service.query.BoardQuery;
+import kr.co.pawpaw.domainrdb.boardImg.domain.BoardImg;
+import kr.co.pawpaw.domainrdb.boardImg.service.query.BoardImgQuery;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
@@ -37,6 +39,7 @@ public class BoardService {
 
     private final UserQuery userQuery;
     private final BoardQuery boardQuery;
+    private final BoardImgQuery imgQuery;
     private final BoardCommand boardCommand;
     private final ReplyService replyService;
 
@@ -117,12 +120,14 @@ public class BoardService {
     }
 
     private BoardListDto convertBoardToDto(Board board) {
+        List<BoardImg> boardImgList = imgQuery.findBoardImgsByBoard(board);
         return BoardListDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .likedCount(board.getLikedCount())
                 .replyCount(board.getReplyCount())
+                .fileNames(boardImgList.stream().map(boardImg -> boardImg.getFileName()).collect(Collectors.toList()))
                 .writer(board.getWriter())
                 .createdDate(board.getCreatedDate())
                 .modifiedDate(board.getModifiedDate())
