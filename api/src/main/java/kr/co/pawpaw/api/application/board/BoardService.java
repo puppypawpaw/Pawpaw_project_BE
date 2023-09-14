@@ -120,14 +120,14 @@ public class BoardService {
     }
 
     private BoardListDto convertBoardToDto(Board board) {
-        List<BoardImg> boardImgList = imgQuery.findBoardImgsByBoard(board);
+        List<BoardImg> boardImgList = imgQuery.findBoardImgsWithFileByBoardId(board.getId());
         return BoardListDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .likedCount(board.getLikedCount())
                 .replyCount(board.getReplyCount())
-                .fileNames(boardImgList.stream().map(boardImg -> boardImg.getFileName()).collect(Collectors.toList()))
+                .fileNames(boardImgList.stream().map(boardImg -> boardImg.getFile().getFileName()).collect(Collectors.toList()))
                 .writer(board.getWriter())
                 .createdDate(board.getCreatedDate())
                 .modifiedDate(board.getModifiedDate())
