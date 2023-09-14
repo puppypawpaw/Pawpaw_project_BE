@@ -14,4 +14,8 @@ public class BoardImgCommand {
     public BoardImg save(BoardImg boardImg){
         return boardImgRepository.save(boardImg);
     }
+
+    public void delete(BoardImg boardImg){
+        boardImgRepository.delete(boardImg);
+    }
 }
