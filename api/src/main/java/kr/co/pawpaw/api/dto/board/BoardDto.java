@@ -65,7 +65,9 @@ public class BoardDto {
         private LocalDateTime modifiedDate;
 
         @Builder
-        public BoardListDto(Long id, String title, String content, String writer, int likedCount, int replyCount, LocalDateTime createdDate, LocalDateTime modifiedDate, List<ReplyListDto> replyListDto,  List<String> fileNames) {
+        public BoardListDto(Long id, String title, String content, String writer, int likedCount,
+                            int replyCount, LocalDateTime createdDate, LocalDateTime modifiedDate,
+                            List<ReplyListDto> replyListDto,  List<String> fileNames) {
             this.id = id;
             this.title = title;
             this.content = content;
