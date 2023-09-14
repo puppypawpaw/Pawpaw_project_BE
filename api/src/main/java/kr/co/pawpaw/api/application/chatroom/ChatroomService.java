@@ -12,6 +12,7 @@ import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
@@ -21,8 +22,7 @@ import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -94,18 +94,16 @@ public class ChatroomService {
             .collect(Collectors.toList());
     }
 
-    public List<ChatroomResponse> getRecommendedChatroomList(final UserId userId) {
-        return chatroomQuery.getNotParticipatedChatroomByUserId(
-            userId,
-            PageRequest.of(0, 10, Sort.by("createdDate"))
-        );
+    public List<ChatroomResponse> getRecommendedNewChatroomList(final UserId userId) {
+        return chatroomQuery.getAccessibleNewChatroomByUserId(userId);
     }
 
-    public List<ChatroomResponse> getTrandingChatroomList(final UserId userId) {
-        return chatroomQuery.getNotParticipatedChatroomByUserId(
-            userId,
-            PageRequest.of(0, 10, Sort.by("createdDate"))
-        );
+    public Slice<TrandingChatroomResponse> getTrandingChatroomList(
+        final UserId userId,
+        final Long beforeId,
+        final int size
+    ) {
+        return chatroomQuery.getAccessibleTrandingChatroom(userId, beforeId, size);
     }
 
 
