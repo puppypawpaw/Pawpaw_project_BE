@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,6 +37,8 @@ class ChatroomCustomRepositoryTest {
     private ChatRepository chatRepository;
     @Autowired
     private ChatroomParticipantRepository chatroomParticipantRepository;
+    @Autowired
+    private ChatroomScheduleRepository chatroomScheduleRepository;
 
     User user1 = User.builder()
         .name("user-name-1")
@@ -143,6 +146,15 @@ class ChatroomCustomRepositoryTest {
         .user(user3)
         .build();
 
+    ChatroomSchedule chatroomSchedule1 = ChatroomSchedule.builder()
+        .creator(user1)
+        .chatroom(chatroom)
+        .startDate(LocalDateTime.now())
+        .endDate(LocalDateTime.now().plusDays(1))
+        .description("chatroomSchedule1-description")
+        .name("chatroomSchedule1-name")
+        .build();
+
     @BeforeEach
     void setup() {
         user1 = userRepository.save(user1);
@@ -170,6 +182,7 @@ class ChatroomCustomRepositoryTest {
         chatroom = chatroomRepository.save(chatroom);
         chatroom2 = chatroomRepository.save(chatroom2);
         chatroom3 = chatroomRepository.save(chatroom3);
+        chatroomSchedule1 = chatroomScheduleRepository.save(chatroomSchedule1);
     }
 
     @Test
@@ -187,13 +200,13 @@ class ChatroomCustomRepositoryTest {
             chatroom.getName(),
             chatroom.getDescription(),
             coverFile.getFileUrl(),
-            chat2.getCreatedDate(),
+            chat2.getCreatedDate().withNano((int)Math.round(chat2.getCreatedDate().getNano() / 1000.0) * 1000),
             chatroom.getHashTagList(),
             user1.getNickname(),
             managerImageFile.getFileUrl(),
             2L,
             false,
-            false
+            true
         );
 
         ChatroomDetailData result = chatroomCustomRepository.findAllByUserIdWithDetailData(user1.getUserId()).get(0);

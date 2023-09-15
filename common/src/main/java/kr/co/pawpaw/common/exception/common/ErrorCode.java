@@ -40,7 +40,10 @@ public enum ErrorCode {
     NOT_FOUND_CHANGE_PASSWORD_TEMP_KEY(404, "CP001", "존재하지 않는 비밀번호 변경 임시 키입니다."),
     // 채팅방
     IS_NOT_CHATROOM_PARTICIPANT(400, "CR001", "채팅방 참석자가 아닙니다."),
-    NOT_ALLOWED_CHATROOM_LEAVE(400, "CR002", "채팅방 매니저는 채팅방을 나갈 수 없습니다.");
+    NOT_ALLOWED_CHATROOM_LEAVE(400, "CR002", "채팅방 매니저는 채팅방을 나갈 수 없습니다."),
+    NOT_FOUND_CHATROOM(404, "CR003", "존재하지 않는 채팅방 입니다."),
+    NOT_A_CHATROOM_PARTICIPANT(400, "CR004", "채팅방 참가자가 아닙니다."),
+    NOT_FOUND_CHATROOM_SCHEDULE(404, "CR005", "존재하지 않는 채팅방 스케줄입니다.");
 
     private final int status;
     private final String code;

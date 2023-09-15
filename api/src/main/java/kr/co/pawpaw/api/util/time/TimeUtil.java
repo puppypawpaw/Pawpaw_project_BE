@@ -8,8 +8,18 @@ import java.time.format.DateTimeFormatter;
 
 @UtilityClass
 public class TimeUtil {
+    private static final DateTimeFormatter defaultDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     public String getYearMonthDay(final LocalDateTime ldt) {
         return ldt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    public LocalDateTime defaultTimeStringToLocalDateTime(final String timeString) {
+        return LocalDateTime.parse(timeString, defaultDateTimeFormatter);
+    }
+
+    public String localDateTimeToDefaultTimeString(final LocalDateTime ldt) {
+        return ldt.format(defaultDateTimeFormatter);
     }
 
     public String getTimeBeforeString(final LocalDateTime ldt) {

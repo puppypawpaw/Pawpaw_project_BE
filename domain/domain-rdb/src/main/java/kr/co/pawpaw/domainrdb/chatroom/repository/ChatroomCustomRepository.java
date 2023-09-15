@@ -9,6 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChat;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroom;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroomParticipant;
+import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroomSchedule;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomDetailData;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.storage.domain.QFile;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -33,6 +35,7 @@ public class ChatroomCustomRepository {
     private static final QFile qFileCover = new QFile("qFileCover");
     private static final QFile qFileManager = new QFile("qFileManager");
     private static final QChat qChat = QChat.chat;
+    private static final QChatroomSchedule qChatroomSchedule = QChatroomSchedule.chatroomSchedule;
 
     public List<ChatroomDetailData> findAllByUserIdWithDetailData(final UserId userId) {
         return queryFactory.select(
@@ -48,7 +51,7 @@ public class ChatroomCustomRepository {
                     qFileManager.fileUrl,
                     qChatroomParticipant.countDistinct(),
                     Expressions.constant(false),
-                    Expressions.constant(false)
+                    qChatroomSchedule.count().gt(0)
                 )
             )
             .from(myQChatroomParticipant)
@@ -59,6 +62,8 @@ public class ChatroomCustomRepository {
             .leftJoin(qUserManager.userImage, qFileManager)
             .leftJoin(qChatroomParticipant).on(qChatroom.eq(qChatroomParticipant.chatroom))
             .leftJoin(qChat).on(qChatroom.eq(qChat.chatroom))
+            .leftJoin(qChatroomSchedule).on(qChatroom.eq(qChatroomSchedule.chatroom)
+                .and(qChatroomSchedule.endDate.after(LocalDateTime.now())))
             .where(myQChatroomParticipant.user.userId.eq(Expressions.constant(userId)))
             .groupBy(
                 qChatroom.id,

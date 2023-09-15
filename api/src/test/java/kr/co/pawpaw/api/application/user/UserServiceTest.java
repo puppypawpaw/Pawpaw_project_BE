@@ -45,6 +45,7 @@ class UserServiceTest {
             .build();
         File file = File.builder()
             .fileName(UUID.randomUUID().toString())
+            .fileUrl("fileUrl")
             .build();
         User user = User.builder()
             .position(position)
@@ -52,16 +53,13 @@ class UserServiceTest {
             .build();
         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
 
-        String fileUrl = "fileUrl";
 
-        when(fileService.getUrl(file.getFileName())).thenReturn(fileUrl);
         //when
         UserResponse userResponse = userService.whoAmI(user.getUserId());
 
         //then
         verify(userQuery).findByUserId(user.getUserId());
-        verify(fileService).getUrl(file.getFileName());
-        assertThat(userResponse.getImageUrl()).isEqualTo(fileUrl);
+        assertThat(userResponse.getImageUrl()).isEqualTo(file.getFileUrl());
         assertThat(userResponse.getNickname()).isEqualTo(user.getNickname());
         assertThat(userResponse.getEmail()).isEqualTo(user.getEmail());
         assertThat(userResponse.getRole()).isEqualTo(user.getRole());

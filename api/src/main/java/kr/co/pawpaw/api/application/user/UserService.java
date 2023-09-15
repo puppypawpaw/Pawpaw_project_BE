@@ -41,6 +41,6 @@ public class UserService {
     }
 
     private UserResponse getUserResponse(final User user) {
-        return UserResponse.of(user, fileService.getUrl(user.getUserImage().getFileName()));
+        return UserResponse.of(user, user.getUserImage().getFileUrl());
     }
 }

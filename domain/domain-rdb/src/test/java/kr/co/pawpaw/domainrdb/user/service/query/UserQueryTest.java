@@ -129,4 +129,17 @@ class UserQueryTest {
         assertThat(result.isPresent()).isTrue();
         assertThat(result.get()).isEqualTo(user);
     }
+
+    @Test
+    @DisplayName("getReferenceById 메서드는 userRepository의 getReferenceById를 호출한다.")
+    void getReferenceById() {
+        //given
+        when(userRepository.getReferenceById(user.getUserId())).thenReturn(user);
+
+        //when
+        User result = userQuery.getReferenceById(user.getUserId());
+
+        //then
+        verify(userRepository).getReferenceById(user.getUserId());
+    }
 }

@@ -47,7 +47,7 @@ public class FileService {
         storageRepository.deleteObject(fileName);
     }
 
-    public String getUrl(final String fileName) {
+    private String getUrl(final String fileName) {
         return storageRepository.getUrl(fileName);
     }
 

@@ -106,7 +106,6 @@ public class ChatroomService {
         return chatroomQuery.getAccessibleTrandingChatroom(userId, beforeId, size);
     }
 
-
     private File createChatroomCoverIfExists(
         final UserId userId,
         final MultipartFile chatroomCoverMultipartFile
