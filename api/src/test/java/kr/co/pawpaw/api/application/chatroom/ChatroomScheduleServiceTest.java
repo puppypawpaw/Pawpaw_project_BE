@@ -27,6 +27,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -172,6 +173,7 @@ class ChatroomScheduleServiceTest {
         Long chatroomId = 123L;
         when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(true);
         ChatroomScheduleData responseData = new ChatroomScheduleData(
+            1L,
             "name",
             "schedule",
             LocalDateTime.now(),
@@ -182,17 +184,19 @@ class ChatroomScheduleServiceTest {
         List<ChatroomScheduleData> responseDataList = List.of(responseData);
 
         Constructor<ChatroomScheduleResponse> constructor = ChatroomScheduleResponse.class.getDeclaredConstructor(
+            Long.class,
             String.class,
             String.class,
             String.class,
             String.class,
-            List.class
+            Collection.class
         );
 
         constructor.setAccessible(true);
 
         List<ChatroomScheduleResponse> resultExpected = List.of(
             constructor.newInstance(
+                responseData.getId(),
                 responseData.getName(),
                 responseData.getDescription(),
                 TimeUtil.localDateTimeToDefaultTimeString(responseData.getStartDate()),

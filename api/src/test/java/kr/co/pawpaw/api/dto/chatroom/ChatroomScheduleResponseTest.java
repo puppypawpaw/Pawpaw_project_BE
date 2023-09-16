@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -20,6 +21,7 @@ class ChatroomScheduleResponseTest {
         LocalDateTime start = LocalDateTime.now();
         LocalDateTime end = start.plusDays(1);
         ChatroomScheduleData before = new ChatroomScheduleData(
+            1L,
             "name",
             "description",
             start,
@@ -28,16 +30,18 @@ class ChatroomScheduleResponseTest {
         );
 
         Constructor<ChatroomScheduleResponse> constructor = ChatroomScheduleResponse.class.getDeclaredConstructor(
+            Long.class,
             String.class,
             String.class,
             String.class,
             String.class,
-            List.class
+            Collection.class
         );
 
         constructor.setAccessible(true);
 
         ChatroomScheduleResponse resultExpected = constructor.newInstance(
+            before.getId(),
             before.getName(),
             before.getDescription(),
             TimeUtil.localDateTimeToDefaultTimeString(start),
