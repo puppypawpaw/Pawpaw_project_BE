@@ -1,5 +1,6 @@
 package kr.co.pawpaw.api.application.board;
 
+import kr.co.pawpaw.api.application.boardImg.BoardImgService;
 import kr.co.pawpaw.api.application.reply.ReplyService;
 import kr.co.pawpaw.api.dto.board.BoardDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;
@@ -37,6 +38,7 @@ public class BoardService {
 
     private final UserQuery userQuery;
     private final BoardQuery boardQuery;
+    private final BoardImgService imgService;
     private final BoardCommand boardCommand;
     private final ReplyService replyService;
 
@@ -117,12 +119,14 @@ public class BoardService {
     }
 
     private BoardListDto convertBoardToDto(Board board) {
+        List<String> fileLink = imgService.viewFileImg(board.getId());
         return BoardListDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .likedCount(board.getLikedCount())
                 .replyCount(board.getReplyCount())
+                .fileNames(fileLink)
                 .writer(board.getWriter())
                 .createdDate(board.getCreatedDate())
                 .modifiedDate(board.getModifiedDate())
