@@ -18,13 +18,17 @@ public class ChatroomSchedule extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
     private String description;
+    @Column(nullable = false)
     private LocalDateTime startDate;
+    @Column(nullable = false)
     private LocalDateTime endDate;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Chatroom chatroom;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User creator;
 
     @Builder

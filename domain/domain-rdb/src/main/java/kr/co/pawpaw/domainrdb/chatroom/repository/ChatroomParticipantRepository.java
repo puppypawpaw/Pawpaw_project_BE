@@ -11,4 +11,9 @@ public interface ChatroomParticipantRepository extends JpaRepository<ChatroomPar
         final UserId userId,
         final Long chatroomId
     );
+
+    boolean existsByUserUserIdAndChatroomId(
+        final UserId userId,
+        final Long chatroomId
+    );
 }
