@@ -74,7 +74,7 @@ public class BoardImgService {
 
     public List<String> viewFileImg(Long boardId) {
         List<BoardImg> boardImgList = imgQuery.findBoardImgsWithFileByBoardId(boardId);
-        return boardImgList.stream().map(boardImg -> fileService.getUrl(boardImg.getFile().getFileName()))
+        return boardImgList.stream().map(boardImg -> boardImg.getFile().getFileUrl())
                 .collect(Collectors.toList());
     }
 
