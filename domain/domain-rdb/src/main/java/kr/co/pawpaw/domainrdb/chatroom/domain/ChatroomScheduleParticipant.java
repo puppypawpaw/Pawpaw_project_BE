@@ -1,7 +1,7 @@
-package kr.co.pawpaw.domainrdb.user.domain;
+package kr.co.pawpaw.domainrdb.chatroom.domain;
 
 import kr.co.pawpaw.domainrdb.common.BaseTimeEntity;
-import kr.co.pawpaw.domainrdb.storage.domain.File;
+import kr.co.pawpaw.domainrdb.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,26 +9,25 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@Getter
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserImage extends BaseTimeEntity {
+public class ChatroomScheduleParticipant extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private ChatroomSchedule chatroomSchedule;
     @ManyToOne(fetch = FetchType.LAZY)
-    private File file;
+    private User user;
 
     @Builder
-    public UserImage(final User user, final File file) {
+    public ChatroomScheduleParticipant(
+        final ChatroomSchedule chatroomSchedule,
+        final User user
+    ) {
+        this.chatroomSchedule = chatroomSchedule;
         this.user = user;
-        this.file = file;
-    }
-
-    public void updateFile(final File file) {
-        this.file = file;
     }
 }

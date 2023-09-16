@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -24,6 +26,7 @@ class FileCommandTest {
     void saveTest() {
         //given
         File file = File.builder()
+            .fileName(UUID.randomUUID().toString())
             .build();
         when(fileRepository.save(eq(file))).thenReturn(file);
 

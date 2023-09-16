@@ -7,16 +7,21 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pawpaw.api.application.chatroom.ChatroomService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
+import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Tag(name = "chatroom")
 @RestController
@@ -104,5 +109,52 @@ public class ChatroomController {
         chatroomService.leaveChatroom(userId, chatroomId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200")
+    })
+    @Operation(
+        method = "GET",
+        summary = "참여중인 채팅방 목록 조회",
+        description = "참여중인 채팅방 목록 조회"
+    )
+    @GetMapping("/participated")
+    public ResponseEntity<List<ChatroomDetailResponse>> getParticipatedChatroomList(
+        @AuthenticatedUserId final UserId userId
+    ) {
+        return ResponseEntity.ok(chatroomService.getParticipatedChatroomList(userId));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200")
+    })
+    @Operation(
+        method = "GET",
+        summary = "추천하는 채팅방 목록 조회",
+        description = "추천하는 채팅방 목록 조회"
+    )
+    @GetMapping("/recommended")
+    public ResponseEntity<List<ChatroomResponse>> getRecommendedNewChatroomList(
+        @AuthenticatedUserId final UserId userId
+    ) {
+        return ResponseEntity.ok(chatroomService.getRecommendedNewChatroomList(userId));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200")
+    })
+    @Operation(
+        method = "GET",
+        summary = "뜨고있는 채팅방 목록 조회",
+        description = "뜨고있는 채팅방 목록 조회"
+    )
+    @GetMapping("/trending")
+    public ResponseEntity<Slice<TrandingChatroomResponse>> getTrandingChatroomList(
+        @AuthenticatedUserId final UserId userId,
+        @RequestParam(name = "beforeId", required = false) final Long beforeId,
+        @RequestParam(name = "size", defaultValue = "12") final int size
+    ) {
+        return ResponseEntity.ok(chatroomService.getTrandingChatroomList(userId, beforeId, size));
     }
 }

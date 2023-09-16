@@ -13,16 +13,13 @@ import kr.co.pawpaw.common.exception.auth.NotVerifiedPhoneNumberException;
 import kr.co.pawpaw.common.exception.term.NotAgreeAllRequiredTermException;
 import kr.co.pawpaw.domainrdb.pet.service.command.PetCommand;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsUsagePurpose;
-import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.term.domain.UserTermAgree;
 import kr.co.pawpaw.domainrdb.term.service.command.TermCommand;
 import kr.co.pawpaw.domainrdb.term.service.query.TermQuery;
 import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import kr.co.pawpaw.domainrdb.user.domain.UserImage;
 import kr.co.pawpaw.domainrdb.user.service.command.UserCommand;
-import kr.co.pawpaw.domainrdb.user.service.command.UserImageCommand;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import kr.co.pawpaw.domainredis.auth.domain.OAuth2TempAttributes;
 import kr.co.pawpaw.domainredis.auth.domain.VerifiedPhoneNumber;
@@ -38,7 +35,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,7 +50,6 @@ public class SignUpService {
     private final OAuth2TempAttributesQuery oAuth2TempAttributesQuery;
     private final OAuth2TempAttributesCommand oAuth2TempAttributesCommand;
     private final FileService fileService;
-    private final UserImageCommand userImageCommand;
 
     @Transactional
     public void signUp(
@@ -131,24 +126,14 @@ public class SignUpService {
         final MultipartFile image,
         final User user
     ) {
-        File file = fileService.saveFileByMultipartFile(image, user.getUserId());
-
-        userImageCommand.save(UserImage.builder()
-            .file(file)
-            .user(user)
-            .build());
+        user.updateImage(fileService.saveFileByMultipartFile(image, user.getUserId()));
     }
 
     private void saveUserImageByUrl(
         final String url,
         final User user
     ) {
-        File file = fileService.saveFileByUrl(url, user.getUserId());
-
-        userImageCommand.save(UserImage.builder()
-            .file(file)
-            .user(user)
-            .build());
+        user.updateImage(fileService.saveFileByUrl(url, user.getUserId()));
     }
 
     private User createUser(

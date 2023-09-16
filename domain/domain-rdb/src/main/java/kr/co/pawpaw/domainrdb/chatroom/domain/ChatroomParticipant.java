@@ -17,13 +17,13 @@ public class ChatroomParticipant extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Chatroom chatroom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
 
-    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false) @Enumerated(value = EnumType.STRING)
     private ChatroomParticipantRole role;
 
     @Builder

@@ -22,6 +22,7 @@ class ChatroomRepositoryTest {
         //given
         Chatroom chatroom = Chatroom.builder()
             .locationLimit(true)
+            .description("chatroom description")
             .name("chatroomName")
             .searchable(true)
             .build();

@@ -1,6 +1,7 @@
 package kr.co.pawpaw.api.application.chatroom;
 
 import kr.co.pawpaw.api.application.file.FileService;
+import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
 import kr.co.pawpaw.api.util.file.FileUtil;
@@ -8,12 +9,11 @@ import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomCover;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
+import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
-import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCoverCommand;
-import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomHashTagCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomQuery;
@@ -22,16 +22,18 @@ import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ChatroomService {
     private final ChatroomCommand chatroomCommand;
-    private final ChatroomCoverCommand chatroomCoverCommand;
-    private final ChatroomHashTagCommand chatroomHashTagCommand;
     private final ChatroomParticipantCommand chatroomParticipantCommand;
     private final ChatroomParticipantQuery chatroomParticipantQuery;
     private final ChatroomQuery chatroomQuery;
@@ -47,10 +49,9 @@ public class ChatroomService {
         User user = userQuery.findByUserId(userId)
             .orElseThrow(NotFoundUserException::new);
 
-        Chatroom chatroom = createChatroomByRequest(request);
+        File coverFile = createChatroomCoverIfExists(userId, chatroomCoverMultipartFile);
+        Chatroom chatroom = createChatroomByRequestAndCoverFile(request, coverFile);
 
-        createChatroomCoverIfExists(userId, chatroomCoverMultipartFile, chatroom);
-        createChatroomHashTags(chatroom, request);
         joinChatroomAsManager(chatroom, user);
 
         return CreateChatroomResponse.of(chatroom);
@@ -85,28 +86,50 @@ public class ChatroomService {
         chatroomParticipantCommand.delete(chatroomParticipant);
     }
 
-    private void createChatroomCoverIfExists(
+
+    public List<ChatroomDetailResponse> getParticipatedChatroomList(final UserId userId) {
+        return chatroomQuery.getParticipatedChatroomDetailDataByUserId(userId)
+            .stream()
+            .map(ChatroomDetailResponse::of)
+            .collect(Collectors.toList());
+    }
+
+    public List<ChatroomResponse> getRecommendedNewChatroomList(final UserId userId) {
+        return chatroomQuery.getAccessibleNewChatroomByUserId(userId);
+    }
+
+    public Slice<TrandingChatroomResponse> getTrandingChatroomList(
         final UserId userId,
-        final MultipartFile chatroomCoverMultipartFile,
-        final Chatroom chatroom
+        final Long beforeId,
+        final int size
+    ) {
+        return chatroomQuery.getAccessibleTrandingChatroom(userId, beforeId, size);
+    }
+
+    private File createChatroomCoverIfExists(
+        final UserId userId,
+        final MultipartFile chatroomCoverMultipartFile
     ) {
         if (chatroomCoverMultipartFile != null && FileUtil.getByteLength(chatroomCoverMultipartFile) > 0) {
-            File chatroomCoverFile = fileService.saveFileByMultipartFile(chatroomCoverMultipartFile, userId);
-
-            createChatroomCover(chatroom, chatroomCoverFile);
+            return fileService.saveFileByMultipartFile(chatroomCoverMultipartFile, userId);
         }
+
+        return null;
     }
 
     private void joinChatroomAsManager(
         final Chatroom chatroom,
         final User user
     ) {
-        chatroomParticipantCommand.save(
-            ChatroomParticipant.builder()
-                .chatroom(chatroom)
-                .role(ChatroomParticipantRole.MANAGER)
-                .user(user)
-                .build());
+        ChatroomParticipant manager = ChatroomParticipant.builder()
+            .chatroom(chatroom)
+            .role(ChatroomParticipantRole.MANAGER)
+            .user(user)
+            .build();
+
+        chatroomParticipantCommand.save(manager);
+
+        chatroom.updateManager(manager);
     }
 
     private void joinChatroomAsParticipant(
@@ -121,27 +144,10 @@ public class ChatroomService {
             .build());
     }
 
-    private void createChatroomCover(
-        final Chatroom chatroom,
-        final File chatroomCoverFile
+    private Chatroom createChatroomByRequestAndCoverFile(
+        final CreateChatroomRequest request,
+        final File coverFile
     ) {
-        chatroomCoverCommand.save(
-            ChatroomCover.builder()
-                .chatroom(chatroom)
-                .coverFile(chatroomCoverFile)
-                .build());
-    }
-
-    private Chatroom createChatroomByRequest(
-        final CreateChatroomRequest request
-    ) {
-        return chatroomCommand.save(request.toChatroom());
-    }
-
-    private void createChatroomHashTags(
-        final Chatroom chatroom,
-        final CreateChatroomRequest request
-    ) {
-        chatroomHashTagCommand.saveAll(request.toChatroomHashTags(chatroom));
+        return chatroomCommand.save(request.toChatroom(coverFile));
     }
 }

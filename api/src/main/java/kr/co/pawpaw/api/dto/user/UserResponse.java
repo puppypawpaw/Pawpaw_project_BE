@@ -33,7 +33,10 @@ public class UserResponse {
         this.imageUrl = imageUrl;
     }
 
-    public static UserResponse of(final User user, final String imageUrl) {
+    public static UserResponse of(
+        final User user,
+        final String imageUrl
+    ) {
         return new UserResponse(
             user.getEmail(),
             user.getRole(),

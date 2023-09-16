@@ -55,4 +55,8 @@ public class UserQuery {
     public boolean existsByPhoneNumber(final String phoneNumber) {
         return userRepository.existsByPhoneNumber(phoneNumber);
     }
+
+    public User getReferenceById(final UserId userId) {
+        return userRepository.getReferenceById(userId);
+    }
 }

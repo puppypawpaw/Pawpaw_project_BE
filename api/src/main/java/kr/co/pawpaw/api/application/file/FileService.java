@@ -47,16 +47,20 @@ public class FileService {
         storageRepository.deleteObject(fileName);
     }
 
-    public String getUrl(final String fileName) {
+    private String getUrl(final String fileName) {
         return storageRepository.getUrl(fileName);
     }
 
     private File saveFileByInputStream(final InputStream inputStream, final ObjectMetadata metadata, final UserId userId) {
+        String fileName = FileUtil.createNewFileName();
+
         File file = fileCommand.save(File.builder()
-            .byteSize(metadata.getContentLength())
-            .contentType(metadata.getContentType())
-            .uploader(em.getReference(User.class, userId))
-            .build());
+                .fileName(fileName)
+                .fileUrl(getUrl(fileName))
+                .byteSize(metadata.getContentLength())
+                .contentType(metadata.getContentType())
+                .uploader(em.getReference(User.class, userId))
+                .build());
 
         storageRepository.putObject(file.getFileName(), inputStream, metadata);
 
