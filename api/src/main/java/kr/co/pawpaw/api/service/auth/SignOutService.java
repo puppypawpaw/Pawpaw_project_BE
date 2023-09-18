@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.application.auth;
+package kr.co.pawpaw.api.service.auth;
 
 import kr.co.pawpaw.api.util.cookie.CookieUtil;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;

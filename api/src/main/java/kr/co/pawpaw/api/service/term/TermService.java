@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.application.term;
+package kr.co.pawpaw.api.service.term;
 
 import kr.co.pawpaw.api.dto.term.CreateTermRequest;
 import kr.co.pawpaw.api.dto.term.TermResponse;

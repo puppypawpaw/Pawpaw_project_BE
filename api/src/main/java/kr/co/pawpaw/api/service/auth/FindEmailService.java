@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.application.auth;
+package kr.co.pawpaw.api.service.auth;
 
 import kr.co.pawpaw.api.dto.user.UserEmailResponse;
 import kr.co.pawpaw.api.util.mask.MaskUtil;

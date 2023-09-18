@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.application.file;
+package kr.co.pawpaw.api.service.file;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import kr.co.pawpaw.api.util.file.FileUtil;

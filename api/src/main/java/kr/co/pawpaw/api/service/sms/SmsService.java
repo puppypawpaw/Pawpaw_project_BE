@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.application.sms;
+package kr.co.pawpaw.api.service.sms;
 
 import kr.co.pawpaw.api.config.property.VerificationProperties;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;

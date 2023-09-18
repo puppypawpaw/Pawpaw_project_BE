@@ -1,6 +1,6 @@
-package kr.co.pawpaw.api.application.auth;
+package kr.co.pawpaw.api.service.auth;
 
-import kr.co.pawpaw.api.application.mail.MailService;
+import kr.co.pawpaw.api.service.mail.MailService;
 import kr.co.pawpaw.api.config.property.MailProperties;
 import kr.co.pawpaw.api.dto.auth.ChangePasswordMailRequest;
 import kr.co.pawpaw.api.dto.auth.ChangePasswordRequest;

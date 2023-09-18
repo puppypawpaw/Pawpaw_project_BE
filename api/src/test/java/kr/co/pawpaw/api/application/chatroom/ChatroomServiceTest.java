@@ -1,6 +1,7 @@
-package kr.co.pawpaw.api.application.chatroom;
+package kr.co.pawpaw.api.service.chatroom;
 
-import kr.co.pawpaw.api.application.file.FileService;
+import kr.co.pawpaw.api.service.chatroom.ChatroomService;
+import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
@@ -12,7 +13,6 @@ import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomDetailData;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
-import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;

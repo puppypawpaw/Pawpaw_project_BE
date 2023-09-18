@@ -1,5 +1,6 @@
-package kr.co.pawpaw.api.application.mail;
+package kr.co.pawpaw.api.service.mail;
 
+import kr.co.pawpaw.api.service.mail.MailService;
 import kr.co.pawpaw.domainrdb.email.domain.EmailLog;
 import kr.co.pawpaw.domainrdb.email.domain.EmailType;
 import kr.co.pawpaw.domainrdb.email.service.command.EmailLogCommand;

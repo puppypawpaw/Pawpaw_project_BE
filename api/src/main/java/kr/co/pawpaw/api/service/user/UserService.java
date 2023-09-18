@@ -1,6 +1,6 @@
-package kr.co.pawpaw.api.application.user;
+package kr.co.pawpaw.api.service.user;
 
-import kr.co.pawpaw.api.application.file.FileService;
+import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.storage.domain.File;

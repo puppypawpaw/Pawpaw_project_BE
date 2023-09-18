@@ -1,7 +1,8 @@
-package kr.co.pawpaw.api.application.user;
+package kr.co.pawpaw.api.service.user;
 
-import kr.co.pawpaw.api.application.file.FileService;
+import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.user.UserResponse;
+import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.domainrdb.position.Position;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;

@@ -3,7 +3,7 @@ package kr.co.pawpaw.api.controller.reply;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import kr.co.pawpaw.api.application.reply.ReplyService;
+import kr.co.pawpaw.api.service.reply.ReplyService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.reply.ReplyDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
