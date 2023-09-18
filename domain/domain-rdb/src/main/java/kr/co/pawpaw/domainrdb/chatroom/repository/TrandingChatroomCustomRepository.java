@@ -68,16 +68,8 @@ public class TrandingChatroomCustomRepository {
             .innerJoin(qUserManager.userImage, qFileManager)
             .leftJoin(qChatroom.chatroomParticipants, qChatroomParticipant)
             .where(condition)
-            .groupBy(
-                qChatroom.id,
-                qTrandingChatroom.id,
-                qChatroom.name,
-                qChatroom.description,
-                qChatroom.hashTagList,
-                qUserManager.nickname,
-                qFileManager.fileUrl
-            )
-            .orderBy(new OrderSpecifier(Order.DESC, qTrandingChatroom.id))
+            .groupBy(qChatroom.id)
+            .orderBy(qTrandingChatroom.id.asc())
             .limit(size+1)
             .fetch();
 
