@@ -2,14 +2,13 @@ package kr.co.pawpaw.domainrdb.chatroom.repository;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.co.pawpaw.domainrdb.chatroom.domain.QChat;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroom;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroomParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QTrandingChatroom;
+import kr.co.pawpaw.domainrdb.chatroom.dto.QTrandingChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
 import kr.co.pawpaw.domainrdb.storage.domain.QFile;
 import kr.co.pawpaw.domainrdb.user.domain.QUser;
@@ -52,18 +51,16 @@ public class TrandingChatroomCustomRepository {
         }
 
         List<TrandingChatroomResponse> chatroomResponseList = queryFactory.select(
-                Projections.constructor(
-                    TrandingChatroomResponse.class,
-                    qChatroom.id,
-                    qTrandingChatroom.id,
-                    qChatroom.name,
-                    qChatroom.description,
-                    qChatroom.hashTagList,
-                    qUserManager.nickname,
-                    qFileManager.fileUrl,
-                    qChatroomParticipant.count()
-                )
-            )
+            new QTrandingChatroomResponse(
+                qChatroom.id,
+                qTrandingChatroom.id,
+                qChatroom.name,
+                qChatroom.description,
+                qChatroom.hashTagList,
+                qUserManager.nickname,
+                qFileManager.fileUrl,
+                qChatroomParticipant.count()
+            ))
             .from(qTrandingChatroom)
             .innerJoin(qTrandingChatroom.chatroom, qChatroom)
             .innerJoin(qChatroom.manager, qChatroomParticipantManager)

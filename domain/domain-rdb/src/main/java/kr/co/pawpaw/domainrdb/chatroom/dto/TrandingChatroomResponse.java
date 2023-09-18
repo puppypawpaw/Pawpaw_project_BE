@@ -1,13 +1,12 @@
 package kr.co.pawpaw.domainrdb.chatroom.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
 public class TrandingChatroomResponse {
     @Schema(description = "채팅방 아이디")
     private Long id;
@@ -25,4 +24,25 @@ public class TrandingChatroomResponse {
     private String managerImageUrl;
     @Schema(description = "채팅방 참여자 수")
     private Long participantNumber;
+
+    @QueryProjection
+    public TrandingChatroomResponse(
+        final Long id,
+        final Long trandingId,
+        final String name,
+        final String description,
+        final List<String> hashTagList,
+        final String managerName,
+        final String managerImageUrl,
+        final Long participantNumber
+    ) {
+        this.id = id;
+        this.trandingId = trandingId;
+        this.name = name;
+        this.description = description;
+        this.hashTagList = hashTagList;
+        this.managerName = managerName;
+        this.managerImageUrl = managerImageUrl;
+        this.participantNumber = participantNumber;
+    }
 }

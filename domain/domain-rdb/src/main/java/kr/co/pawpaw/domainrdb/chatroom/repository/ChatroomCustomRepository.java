@@ -2,7 +2,6 @@ package kr.co.pawpaw.domainrdb.chatroom.repository;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,6 +11,8 @@ import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroomParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroomSchedule;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomDetailData;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.QChatroomDetailData;
+import kr.co.pawpaw.domainrdb.chatroom.dto.QChatroomResponse;
 import kr.co.pawpaw.domainrdb.storage.domain.QFile;
 import kr.co.pawpaw.domainrdb.user.domain.QUser;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
@@ -39,8 +40,7 @@ public class ChatroomCustomRepository {
 
     public List<ChatroomDetailData> findAllByUserIdWithDetailData(final UserId userId) {
         return queryFactory.select(
-                Projections.constructor(
-                    ChatroomDetailData.class,
+                new QChatroomDetailData(
                     qChatroom.id,
                     qChatroom.name,
                     qChatroom.description,
@@ -79,8 +79,7 @@ public class ChatroomCustomRepository {
 
     public List<ChatroomResponse> findAccessibleNewChatroomByUserId(final UserId userId) {
         return queryFactory.select(
-                Projections.constructor(
-                    ChatroomResponse.class,
+                new QChatroomResponse(
                     qChatroom.id,
                     qChatroom.name,
                     qChatroom.description,
