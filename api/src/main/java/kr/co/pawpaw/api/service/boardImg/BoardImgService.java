@@ -1,7 +1,7 @@
-package kr.co.pawpaw.api.application.boardImg;
+package kr.co.pawpaw.api.service.boardImg;
 
 
-import kr.co.pawpaw.api.application.file.FileService;
+import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.boardImg.BoardImgDto;
 import kr.co.pawpaw.common.exception.board.BoardException;
 import kr.co.pawpaw.domainrdb.board.domain.Board;

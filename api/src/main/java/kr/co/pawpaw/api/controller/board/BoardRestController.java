@@ -3,7 +3,7 @@ package kr.co.pawpaw.api.controller.board;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import kr.co.pawpaw.api.application.board.BoardService;
+import kr.co.pawpaw.api.service.board.BoardService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.board.BoardDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;

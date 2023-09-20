@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.application.reply;
+package kr.co.pawpaw.api.service.reply;
 
 import kr.co.pawpaw.api.dto.reply.ReplyDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;

@@ -11,9 +11,9 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 public class CheckVerificationCodeRequest {
     @NotBlank
-    @Schema(description = "폰 번호")
+    @Schema(description = "폰 번호", example = "01012345678")
     private String phoneNumber;
     @NotBlank
-    @Schema(description = "인증코드")
+    @Schema(description = "인증코드", example = "X1ncFc")
     private String code;
 }

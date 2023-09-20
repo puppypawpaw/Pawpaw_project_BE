@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.application.auth;
+package kr.co.pawpaw.api.service.auth;
 
 import kr.co.pawpaw.api.config.auth.object.OAuth2CustomUser;
 import kr.co.pawpaw.api.config.auth.provider.JwtTokenProvider;

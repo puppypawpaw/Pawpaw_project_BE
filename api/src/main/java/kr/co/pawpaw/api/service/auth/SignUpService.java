@@ -1,6 +1,6 @@
-package kr.co.pawpaw.api.application.auth;
+package kr.co.pawpaw.api.service.auth;
 
-import kr.co.pawpaw.api.application.file.FileService;
+import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.auth.DuplicateEmailResponse;
 import kr.co.pawpaw.api.dto.auth.SignUpRequest;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpInfoResponse;

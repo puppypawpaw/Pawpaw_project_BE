@@ -1,11 +1,19 @@
 package kr.co.pawpaw.domainrdb.chatroom.dto;
 
-import lombok.AllArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class ChatroomScheduleParticipantResponse {
     private String nickname;
     private String imageUrl;
+
+    @QueryProjection
+    public ChatroomScheduleParticipantResponse(
+        final String nickname,
+        final String imageUrl
+    ) {
+        this.nickname = nickname;
+        this.imageUrl = imageUrl;
+    }
 }

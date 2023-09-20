@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.application.chatroom;
+package kr.co.pawpaw.api.service.chatroom;
 
 import kr.co.pawpaw.api.dto.chatroom.ChatroomScheduleResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleRequest;

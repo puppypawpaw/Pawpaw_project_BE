@@ -3,7 +3,7 @@ package kr.co.pawpaw.api.controller.boardlike;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import kr.co.pawpaw.api.application.boardlike.BoardLikeService;
+import kr.co.pawpaw.api.service.boardlike.BoardLikeService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;

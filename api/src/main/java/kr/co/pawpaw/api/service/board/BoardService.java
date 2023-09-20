@@ -1,7 +1,7 @@
-package kr.co.pawpaw.api.application.board;
+package kr.co.pawpaw.api.service.board;
 
-import kr.co.pawpaw.api.application.boardImg.BoardImgService;
-import kr.co.pawpaw.api.application.reply.ReplyService;
+import kr.co.pawpaw.api.service.boardImg.BoardImgService;
+import kr.co.pawpaw.api.service.reply.ReplyService;
 import kr.co.pawpaw.api.dto.board.BoardDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.RegisterResponseDto;

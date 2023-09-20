@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.application.boardlike;
+package kr.co.pawpaw.api.service.boardlike;
 
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.board.BoardLikeException;

@@ -21,18 +21,18 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SignUpRequest {
     @NotNull
-    @Schema(description = "유저의 약관 동의 여부, 1, 2, 3번이 필수, 4번이 필수아님")
+    @Schema(description = "유저의 약관 동의 여부, 1, 2, 3번이 필수, 4번이 필수아님", example = "[1,2,3]")
     private List<Long> termAgrees;
     @NotBlank
-    @Schema(description = "유저의 닉네임")
+    @Schema(description = "유저의 닉네임", example = "수박이")
     private String nickname;
     @NotBlank
-    @Schema(description = "유저의 이메일")
+    @Schema(description = "유저의 이메일", example = "zigzaag@pawpaw.com")
     private String email;
     @NotBlank
-    @Schema(description = "유저의 비밀번호")
+    @Schema(description = "유저의 비밀번호", example = "abcd1234")
     private String password;
-    @Schema(description = "유저의 핸드폰 번호")
+    @Schema(description = "유저의 핸드폰 번호", example = "01012345678")
     private String phoneNumber;
     @NotNull
     @Valid

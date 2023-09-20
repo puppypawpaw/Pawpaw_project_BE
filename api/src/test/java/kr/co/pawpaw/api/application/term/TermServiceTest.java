@@ -1,8 +1,9 @@
-package kr.co.pawpaw.api.application.term;
+package kr.co.pawpaw.api.service.term;
 
 import kr.co.pawpaw.api.dto.term.CreateTermRequest;
 import kr.co.pawpaw.api.dto.term.TermResponse;
 import kr.co.pawpaw.api.dto.term.UpdateTermRequest;
+import kr.co.pawpaw.api.service.term.TermService;
 import kr.co.pawpaw.common.exception.term.NotFoundTermException;
 import kr.co.pawpaw.domainrdb.term.domain.Term;
 import kr.co.pawpaw.domainrdb.term.service.command.TermCommand;

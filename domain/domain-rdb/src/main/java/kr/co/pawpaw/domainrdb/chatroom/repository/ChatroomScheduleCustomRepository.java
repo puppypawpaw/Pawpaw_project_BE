@@ -1,11 +1,11 @@
 package kr.co.pawpaw.domainrdb.chatroom.repository;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroomSchedule;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroomScheduleParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomScheduleData;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomScheduleParticipantResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.QChatroomScheduleData;
+import kr.co.pawpaw.domainrdb.chatroom.dto.QChatroomScheduleParticipantResponse;
 import kr.co.pawpaw.domainrdb.storage.domain.QFile;
 import kr.co.pawpaw.domainrdb.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +20,14 @@ import static com.querydsl.core.group.GroupBy.set;
 @Repository
 @RequiredArgsConstructor
 public class ChatroomScheduleCustomRepository {
-    private final JPAQueryFactory jpaQueryFactory;
+    private final JPAQueryFactory queryFactory;
     private final QChatroomScheduleParticipant qChatroomScheduleParticipant = QChatroomScheduleParticipant.chatroomScheduleParticipant;
     private final QUser qParticipantUser = QUser.user;
     private final QFile qParticipantUserImage = QFile.file;
     private final QChatroomSchedule qChatroomSchedule = QChatroomSchedule.chatroomSchedule;
 
     public List<ChatroomScheduleData> findNotEndChatroomScheduleByChatroomId(final Long chatroomId) {
-        return jpaQueryFactory
+        return queryFactory
             .from(qChatroomSchedule)
             .leftJoin(qChatroomScheduleParticipant).on(qChatroomScheduleParticipant.chatroomSchedule.eq(qChatroomSchedule))
             .leftJoin(qChatroomScheduleParticipant.user, qParticipantUser)
@@ -37,16 +37,14 @@ public class ChatroomScheduleCustomRepository {
             .orderBy(qChatroomSchedule.startDate.asc())
             .transform(
                 groupBy(qChatroomSchedule.id).list(
-                    Projections.constructor(
-                        ChatroomScheduleData.class,
+                    new QChatroomScheduleData(
                         qChatroomSchedule.id,
                         qChatroomSchedule.name,
                         qChatroomSchedule.description,
                         qChatroomSchedule.startDate,
                         qChatroomSchedule.endDate,
                         set(
-                            Projections.constructor(
-                                ChatroomScheduleParticipantResponse.class,
+                            new QChatroomScheduleParticipantResponse(
                                 qParticipantUser.nickname,
                                 qParticipantUserImage.fileUrl
                             ).skipNulls()

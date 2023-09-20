@@ -1,8 +1,9 @@
-package kr.co.pawpaw.api.application.chatroom;
+package kr.co.pawpaw.api.service.chatroom;
 
 import kr.co.pawpaw.api.dto.chatroom.ChatroomScheduleResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleResponse;
+import kr.co.pawpaw.api.service.chatroom.ChatroomScheduleService;
 import kr.co.pawpaw.api.util.time.TimeUtil;
 import kr.co.pawpaw.common.exception.chatroom.NotAChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomScheduleException;

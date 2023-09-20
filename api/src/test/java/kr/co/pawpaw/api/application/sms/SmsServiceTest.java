@@ -1,9 +1,10 @@
-package kr.co.pawpaw.api.application.sms;
+package kr.co.pawpaw.api.service.sms;
 
 import kr.co.pawpaw.api.config.property.VerificationProperties;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeResponse;
 import kr.co.pawpaw.api.dto.sms.SendVerificationCodeRequest;
+import kr.co.pawpaw.api.service.sms.SmsService;
 import kr.co.pawpaw.common.exception.sms.InvalidVerificationCodeException;
 import kr.co.pawpaw.common.exception.sms.OutOfSmsLimitException;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsLog;

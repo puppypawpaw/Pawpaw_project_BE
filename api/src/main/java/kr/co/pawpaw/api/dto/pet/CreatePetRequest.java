@@ -15,9 +15,9 @@ import javax.validation.constraints.Size;
 public class CreatePetRequest {
     @NotBlank
     @Size(max=10)
-    @Schema(description = "펫 이름")
+    @Schema(description = "펫 이름", example = "루이")
     private String petName;
     @NotNull
-    @Schema(description = "펫 유형")
+    @Schema(description = "펫 유형", example = "DOG|CAT|FISH|BIRD|HAMSTER|RABBIT|GUINEA_PIG|LIZARD|FROG")
     private PetType petType;
 }
