@@ -65,8 +65,8 @@ public class ChatroomController {
     })
     @Operation(
         method = "POST",
-        summary = "채팅방 입장 API(참석자)",
-        description = "채팅방 입장 API(참석자)"
+        summary = "채팅방 입장 API(참여자)",
+        description = "채팅방 입장 API(참여자)"
     )
     @PostMapping("/{chatroomId}/participants")
     public ResponseEntity<Void> joinChatroom(
@@ -87,7 +87,7 @@ public class ChatroomController {
         ),
         @ApiResponse(
             responseCode = "400",
-            description = "채팅방 참석자가 아닙니다.",
+            description = "채팅방 참여자가 아닙니다.",
             content = @Content
         ),
         @ApiResponse(
@@ -98,8 +98,8 @@ public class ChatroomController {
     })
     @Operation(
         method = "DELETE",
-        summary = "채팅방 퇴장 API(참석자)",
-        description = "채팅방 퇴장 API(참석자)"
+        summary = "채팅방 퇴장 API(참여자)",
+        description = "채팅방 퇴장 API(참여자)"
     )
     @DeleteMapping("/{chatroomId}/participants")
     public ResponseEntity<Void> leaveChatroom(

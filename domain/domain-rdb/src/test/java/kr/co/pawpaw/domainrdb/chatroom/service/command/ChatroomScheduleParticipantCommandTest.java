@@ -33,4 +33,17 @@ class ChatroomScheduleParticipantCommandTest {
         verify(chatroomScheduleParticipantRepository).save(chatroomScheduleParticipant);
         assertThat(result).isEqualTo(chatroomScheduleParticipant);
     }
+
+    @Test
+    @DisplayName("delete 메서드는 chatroomScheduleParticipantRepository의 delete 메서드를 호출한다.")
+    void delete() {
+        //given
+        ChatroomScheduleParticipant chatroomScheduleParticipant = ChatroomScheduleParticipant.builder().build();
+
+        //when
+        chatroomScheduleParticipantCommand.delete(chatroomScheduleParticipant);
+
+        //then
+        verify(chatroomScheduleParticipantRepository).delete(chatroomScheduleParticipant);
+    }
 }

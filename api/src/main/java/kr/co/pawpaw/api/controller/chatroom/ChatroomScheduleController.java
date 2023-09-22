@@ -29,7 +29,7 @@ public class ChatroomScheduleController {
         @ApiResponse(responseCode = "200"),
         @ApiResponse(
             responseCode = "400",
-            description = "채팅방 참석자가 아닙니다.",
+            description = "채팅방 참여자가 아닙니다.",
             content = @Content
         ),
     })
@@ -51,7 +51,7 @@ public class ChatroomScheduleController {
         @ApiResponse(responseCode = "204"),
         @ApiResponse(
             responseCode = "400",
-            description = "채팅방 참석자가 아닙니다.",
+            description = "채팅방 참여자가 아닙니다.",
             content = @Content
         ),
         @ApiResponse(
@@ -80,7 +80,7 @@ public class ChatroomScheduleController {
         @ApiResponse(responseCode = "200"),
         @ApiResponse(
             responseCode = "400",
-            description = "채팅방 참석자가 아닙니다.",
+            description = "채팅방 참여자가 아닙니다.",
             content = @Content
         )
     })
@@ -95,5 +95,34 @@ public class ChatroomScheduleController {
         @PathVariable(value = "chatroomId") final Long chatroomId
     ) {
         return ResponseEntity.ok(chatroomScheduleService.getNotEndChatroomScheduleList(userId, chatroomId));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 채팅방 스케줄입니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 스케줄 참여자가 아닙니다.",
+            content = @Content
+        )
+    })
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<Void> leaveChatroomSchedule(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable(value = "chatroomId") final Long chatroomId,
+        @PathVariable(value = "scheduleId") final Long scheduleId
+    ) {
+        chatroomScheduleService.leaveChatroomSchedule(userId, chatroomId, scheduleId);
+
+        return ResponseEntity.noContent().build();
     }
 }

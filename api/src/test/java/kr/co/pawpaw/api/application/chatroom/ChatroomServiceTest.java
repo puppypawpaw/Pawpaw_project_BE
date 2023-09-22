@@ -142,7 +142,7 @@ class ChatroomServiceTest {
     }
 
     @Test
-    @DisplayName("joinChatroom 메서드는 participant 타입으로 참가자를 저장한다.")
+    @DisplayName("joinChatroom 메서드는 participant 타입으로 참여자를 저장한다.")
     void joinChatroom() {
         //given
         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
@@ -169,7 +169,7 @@ class ChatroomServiceTest {
     }
 
     @Test
-    @DisplayName("leaveChatroom 메서드는 채팅방 참가자가 아니라는 예외가 발생할 수 있다.")
+    @DisplayName("leaveChatroom 메서드는 채팅방 참여자가 아니라는 예외가 발생할 수 있다.")
     void leaveChatroomIsNotChatroomParticipantException() {
         //given
         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
