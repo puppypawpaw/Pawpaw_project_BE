@@ -63,7 +63,7 @@ public class TermController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
         @ApiResponse(
-            responseCode = "400",
+            responseCode = "403",
             description = "권한이 부족합니다.",
             content = @Content
         )
@@ -87,7 +87,7 @@ public class TermController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
         @ApiResponse(
-            responseCode = "400",
+            responseCode = "403",
             description = "권한이 부족합니다.",
             content = @Content
         )
@@ -116,7 +116,7 @@ public class TermController {
             content = @Content
         ),
         @ApiResponse(
-            responseCode = "400",
+            responseCode = "403",
             description = "권한이 부족합니다.",
             content = @Content
         )

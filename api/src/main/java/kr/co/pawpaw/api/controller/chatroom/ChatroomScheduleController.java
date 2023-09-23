@@ -5,11 +5,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.pawpaw.api.service.chatroom.ChatroomScheduleService;
+import kr.co.pawpaw.api.aop.ChatroomRoleCheck;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.chatroom.ChatroomScheduleResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleResponse;
+import kr.co.pawpaw.api.service.chatroom.ChatroomScheduleService;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,7 @@ public class ChatroomScheduleController {
         summary = "채팅방 스케줄 생성 API",
         description = "채팅방 스케줄 생성 API"
     )
+    @ChatroomRoleCheck
     @PostMapping
     public ResponseEntity<CreateChatroomScheduleResponse> createChatroomSchedule(
         @AuthenticatedUserId final UserId userId,

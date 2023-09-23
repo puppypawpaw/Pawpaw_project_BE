@@ -17,7 +17,8 @@ public enum ErrorCode {
     // 약관
     NOT_FOUND_TERM(404, "T001", "존재하지 않는 약관입니다."),
     NOT_AGREE_ALL_REQUIRED_TERM(400, "T002", "모든 필수 약관에 동의가 필요합니다."),
-    PERMISSION_REQUIRED(400, "PM001", "권한이 부족합니다."),
+    // 권한 부족
+    PERMISSION_REQUIRED(403, "PM001", "권한이 부족합니다."),
     INVALID_PET_NAME(400, "P001", "유효하지 않은 반려동물 이름입니다."),
     INVALID_PET_INTRODUCTION(400, "P002", "유효하지 않은 반려동물 소개입니다."),
     // 소셜 회원가입
