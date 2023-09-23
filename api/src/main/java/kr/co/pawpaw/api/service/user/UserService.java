@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -41,6 +43,8 @@ public class UserService {
     }
 
     private UserResponse getUserResponse(final User user) {
-        return UserResponse.of(user, user.getUserImage().getFileUrl());
+        return UserResponse.of(user, Optional.ofNullable(user.getUserImage())
+            .map(File::getFileUrl)
+            .orElse(null));
     }
 }
