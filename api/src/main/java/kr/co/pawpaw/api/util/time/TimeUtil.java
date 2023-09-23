@@ -5,12 +5,17 @@ import lombok.experimental.UtilityClass;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
 @UtilityClass
 public class TimeUtil {
     private static final DateTimeFormatter defaultDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public String getYearMonthDay(final LocalDateTime ldt) {
+        if (Objects.isNull(ldt)) {
+            return null;
+        }
+
         return ldt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
@@ -19,10 +24,18 @@ public class TimeUtil {
     }
 
     public String localDateTimeToDefaultTimeString(final LocalDateTime ldt) {
+        if (Objects.isNull(ldt)) {
+            return null;
+        }
+
         return ldt.format(defaultDateTimeFormatter);
     }
 
     public String getTimeBeforeString(final LocalDateTime ldt) {
+        if (Objects.isNull(ldt)) {
+            return null;
+        }
+
         long beforeMinutes = Duration.between(ldt, LocalDateTime.now()).toMinutes();
 
         if (beforeMinutes == 0) {
