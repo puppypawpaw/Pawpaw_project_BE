@@ -5,6 +5,7 @@ import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
 import kr.co.pawpaw.api.util.file.FileUtil;
+import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
@@ -60,12 +61,14 @@ public class ChatroomService {
     @Transactional
     public void joinChatroom(
         final UserId userId,
-        final Long chatRoomId
+        final Long chatroomId
     ) {
         User user = userQuery.findByUserId(userId)
             .orElseThrow(NotFoundUserException::new);
 
-        joinChatroomAsParticipant(chatRoomId, user);
+        checkAlreadyChatroomParticipant(chatroomId, user);
+
+        joinChatroomAsParticipant(chatroomId, user);
     }
 
     @Transactional
@@ -86,6 +89,14 @@ public class ChatroomService {
         chatroomParticipantCommand.delete(chatroomParticipant);
     }
 
+    private void checkAlreadyChatroomParticipant(
+        final Long chatroomId,
+        final User user
+    ) {
+        if (chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)) {
+            throw new AlreadyChatroomParticipantException();
+        }
+    }
 
     public List<ChatroomDetailResponse> getParticipatedChatroomList(final UserId userId) {
         return chatroomQuery.getParticipatedChatroomDetailDataByUserId(userId)

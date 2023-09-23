@@ -61,6 +61,11 @@ public class ChatroomController {
             responseCode = "404",
             description = "존재하지 않는 유저입니다.",
             content = @Content
+        ),
+        @ApiResponse(
+            responseCode= "409",
+            description = "이미 참여한 채팅방입니다.",
+            content = @Content
         )
     })
     @Operation(

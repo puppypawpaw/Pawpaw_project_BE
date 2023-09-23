@@ -1,10 +1,11 @@
-package kr.co.pawpaw.api.service.chatroom;
+package kr.co.pawpaw.api.application.chatroom;
 
 import kr.co.pawpaw.api.service.chatroom.ChatroomService;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
+import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
@@ -22,6 +23,7 @@ import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -129,31 +131,56 @@ class ChatroomServiceTest {
         assertThat(response.getChatroomId()).isEqualTo(id);
     }
 
-    @Test
-    @DisplayName("joinChatroom 메서드는 존재하지 않는 유저 예외가 발생 가능하다.")
-    void joinChatroomNotFoundUserException() {
-        //given
-        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
-        Long chatroomId = 12345L;
-        //when
-        assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroomId)).isInstanceOf(NotFoundUserException.class);
+    @Nested
+    @DisplayName("joinChatroom 메서드는")
+    class JoinChatroom {
+        @Nested
+        @DisplayName("유저가")
+        class User {
+            @Test
+            @DisplayName("존재하지 않으면 예외가 발생한다.")
+            void NotFoundUserException() {
+                //given
+                when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
+                Long chatroomId = 12345L;
+                //when
+                assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroomId)).isInstanceOf(NotFoundUserException.class);
 
-        //then
-    }
+                //then
+            }
+            @Nested
+            @DisplayName("존재하고 채팅방에")
+            class Chatroom {
+                @Test
+                @DisplayName("이미 참여했으면 예외가 발생한다.")
+                void alreadyChatroomParticipantException() {
+                    //given
+                    when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+                    Long chatroomId = 12345L;
+                    when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(true);
+                    //when
+                    assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroomId)).isInstanceOf(AlreadyChatroomParticipantException.class);
 
-    @Test
-    @DisplayName("joinChatroom 메서드는 participant 타입으로 참여자를 저장한다.")
-    void joinChatroom() {
-        //given
-        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-        Long chatroomId = 12345L;
-        //when
-        chatroomService.joinChatroom(user.getUserId(), chatroomId);
+                    //then
+                }
 
-        //then
-        ArgumentCaptor<ChatroomParticipant> chatroomParticipantArgumentCaptor = ArgumentCaptor.forClass(ChatroomParticipant.class);
-        verify(chatroomParticipantCommand).save(chatroomParticipantArgumentCaptor.capture());
-        assertThat(chatroomParticipantArgumentCaptor.getValue().isManager()).isFalse();
+                @Test
+                @DisplayName("참여하지 않았으면 participant role로 참여자를 생성한다.")
+                void success() {
+                    //given
+                    when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+                    Long chatroomId = 12345L;
+                    when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(false);
+                    //when
+                    chatroomService.joinChatroom(user.getUserId(), chatroomId);
+
+                    //then
+                    ArgumentCaptor<ChatroomParticipant> chatroomParticipantArgumentCaptor = ArgumentCaptor.forClass(ChatroomParticipant.class);
+                    verify(chatroomParticipantCommand).save(chatroomParticipantArgumentCaptor.capture());
+                    assertThat(chatroomParticipantArgumentCaptor.getValue().isManager()).isFalse();
+                }
+            }
+        }
     }
 
     @Test
