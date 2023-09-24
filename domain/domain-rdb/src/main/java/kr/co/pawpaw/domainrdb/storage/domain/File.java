@@ -23,7 +23,7 @@ public class File extends BaseTimeEntity {
     @Column(nullable = false)
     private Long byteSize;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User uploader;
 
     @Builder
