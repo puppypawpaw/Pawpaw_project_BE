@@ -5,11 +5,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.pawpaw.api.service.chatroom.ChatroomService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
+import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
+import kr.co.pawpaw.api.service.chatroom.ChatroomService;
+import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
@@ -54,6 +56,46 @@ public class ChatroomController {
     ) {
         return ResponseEntity.ok(chatroomService.createChatroom(userId, body, image));
     }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200")
+    })
+    @Operation(
+        method = "GET",
+        summary = "채팅방 기본 커버(이미지) 조회 API",
+        description = "채팅방 기본 커버 이미지 id 및 url 조회 API"
+    )
+    @GetMapping("/default-cover")
+    public ResponseEntity<List<ChatroomCoverResponse>> getChatroomDefaultCover() {
+        return ResponseEntity.ok(chatroomService.getChatroomDefaultCoverList());
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 유저입니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 채팅방 기본 커버입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "POST",
+        summary = "채팅방 생성 API(기본 커버 이미지로)",
+        description = "채팅방 생성 API(기본 커버 이미지로), 자동으로 채팅방 매니저로 등록됨"
+    )
+    @PostMapping("/default")
+    public ResponseEntity<CreateChatroomResponse> createChatroomWithDefaultCover(
+        @RequestBody @Valid final CreateChatroomWithDefaultCoverRequest request,
+        @AuthenticatedUserId final UserId userId
+    ) {
+        return ResponseEntity.ok(chatroomService.createChatroomWithDefaultCover(userId, request));
+    }
+
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),

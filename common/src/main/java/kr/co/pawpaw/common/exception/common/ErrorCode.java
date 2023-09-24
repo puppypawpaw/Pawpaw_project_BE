@@ -47,10 +47,13 @@ public enum ErrorCode {
     NOT_FOUND_CHATROOM_SCHEDULE(404, "CR005", "존재하지 않는 채팅방 스케줄입니다."),
     NOT_A_CHATROOM_SCHEDULE_PARTICIPANT(400, "CR006", "채팅방 스케줄 참여자가 아닙니다."),
     ALREADY_CHATROOM_PARTICIPANT(409, "CR007", "이미 참여한 채팅방입니다."),
+    NOT_FOUND_CHATROOM_DEFAULT_COVER(404, "CR008", "존재하지 않는 채팅방 기본 커버입니다."),
     // 게시판 이미지
     BOARD_IMG_CANNOT_UPLOAD_EXCEPTION(400, "BOARD_IMG_CANNOT_UPLOAD_EXCEPTION", "이미지 업로드를 실패했습니다"),
     BOARD_IMG_CANNOT_VIEW_EXCEPTION(400, "BOARD_IMG_CANNOT_VIEW_EXCEPTION", "이미지 조회를 실패했습니다"),
-    BOARD_IMG_CANNOT_REMOVE_EXCEPTION(400, "BOARD_IMG_CANNOT_REMOVE_EXCEPTION", "이미지 삭제를 실패했습니다");
+    BOARD_IMG_CANNOT_REMOVE_EXCEPTION(400, "BOARD_IMG_CANNOT_REMOVE_EXCEPTION", "이미지 삭제를 실패했습니다"),
+    // 반려동물
+    INVALID_PET_TYPE(400, "PE001", "유효하지 않은 반려동물 종류입니다.");
 
     private final int status;
     private final String code;

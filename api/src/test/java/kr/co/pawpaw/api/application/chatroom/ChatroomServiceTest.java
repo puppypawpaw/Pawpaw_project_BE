@@ -1,5 +1,6 @@
 package kr.co.pawpaw.api.application.chatroom;
 
+import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
 import kr.co.pawpaw.api.service.chatroom.ChatroomService;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
@@ -8,14 +9,18 @@ import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
 import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
+import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
+import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomDefaultCover;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
+import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomDetailData;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
+import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomDefaultCoverQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomQuery;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
@@ -54,6 +59,8 @@ class ChatroomServiceTest {
     @Mock
     private ChatroomParticipantQuery chatroomParticipantQuery;
     @Mock
+    private ChatroomDefaultCoverQuery chatroomDefaultCoverQuery;
+    @Mock
     private ChatroomQuery chatroomQuery;
     @Mock
     private UserQuery userQuery;
@@ -73,6 +80,15 @@ class ChatroomServiceTest {
         .hashTagList(List.of("hashTag1", "hashTag2"))
         .build();
 
+    private final CreateChatroomWithDefaultCoverRequest requestWithDefaultCover = CreateChatroomWithDefaultCoverRequest.builder()
+        .name("chatroom-name")
+        .description("chatroom-description")
+        .locationLimit(true)
+        .searchable(false)
+        .hashTagList(List.of("hashTag1", "hashTag2"))
+        .coverId(12345L)
+        .build();
+
     private final File file = File.builder()
         .fileName(UUID.randomUUID().toString())
         .uploader(user)
@@ -80,55 +96,170 @@ class ChatroomServiceTest {
         .contentType("contentType")
         .build();
 
+    private final ChatroomDefaultCover cover = ChatroomDefaultCover.builder()
+        .coverFile(file)
+        .build();
 
-    @Test
-    @DisplayName("createChatroom메서드는 존재하지 않는 유저 예외가 발생가능하다.")
-    void createChatroomNotFoundUserException() {
-        //given
-        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
+    @Nested
+    @DisplayName("createChatroom 메서드는")
+    class CreateChatroom {
+        @Nested
+        @DisplayName("유저가")
+        class User {
+            @Test
+            @DisplayName("존재하지않으면 예외가 발생한다.")
+            void NotFoundUserException() {
+                //given
+                when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
 
-        //when
-        assertThatThrownBy(() -> chatroomService.createChatroom(user.getUserId(), request, multipartFile)).isInstanceOf(NotFoundUserException.class);
+                //when
+                assertThatThrownBy(() -> chatroomService.createChatroom(user.getUserId(), request, multipartFile)).isInstanceOf(NotFoundUserException.class);
 
-        //then
-        verify(userQuery).findByUserId(user.getUserId());
+                //then
+                verify(userQuery).findByUserId(user.getUserId());
+            }
+
+            @Nested
+            @DisplayName("존재하고 생성된 chatroom의")
+            class Chatroom {
+                @Nested
+                @DisplayName("mulitparFile이")
+                class MultipartFile {
+                    @Test
+                    @DisplayName("null이면 fileService의 saveFileByMultipartFile메서드를 호출하지 않는다.")
+                    void nullNotCallSaveFileByMultipartFile() {
+                        //given
+                        kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
+                        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+                        when(chatroomCommand.save(any(kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+                        //when
+                        chatroomService.createChatroom(user.getUserId(), request, null);
+                        //then
+                        verify(fileService, times(0)).saveFileByMultipartFile(any(), any());
+                    }
+
+                    @Test
+                    @DisplayName("길이가 0이면 fileService의 saveFileByMultipartFile메서드를 호출하지 않는다.")
+                    void zeroLenNotCallSaveFileByMultipartFile() throws IOException {
+                        //given
+                        kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
+                        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+                        when(chatroomCommand.save(any(kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+                        when(multipartFile.getBytes()).thenReturn(new byte[0]);
+
+                        //when
+                        chatroomService.createChatroom(user.getUserId(), request, multipartFile);
+
+                        //then
+                        verify(fileService, times(0)).saveFileByMultipartFile(any(), any());
+                    }
+
+                    @Test
+                    @DisplayName("정상이면 생성된 chatroom의 Id를 필드로 가지는 CreateChatroomResponse를 반환한다.")
+                    void returnCreateChatroomResponse() throws IllegalAccessException, IOException, NoSuchFieldException {
+                        //given
+                        kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
+                        Field idField = chatroom.getClass().getDeclaredField("id");
+                        idField.setAccessible(true);
+                        Long id = 1234L;
+                        idField.set(chatroom, id);
+                        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+                        when(chatroomCommand.save(any(kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+                        when(multipartFile.getBytes()).thenReturn(new byte[file.getByteSize().intValue()]);
+                        when(fileService.saveFileByMultipartFile(multipartFile, user.getUserId())).thenReturn(file);
+                        //when
+                        CreateChatroomResponse response = chatroomService.createChatroom(user.getUserId(), request, multipartFile);
+
+                        //then
+                        assertThat(response.getChatroomId()).isEqualTo(id);
+                    }
+                }
+            }
+        }
     }
 
-    @Test
-    @DisplayName("createChatroom메서드는 생성된 chatroom의 multipartFile이 null이거나 길이가 0이면 fileService의 saveFileByMultipartFile메서드를 호출하지 않는다.")
-    void createChatroomNoMultipartFile() throws IOException {
-        //given
-        Chatroom chatroom = request.toChatroom(file);
-        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-        when(chatroomCommand.save(any(Chatroom.class))).thenReturn(chatroom);
-        when(multipartFile.getBytes()).thenReturn(new byte[0]);
+    @Nested
+    @DisplayName("createChatroomWithDefaultCover 메서드는")
+    class CreateChatroomWithDefaultCover {
+        @Nested
+        @DisplayName("유저가")
+        class User {
+            @Test
+            @DisplayName("존재하지않으면 예외가 발생한다.")
+            void NotFoundUserException() {
+                //given
+                when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
 
-        //when
-        chatroomService.createChatroom(user.getUserId(), request, null);
-        chatroomService.createChatroom(user.getUserId(), request, multipartFile);
+                //when
+                assertThatThrownBy(() -> chatroomService.createChatroomWithDefaultCover(user.getUserId(), requestWithDefaultCover)).isInstanceOf(NotFoundUserException.class);
 
-        //then
-        verify(fileService, times(0)).saveFileByMultipartFile(any(), any());
+                //then
+                verify(userQuery).findByUserId(user.getUserId());
+            }
+
+            @Nested
+            @DisplayName("존재하고 ChatroomDefaultCover가")
+            class ChatroomDefaultCover {
+                @Test
+                @DisplayName("존재하지 않으면 예외가 발생한다.")
+                void notFoundChatroomDefaultCoverException() {
+                    //given
+                    Long chatroomDefaultCoverId = 12345L;
+                    when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+                    when(chatroomDefaultCoverQuery.findById(chatroomDefaultCoverId)).thenReturn(Optional.empty());
+
+                    //when
+                    assertThatThrownBy(() -> chatroomService.createChatroomWithDefaultCover(user.getUserId(), requestWithDefaultCover)).isInstanceOf(NotFoundChatroomDefaultCoverException.class);
+
+                    //then
+                }
+
+                @Test
+                @DisplayName("존재하면 생성된 chatroom의 Id를 필드로 가지는 CreateChatroomResponse를 반환한다.")
+                void returnCreateChatroomResponse() throws NoSuchFieldException, IllegalAccessException {
+                    //given
+                    kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom chatroom = requestWithDefaultCover.toChatroom(file);
+                    Field idField = chatroom.getClass().getDeclaredField("id");
+                    idField.setAccessible(true);
+                    idField.set(chatroom, requestWithDefaultCover.getCoverId());
+                    when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+                    when(chatroomDefaultCoverQuery.findById(requestWithDefaultCover.getCoverId())).thenReturn(Optional.of(cover));
+                    when(chatroomCommand.save(any(kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+
+                    //when
+                    CreateChatroomResponse response = chatroomService.createChatroomWithDefaultCover(user.getUserId(), requestWithDefaultCover);
+
+                    //then
+                    assertThat(response.getChatroomId()).isEqualTo(requestWithDefaultCover.getCoverId());
+                }
+            }
+        }
     }
 
-    @Test
-    @DisplayName("createChatroom메서드는 생성된 chatroom의 Id를 필드로 가지는 CreateChatroomResponse를 반환한다.")
-    void createChatroom() throws IOException, NoSuchFieldException, IllegalAccessException {
-        //given
-        Chatroom chatroom = request.toChatroom(file);
-        Field idField = chatroom.getClass().getDeclaredField("id");
-        idField.setAccessible(true);
-        Long id = 1234L;
-        idField.set(chatroom, id);
-        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-        when(chatroomCommand.save(any(Chatroom.class))).thenReturn(chatroom);
-        when(multipartFile.getBytes()).thenReturn(new byte[file.getByteSize().intValue()]);
-        when(fileService.saveFileByMultipartFile(multipartFile, user.getUserId())).thenReturn(file);
-        //when
-        CreateChatroomResponse response = chatroomService.createChatroom(user.getUserId(), request, multipartFile);
+    @Nested
+    @DisplayName("getChatroomDefaultCoverList 메서드는")
+    class GetChatroomDefaultCoverList {
+        @Nested
+        @DisplayName("chatroomDefaultCoverQuery의")
+        class ChatroomDefaultCoverQuery {
+            @Test
+            @DisplayName("findAllChatroomCover 메서드를 호출하고 반환값을 그대로 반환한다.")
+            void findAllChatroomCover() {
+                //given
+                List<ChatroomCoverResponse> responseList = List.of(
+                    new ChatroomCoverResponse(12345L, "coverUrl1"),
+                    new ChatroomCoverResponse(123456L, "coverUrl2")
+                );
+                when(chatroomDefaultCoverQuery.findAllChatroomCover()).thenReturn(responseList);
 
-        //then
-        assertThat(response.getChatroomId()).isEqualTo(id);
+                //when
+                List<ChatroomCoverResponse> result = chatroomService.getChatroomDefaultCoverList();
+
+                //then
+                assertThat(result).usingRecursiveComparison().isEqualTo(responseList);
+                verify(chatroomDefaultCoverQuery).findAllChatroomCover();
+            }
+        }
     }
 
     @Nested
