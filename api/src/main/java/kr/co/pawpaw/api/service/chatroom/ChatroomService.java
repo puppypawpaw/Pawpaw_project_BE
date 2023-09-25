@@ -11,18 +11,17 @@ import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
 import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomDefaultCover;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipant;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
+import kr.co.pawpaw.domainrdb.chatroom.domain.*;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
+import kr.co.pawpaw.domainrdb.chatroom.service.command.TrandingChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomDefaultCoverQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomQuery;
+import kr.co.pawpaw.domainrdb.chatroom.service.query.TrandingChatroomQuery;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
@@ -43,6 +42,8 @@ public class ChatroomService {
     private final ChatroomParticipantCommand chatroomParticipantCommand;
     private final ChatroomParticipantQuery chatroomParticipantQuery;
     private final ChatroomDefaultCoverQuery chatroomDefaultCoverQuery;
+    private final TrandingChatroomCommand trandingChatroomCommand;
+    private final TrandingChatroomQuery trandingChatroomQuery;
     private final ChatroomQuery chatroomQuery;
     private final UserQuery userQuery;
     private final FileService fileService;
@@ -93,6 +94,8 @@ public class ChatroomService {
         checkAlreadyChatroomParticipant(chatroomId, user);
 
         joinChatroomAsParticipant(chatroomId, user);
+
+        createTrandingChatroom(chatroomId);
     }
 
     @Transactional
@@ -134,6 +137,14 @@ public class ChatroomService {
 
     public List<ChatroomCoverResponse> getChatroomDefaultCoverList() {
         return chatroomDefaultCoverQuery.findAllChatroomCover();
+    }
+
+    private void createTrandingChatroom(final Long chatroomId) {
+        if (!trandingChatroomQuery.existsByChatroomId(chatroomId)) {
+            trandingChatroomCommand.save(TrandingChatroom.builder()
+                .chatroom(chatroomQuery.getReferenceById(chatroomId))
+                .build());
+        }
     }
 
     private void checkAlreadyChatroomParticipant(

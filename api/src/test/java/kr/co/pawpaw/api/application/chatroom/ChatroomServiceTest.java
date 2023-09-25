@@ -11,22 +11,22 @@ import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
 import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomDefaultCover;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipant;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
+import kr.co.pawpaw.domainrdb.chatroom.domain.*;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomDetailData;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
+import kr.co.pawpaw.domainrdb.chatroom.service.command.TrandingChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomDefaultCoverQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomQuery;
+import kr.co.pawpaw.domainrdb.chatroom.service.query.TrandingChatroomQuery;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -60,6 +61,10 @@ class ChatroomServiceTest {
     private ChatroomParticipantQuery chatroomParticipantQuery;
     @Mock
     private ChatroomDefaultCoverQuery chatroomDefaultCoverQuery;
+    @Mock
+    private TrandingChatroomCommand trandingChatroomCommand;
+    @Mock
+    private TrandingChatroomQuery trandingChatroomQuery;
     @Mock
     private ChatroomQuery chatroomQuery;
     @Mock
@@ -99,6 +104,16 @@ class ChatroomServiceTest {
     private final ChatroomDefaultCover cover = ChatroomDefaultCover.builder()
         .coverFile(file)
         .build();
+
+    private static final Chatroom chatroom = Chatroom.builder()
+        .build();
+
+    @BeforeAll
+    static void setup() throws NoSuchFieldException, IllegalAccessException {
+        Field idField = Chatroom.class.getDeclaredField("id");
+        idField.setAccessible(true);
+        idField.set(chatroom, 12345L);
+    }
 
     @Nested
     @DisplayName("createChatroom 메서드는")
@@ -273,43 +288,64 @@ class ChatroomServiceTest {
             void NotFoundUserException() {
                 //given
                 when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
-                Long chatroomId = 12345L;
+
                 //when
-                assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroomId)).isInstanceOf(NotFoundUserException.class);
+                assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(NotFoundUserException.class);
 
                 //then
             }
-            @Nested
-            @DisplayName("존재하고 채팅방에")
-            class Chatroom {
-                @Test
-                @DisplayName("이미 참여했으면 예외가 발생한다.")
-                void alreadyChatroomParticipantException() {
-                    //given
-                    when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-                    Long chatroomId = 12345L;
-                    when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(true);
-                    //when
-                    assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroomId)).isInstanceOf(AlreadyChatroomParticipantException.class);
+        }
+        @Nested
+        @DisplayName("채팅방에")
+        class Chatroom {
+            @Test
+            @DisplayName("이미 참여했으면 예외가 발생한다.")
+            void alreadyChatroomParticipantException() {
+                //given
+                when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+                when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(true);
+                //when
+                assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(AlreadyChatroomParticipantException.class);
 
-                    //then
-                }
+                //then
+            }
 
-                @Test
-                @DisplayName("참여하지 않았으면 participant role로 참여자를 생성한다.")
-                void success() {
-                    //given
-                    when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-                    Long chatroomId = 12345L;
-                    when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(false);
-                    //when
-                    chatroomService.joinChatroom(user.getUserId(), chatroomId);
+            @Test
+            @DisplayName("참여하지 않았으면 participant role로 참여자를 생성한다.")
+            void success() {
+                //given
+                when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+                when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(false);
+                when(trandingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(true);
+                //when
+                chatroomService.joinChatroom(user.getUserId(), chatroom.getId());
 
-                    //then
-                    ArgumentCaptor<ChatroomParticipant> chatroomParticipantArgumentCaptor = ArgumentCaptor.forClass(ChatroomParticipant.class);
-                    verify(chatroomParticipantCommand).save(chatroomParticipantArgumentCaptor.capture());
-                    assertThat(chatroomParticipantArgumentCaptor.getValue().isManager()).isFalse();
-                }
+                //then
+                ArgumentCaptor<ChatroomParticipant> chatroomParticipantArgumentCaptor = ArgumentCaptor.forClass(ChatroomParticipant.class);
+                verify(chatroomParticipantCommand).save(chatroomParticipantArgumentCaptor.capture());
+                assertThat(chatroomParticipantArgumentCaptor.getValue().isManager()).isFalse();
+            }
+        }
+
+        @Nested
+        @DisplayName("참여한 채팅방을")
+        class ParticipatedChatroom {
+            @Test
+            @DisplayName("뜨고있는 채팅방으로 설정한다.")
+            void setTrandingChatroom() throws NoSuchFieldException, IllegalAccessException {
+                //given
+                when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+                when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(false);
+                when(trandingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(false);
+                when(chatroomQuery.getReferenceById(chatroom.getId())).thenReturn(chatroom);
+
+                //when
+                chatroomService.joinChatroom(user.getUserId(), chatroom.getId());
+
+                //then
+                ArgumentCaptor<TrandingChatroom> trandingChatroomArgumentCaptor = ArgumentCaptor.forClass(TrandingChatroom.class);
+                verify(trandingChatroomCommand).save(trandingChatroomArgumentCaptor.capture());
+                assertThat(trandingChatroomArgumentCaptor.getValue().getChatroom().getId()).isEqualTo(chatroom.getId());
             }
         }
     }
@@ -319,9 +355,8 @@ class ChatroomServiceTest {
     void leaveChatroomNotFoundUserException() {
         //given
         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
-        Long chatroomId = 12345L;
         //when
-        assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroomId)).isInstanceOf(NotFoundUserException.class);
+        assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(NotFoundUserException.class);
 
         //then
     }
@@ -331,11 +366,10 @@ class ChatroomServiceTest {
     void leaveChatroomIsNotChatroomParticipantException() {
         //given
         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-        Long chatroomId = 12345L;
-        when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(Optional.empty());
+        when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(Optional.empty());
 
         //when
-        assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroomId)).isInstanceOf(IsNotChatroomParticipantException.class);
+        assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(IsNotChatroomParticipantException.class);
 
         //then
     }
@@ -345,13 +379,12 @@ class ChatroomServiceTest {
     void leaveChatroomNotAllowedChatroomLeaveException() {
         //given
         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-        Long chatroomId = 12345L;
-        when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(Optional.of(ChatroomParticipant.builder()
+        when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(Optional.of(ChatroomParticipant.builder()
                 .role(ChatroomParticipantRole.MANAGER)
             .build()));
 
         //when
-        assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroomId)).isInstanceOf(NotAllowedChatroomLeaveException.class);
+        assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(NotAllowedChatroomLeaveException.class);
 
         //then
     }
@@ -361,14 +394,13 @@ class ChatroomServiceTest {
     void leaveChatroom() {
         //given
         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-        Long chatroomId = 12345L;
         ChatroomParticipant chatroomParticipant = ChatroomParticipant.builder()
             .role(ChatroomParticipantRole.PARTICIPANT)
             .build();
-        when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(Optional.of(chatroomParticipant));
+        when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(Optional.of(chatroomParticipant));
 
         //when
-        chatroomService.leaveChatroom(user.getUserId(), chatroomId);
+        chatroomService.leaveChatroom(user.getUserId(), chatroom.getId());
 
         //then
         verify(chatroomParticipantCommand).delete(chatroomParticipant);
