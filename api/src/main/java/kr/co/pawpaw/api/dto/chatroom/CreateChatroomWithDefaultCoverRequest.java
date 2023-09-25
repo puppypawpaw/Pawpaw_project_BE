@@ -13,7 +13,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class CreateChatroomRequest {
+public class CreateChatroomWithDefaultCoverRequest {
     @NotBlank
     @Schema(description = "채팅방 이름", example = "한강 산책")
     private String name;
@@ -21,7 +21,7 @@ public class CreateChatroomRequest {
     @Schema(description = "채팅방 설명", example = "한강 산책 같이 가요")
     private String description;
     @NotNull
-    @Schema(description = "채팅방 해시태그 목록", example = "['한강', '산책']")
+    @Schema(description = "채팅방 해시태그 목록", example = "[한강, 산책]")
     private List<String> hashTagList;
     @NotNull
     @Schema(description = "검색 가능 여부", example = "true")
@@ -29,6 +29,9 @@ public class CreateChatroomRequest {
     @NotNull
     @Schema(description = "장소 제한 여부", example = "true")
     private Boolean locationLimit;
+    @NotNull
+    @Schema(description = "채팅방 기본 커버 아이디", example = "1")
+    private Long coverId;
 
     public Chatroom toChatroom(final File coverFile) {
         return Chatroom.builder()

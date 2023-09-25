@@ -13,4 +13,8 @@ public class ChatroomScheduleParticipantCommand {
     public ChatroomScheduleParticipant save(final ChatroomScheduleParticipant chatroomScheduleParticipant) {
         return chatroomScheduleParticipantRepository.save(chatroomScheduleParticipant);
     }
+
+    public void delete(final ChatroomScheduleParticipant chatroomScheduleParticipant) {
+        chatroomScheduleParticipantRepository.delete(chatroomScheduleParticipant);
+    }
 }

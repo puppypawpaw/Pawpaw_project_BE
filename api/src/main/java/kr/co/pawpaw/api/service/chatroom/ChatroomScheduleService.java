@@ -4,6 +4,7 @@ import kr.co.pawpaw.api.dto.chatroom.ChatroomScheduleResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleResponse;
 import kr.co.pawpaw.common.exception.chatroom.NotAChatroomParticipantException;
+import kr.co.pawpaw.common.exception.chatroom.NotAChatroomScheduleParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomScheduleException;
 import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomSchedule;
@@ -12,6 +13,7 @@ import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomScheduleCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomScheduleParticipantCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomQuery;
+import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomScheduleParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomScheduleQuery;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
@@ -28,6 +30,7 @@ public class ChatroomScheduleService {
     private final ChatroomScheduleQuery chatroomScheduleQuery;
     private final ChatroomScheduleCommand chatroomScheduleCommand;
     private final ChatroomScheduleParticipantCommand chatroomScheduleParticipantCommand;
+    private final ChatroomScheduleParticipantQuery chatroomScheduleParticipantQuery;
     private final ChatroomParticipantQuery chatroomParticipantQuery;
     private final UserQuery userQuery;
     private final ChatroomQuery chatroomQuery;
@@ -56,6 +59,16 @@ public class ChatroomScheduleService {
         checkChatroomParticipant(userId, chatroomId);
         checkChatroomSchedule(chatroomId, chatroomScheduleId);
         createChatroomScheduleParticipant(userId, chatroomScheduleId);
+    }
+
+    public void leaveChatroomSchedule(
+        final UserId userId,
+        final Long chatroomId,
+        final Long chatroomScheduleId
+    ) {
+        checkChatroomParticipant(userId, chatroomId);
+        checkChatroomSchedule(chatroomId, chatroomScheduleId);
+        deleteChatroomScheduleParticipant(userId, chatroomScheduleId);
     }
 
     public List<ChatroomScheduleResponse> getNotEndChatroomScheduleList(
@@ -108,5 +121,15 @@ public class ChatroomScheduleService {
                 .user(userQuery.getReferenceById(userId))
                 .build()
         );
+    }
+
+    private void deleteChatroomScheduleParticipant(
+        final UserId userId,
+        final Long chatroomScheduleId
+    ) {
+        ChatroomScheduleParticipant chatroomScheduleParticipant = chatroomScheduleParticipantQuery.findByChatroomScheduleIdAndUserUserId(chatroomScheduleId, userId)
+            .orElseThrow(NotAChatroomScheduleParticipantException::new);
+
+        chatroomScheduleParticipantCommand.delete(chatroomScheduleParticipant);
     }
 }

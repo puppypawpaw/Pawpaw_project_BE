@@ -1,20 +1,26 @@
 package kr.co.pawpaw.api.service.chatroom;
 
-import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
+import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
+import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.util.file.FileUtil;
+import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
+import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
+import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomDefaultCover;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
+import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
+import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomDefaultCoverQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomQuery;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
@@ -36,6 +42,7 @@ public class ChatroomService {
     private final ChatroomCommand chatroomCommand;
     private final ChatroomParticipantCommand chatroomParticipantCommand;
     private final ChatroomParticipantQuery chatroomParticipantQuery;
+    private final ChatroomDefaultCoverQuery chatroomDefaultCoverQuery;
     private final ChatroomQuery chatroomQuery;
     private final UserQuery userQuery;
     private final FileService fileService;
@@ -58,14 +65,34 @@ public class ChatroomService {
     }
 
     @Transactional
-    public void joinChatroom(
+    public CreateChatroomResponse createChatroomWithDefaultCover(
         final UserId userId,
-        final Long chatRoomId
+        final CreateChatroomWithDefaultCoverRequest request
     ) {
         User user = userQuery.findByUserId(userId)
             .orElseThrow(NotFoundUserException::new);
 
-        joinChatroomAsParticipant(chatRoomId, user);
+        ChatroomDefaultCover chatroomDefaultCover = chatroomDefaultCoverQuery.findById(request.getCoverId())
+            .orElseThrow(NotFoundChatroomDefaultCoverException::new);
+
+        Chatroom chatroom = createChatroomByRequestAndCoverFile(request, chatroomDefaultCover.getCoverFile());
+
+        joinChatroomAsManager(chatroom, user);
+
+        return CreateChatroomResponse.of(chatroom);
+    }
+
+    @Transactional
+    public void joinChatroom(
+        final UserId userId,
+        final Long chatroomId
+    ) {
+        User user = userQuery.findByUserId(userId)
+            .orElseThrow(NotFoundUserException::new);
+
+        checkAlreadyChatroomParticipant(chatroomId, user);
+
+        joinChatroomAsParticipant(chatroomId, user);
     }
 
     @Transactional
@@ -86,7 +113,6 @@ public class ChatroomService {
         chatroomParticipantCommand.delete(chatroomParticipant);
     }
 
-
     public List<ChatroomDetailResponse> getParticipatedChatroomList(final UserId userId) {
         return chatroomQuery.getParticipatedChatroomDetailDataByUserId(userId)
             .stream()
@@ -104,6 +130,19 @@ public class ChatroomService {
         final int size
     ) {
         return chatroomQuery.getAccessibleTrandingChatroom(userId, beforeId, size);
+    }
+
+    public List<ChatroomCoverResponse> getChatroomDefaultCoverList() {
+        return chatroomDefaultCoverQuery.findAllChatroomCover();
+    }
+
+    private void checkAlreadyChatroomParticipant(
+        final Long chatroomId,
+        final User user
+    ) {
+        if (chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)) {
+            throw new AlreadyChatroomParticipantException();
+        }
     }
 
     private File createChatroomCoverIfExists(
@@ -146,6 +185,13 @@ public class ChatroomService {
 
     private Chatroom createChatroomByRequestAndCoverFile(
         final CreateChatroomRequest request,
+        final File coverFile
+    ) {
+        return chatroomCommand.save(request.toChatroom(coverFile));
+    }
+
+    private Chatroom createChatroomByRequestAndCoverFile(
+        final CreateChatroomWithDefaultCoverRequest request,
         final File coverFile
     ) {
         return chatroomCommand.save(request.toChatroom(coverFile));

@@ -4,6 +4,7 @@ import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomSchedule;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomScheduleParticipant;
 import kr.co.pawpaw.domainrdb.user.domain.User;
+import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -67,5 +68,29 @@ class ChatroomScheduleParticipantRepositoryTest {
         //then
         assertThat(result.isPresent()).isTrue();
         assertThat(result.get()).usingRecursiveComparison().isEqualTo(chatroomScheduleParticipant);
+    }
+
+    @Test
+    @DisplayName("저장 및 findByChatroomScheduleIdAndUserUserId 메서드 반환값 테스트")
+    void findByChatroomScheduleIdAndUserUserId() {
+        //given
+
+        //when
+        chatroomScheduleParticipant = chatroomScheduleParticipantRepository.save(ChatroomScheduleParticipant.builder()
+            .chatroomSchedule(chatroomSchedule)
+            .user(user)
+            .build());
+
+        Optional<ChatroomScheduleParticipant> bothCorrectResult = chatroomScheduleParticipantRepository.findByChatroomScheduleIdAndUserUserId(chatroomSchedule.getId(), user.getUserId());
+        Optional<ChatroomScheduleParticipant> userIdIncorrectResult = chatroomScheduleParticipantRepository.findByChatroomScheduleIdAndUserUserId(chatroomSchedule.getId(), UserId.create());
+        Optional<ChatroomScheduleParticipant> chatroomIdIncorrectResult = chatroomScheduleParticipantRepository.findByChatroomScheduleIdAndUserUserId(chatroom.getId() + 1, user.getUserId());
+        Optional<ChatroomScheduleParticipant> bothIncorrectResult = chatroomScheduleParticipantRepository.findByChatroomScheduleIdAndUserUserId(chatroom.getId() + 1, UserId.create());
+
+        //then
+        assertThat(bothCorrectResult.isPresent()).isTrue();
+        assertThat(userIdIncorrectResult.isPresent()).isFalse();
+        assertThat(chatroomIdIncorrectResult.isPresent()).isFalse();
+        assertThat(bothIncorrectResult.isPresent()).isFalse();
+        assertThat(bothCorrectResult.get()).usingRecursiveComparison().isEqualTo(chatroomScheduleParticipant);
     }
 }

@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.service.file;
+package kr.co.pawpaw.api.application.file;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import kr.co.pawpaw.api.service.file.FileService;
@@ -16,13 +16,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

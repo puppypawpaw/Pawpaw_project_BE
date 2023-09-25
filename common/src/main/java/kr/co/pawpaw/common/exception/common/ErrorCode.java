@@ -17,7 +17,8 @@ public enum ErrorCode {
     // 약관
     NOT_FOUND_TERM(404, "T001", "존재하지 않는 약관입니다."),
     NOT_AGREE_ALL_REQUIRED_TERM(400, "T002", "모든 필수 약관에 동의가 필요합니다."),
-    PERMISSION_REQUIRED(400, "PM001", "권한이 부족합니다."),
+    // 권한 부족
+    PERMISSION_REQUIRED(403, "PM001", "권한이 부족합니다."),
     INVALID_PET_NAME(400, "P001", "유효하지 않은 반려동물 이름입니다."),
     INVALID_PET_INTRODUCTION(400, "P002", "유효하지 않은 반려동물 소개입니다."),
     // 소셜 회원가입
@@ -39,15 +40,20 @@ public enum ErrorCode {
     // 비밀번호 변경
     NOT_FOUND_CHANGE_PASSWORD_TEMP_KEY(404, "CP001", "존재하지 않는 비밀번호 변경 임시 키입니다."),
     // 채팅방
-    IS_NOT_CHATROOM_PARTICIPANT(400, "CR001", "채팅방 참석자가 아닙니다."),
+    IS_NOT_CHATROOM_PARTICIPANT(400, "CR001", "채팅방 참여자가 아닙니다."),
     NOT_ALLOWED_CHATROOM_LEAVE(400, "CR002", "채팅방 매니저는 채팅방을 나갈 수 없습니다."),
     NOT_FOUND_CHATROOM(404, "CR003", "존재하지 않는 채팅방 입니다."),
-    NOT_A_CHATROOM_PARTICIPANT(400, "CR004", "채팅방 참가자가 아닙니다."),
+    NOT_A_CHATROOM_PARTICIPANT(400, "CR004", "채팅방 참여자가 아닙니다."),
     NOT_FOUND_CHATROOM_SCHEDULE(404, "CR005", "존재하지 않는 채팅방 스케줄입니다."),
+    NOT_A_CHATROOM_SCHEDULE_PARTICIPANT(400, "CR006", "채팅방 스케줄 참여자가 아닙니다."),
+    ALREADY_CHATROOM_PARTICIPANT(409, "CR007", "이미 참여한 채팅방입니다."),
+    NOT_FOUND_CHATROOM_DEFAULT_COVER(404, "CR008", "존재하지 않는 채팅방 기본 커버입니다."),
     // 게시판 이미지
     BOARD_IMG_CANNOT_UPLOAD_EXCEPTION(400, "BOARD_IMG_CANNOT_UPLOAD_EXCEPTION", "이미지 업로드를 실패했습니다"),
     BOARD_IMG_CANNOT_VIEW_EXCEPTION(400, "BOARD_IMG_CANNOT_VIEW_EXCEPTION", "이미지 조회를 실패했습니다"),
-    BOARD_IMG_CANNOT_REMOVE_EXCEPTION(400, "BOARD_IMG_CANNOT_REMOVE_EXCEPTION", "이미지 삭제를 실패했습니다");
+    BOARD_IMG_CANNOT_REMOVE_EXCEPTION(400, "BOARD_IMG_CANNOT_REMOVE_EXCEPTION", "이미지 삭제를 실패했습니다"),
+    // 반려동물
+    INVALID_PET_TYPE(400, "PE001", "유효하지 않은 반려동물 종류입니다.");
 
     private final int status;
     private final String code;
