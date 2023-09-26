@@ -12,6 +12,7 @@ import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.QChatroomDetailData;
 import kr.co.pawpaw.domainrdb.chatroom.dto.QChatroomResponse;
 import kr.co.pawpaw.domainrdb.common.repository.OrderByNull;
+import kr.co.pawpaw.domainrdb.common.repository.OrderByRandom;
 import kr.co.pawpaw.domainrdb.storage.domain.QFile;
 import kr.co.pawpaw.domainrdb.user.domain.QUser;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
@@ -91,8 +92,13 @@ public class ChatroomCustomRepository {
                     .from(qChatroomParticipant)
                     .where(qChatroomParticipant.user.userId.eq(userId)))
                 .and(qChatroom.searchable.isTrue()))
-            .groupBy(qChatroom.id)
-            .orderBy(qChatroom.id.asc())
+            .groupBy(qChatroom.id,
+                qChatroom.name,
+                qChatroom.description,
+                qChatroom.hashTagList,
+                qUserManager.nickname,
+                qFileManager.fileUrl)
+            .orderBy(OrderByRandom.DEFAULT)
             .limit(10)
             .fetch();
     }

@@ -9,19 +9,26 @@ import kr.co.pawpaw.domainrdb.storage.repository.FileRepository;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
+@Nested
+@DisplayName("ChatroomCustomRepository의")
 @Import(value = { ChatroomCustomRepository.class, QuerydslConfig.class })
 @DataJpaTest
 class ChatroomCustomRepositoryTest {
@@ -223,52 +230,83 @@ class ChatroomCustomRepositoryTest {
         assertThat(result.get(1).getId()).isEqualTo(chatroom2.getId());
     }
 
-    @Test
-    @DisplayName("findAccessibleNewChatroomByUserId메서드 참여 안한 채팅방만 조회")
-    void findCanParticipatedChatroomByUserIdNotParticipateTest() {
-        assertThat(chatroomCustomRepository.findAccessibleNewChatroomByUserId(user1.getUserId()).size())
-            .isEqualTo(0);
+    @Nested
+    @DisplayName("findAccessibleNewChatroomByUserId 메서드는")
+    class FindAccessibleNewChatroomByUserId {
+        @Nested
+        @DisplayName("참여 안한 채팅방만")
+        class OnlyNotParticipatedChatroom {
+            @Test
+            @DisplayName("조회한다.")
+            void search() {
+                assertThat(chatroomCustomRepository.findAccessibleNewChatroomByUserId(user1.getUserId()).size())
+                    .isEqualTo(0);
 
-        assertThat(chatroomCustomRepository.findAccessibleNewChatroomByUserId(UserId.of(UUID.randomUUID().toString())).size())
-            .isEqualTo(2);
-    }
+                assertThat(chatroomCustomRepository.findAccessibleNewChatroomByUserId(UserId.of(UUID.randomUUID().toString())).size())
+                    .isEqualTo(2);
+            }
+        }
 
-    @Test
-    @DisplayName("findAccessibleNewChatroomByUserId 메서드 응답 필드 확인")
-    void findCanParticipatedChatroomByUserIdFieldTest() {
-        ChatroomResponse expectedResult = new ChatroomResponse(
-            chatroom.getId(),
-            chatroom.getName(),
-            chatroom.getDescription(),
-            chatroom.getHashTagList(),
-            user1.getNickname(),
-            managerImageFile.getFileUrl(),
-            2L
-        );
+        @Nested
+        @DisplayName("임의의 순서대로")
+        class RandomOrder {
+            Set<String> previousResult = new HashSet<>();
+            @Test
+            @DisplayName("조회한다.")
+            void search() {
+                for (int i = 0; i < 20; ++i) {
+                    previousResult.add(chatroomCustomRepository.findAccessibleNewChatroomByUserId(UserId.of(UUID.randomUUID().toString()))
+                        .stream()
+                        .map(ChatroomResponse::getId)
+                        .map(String::valueOf)
+                        .collect(Collectors.joining("<>")));
+                }
 
-        ChatroomResponse result = chatroomCustomRepository.findAccessibleNewChatroomByUserId(
-            UserId.of(UUID.randomUUID().toString())
-        ).get(0);
+                assertThat(previousResult.size() > 1).isTrue();
+            }
+        }
 
-        assertThat(result).usingRecursiveComparison().isEqualTo(expectedResult);
-    }
+        @Nested
+        @DisplayName("응답 필드")
+        class Result {
+            @Test
+            @DisplayName("확인")
+            void check() {
+                ChatroomResponse expectedResult = new ChatroomResponse(
+                    chatroom.getId(),
+                    chatroom.getName(),
+                    chatroom.getDescription(),
+                    chatroom.getHashTagList(),
+                    user1.getNickname(),
+                    managerImageFile.getFileUrl(),
+                    2L
+                );
 
-    @Test
-    @DisplayName("findAccessibleNewChatroomByUserId 메서드 채팅방 순서 테스트")
-    void findAccessibleNewChatroomByUserIdOrderTest() {
-        List<ChatroomResponse> result = chatroomCustomRepository.findAccessibleNewChatroomByUserId(UserId.create());
+                ChatroomResponse result = chatroomCustomRepository.findAccessibleNewChatroomByUserId(UserId.of(UUID.randomUUID().toString()))
+                    .stream()
+                    .filter(response -> response.getId().equals(chatroom.getId()))
+                    .collect(Collectors.toList()).get(0);
 
-        assertThat(result.get(0).getId()).isEqualTo(chatroom.getId());
-        assertThat(result.get(1).getId()).isEqualTo(chatroom2.getId());
-    }
+                assertThat(result).usingRecursiveComparison().isEqualTo(expectedResult);
+            }
+        }
 
-    @Test
-    @DisplayName("findAccessibleNewChatroomByUserId 메서드 searchable 필드가 참인 채팅방만 검색한다.")
-    void findAccessibleNewChatroomByUserIdSearchableTest() {
-        List<ChatroomResponse> result = chatroomCustomRepository.findAccessibleNewChatroomByUserId(UserId.create());
+        @Nested
+        @DisplayName("searchable 필드가")
+        class Searchable {
+            @Test
+            @DisplayName("True인 채팅방만 검색한다.")
+            void isTrue() {
+                List<ChatroomResponse> result = chatroomCustomRepository.findAccessibleNewChatroomByUserId(UserId.create());
 
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0).getId()).isEqualTo(chatroom.getId());
-        assertThat(result.get(1).getId()).isEqualTo(chatroom2.getId());
+                assertThat(result.size()).isEqualTo(2);
+                assertThat(result.stream().map(ChatroomResponse::getId)
+                    .anyMatch(id -> id.equals(chatroom.getId())))
+                    .isTrue();
+                assertThat(result.stream().map(ChatroomResponse::getId)
+                    .anyMatch(id -> id.equals(chatroom2.getId())))
+                    .isTrue();
+            }
+        }
     }
 }
