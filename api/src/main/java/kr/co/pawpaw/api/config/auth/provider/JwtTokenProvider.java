@@ -30,7 +30,7 @@ public class JwtTokenProvider {
 
     public String createAccessToken(final Authentication authentication) {
         Date now = new Date();
-        Date expiredAt = new Date(now.getTime() + jwtProperties.getAccessTokenLifeTime());
+        Date expiredAt = new Date(now.getTime() + jwtProperties.getAccessTokenLifeTime() * 1000);
 
         return Jwts.builder()
             .setSubject(authentication.getName())
@@ -44,7 +44,7 @@ public class JwtTokenProvider {
 
     public String createRefreshToken() {
         Date now = new Date();
-        Date expiredAt = new Date(now.getTime() + jwtProperties.getRefreshTokenLifeTime());
+        Date expiredAt = new Date(now.getTime() + jwtProperties.getRefreshTokenLifeTime() * 1000);
 
         return Jwts.builder()
             .claim(TOKEN_TYPE_KEY, TokenType.REFRESH)
