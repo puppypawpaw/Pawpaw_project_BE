@@ -2,12 +2,14 @@ package kr.co.pawpaw.domainrdb.user.domain;
 
 import kr.co.pawpaw.domainrdb.common.BaseTimeEntity;
 import kr.co.pawpaw.domainrdb.position.Position;
+import kr.co.pawpaw.domainrdb.storage.domain.File;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -18,6 +20,8 @@ public class User extends BaseTimeEntity {
 
     private String email;
     private String password;
+    @Column(name="real_name")
+    private String name;
     private String nickname;
     private String phoneNumber;
     @Embedded
@@ -26,23 +30,41 @@ public class User extends BaseTimeEntity {
     private Role role;
     @Enumerated(value = EnumType.STRING)
     private OAuth2Provider provider;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private File userImage;
 
     @Builder
     public User(
         final String email,
         final String password,
+        final String name,
         final String nickname,
         final String phoneNumber,
         final Position position,
-        final OAuth2Provider provider
+        final OAuth2Provider provider,
+        final LocalDateTime createdDate,
+        final LocalDateTime modifiedDate,
+        final File userImage
     ) {
+        this.createdDate = createdDate;
+        this.modifiedDate = modifiedDate;
         this.userId = UserId.create();
         this.email = email;
         this.password = password;
         this.role = Role.USER;
+        this.name = name;
         this.nickname = nickname;
         this.phoneNumber = phoneNumber;
         this.position = position;
         this.provider = provider;
+        this.userImage = userImage;
+    }
+
+    public void updateImage(final File userImage) {
+        this.userImage = userImage;
+    }
+
+    public void updatePassword(final String password) {
+        this.password = password;
     }
 }

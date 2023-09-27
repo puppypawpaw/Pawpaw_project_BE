@@ -6,11 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
 
 import java.util.UUID;
 
 @Getter
-@RedisHash(value = "OAuth2TempAttributes", timeToLive = 60 * 60 * 24L)
+@RedisHash(value = "oAuth2TempAttributes")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OAuth2TempAttributes {
     @Id
@@ -19,6 +20,8 @@ public class OAuth2TempAttributes {
     private String email;
     private String profileImageUrl;
     private String provider;
+    @TimeToLive
+    private Long ttl;
 
     @Builder
     public OAuth2TempAttributes(
@@ -32,5 +35,9 @@ public class OAuth2TempAttributes {
         this.email = email;
         this.profileImageUrl = profileImageUrl;
         this.provider = provider;
+    }
+
+    public void updateTtl(final Long ttl) {
+        this.ttl = ttl;
     }
 }

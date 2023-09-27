@@ -14,15 +14,18 @@ import org.springframework.data.redis.core.TimeToLive;
 public class VerifiedPhoneNumber {
     @Id
     private String id;
+    private String userName;
     @TimeToLive
     private Long ttl;
 
     @Builder
     public VerifiedPhoneNumber(
         final String phoneNumber,
-        final String usagePurpose
+        final String usagePurpose,
+        final String userName
     ) {
         this.id = getCompositeKey(phoneNumber, usagePurpose);
+        this.userName = userName;
     }
 
     public static String getCompositeKey(final String phoneNumber, final String usagePurpose) {

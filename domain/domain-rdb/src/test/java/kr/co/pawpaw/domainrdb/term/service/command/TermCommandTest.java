@@ -28,7 +28,7 @@ class TermCommandTest {
     private TermCommand termCommand;
 
     @Test
-    @DisplayName("save 메소드 테스트")
+    @DisplayName("save 메서드 테스트")
     void save() {
         //given
         Term input = Term.builder()
@@ -47,7 +47,7 @@ class TermCommandTest {
     }
 
     @Test
-    @DisplayName("deleteById 메소드 테스트")
+    @DisplayName("deleteById 메서드 테스트")
     void deleteById() {
         //given
         Long input = 1L;
@@ -60,7 +60,7 @@ class TermCommandTest {
     }
 
     @Test
-    @DisplayName("saveAlluserTermAgrees 메소드 테스트")
+    @DisplayName("saveAlluserTermAgrees 메서드 테스트")
     void saveAllUserTermAgrees() {
         //given
         Term term = Term.builder()

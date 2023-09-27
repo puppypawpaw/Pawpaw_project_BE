@@ -5,6 +5,8 @@ import kr.co.pawpaw.domainrdb.storage.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class FileCommand {
@@ -16,5 +18,9 @@ public class FileCommand {
 
     public void deleteById(final String fileName) {
         fileRepository.deleteById(fileName);
+    }
+
+    public List<File> saveAll(final Iterable<File> files) {
+        return fileRepository.saveAll(files);
     }
 }

@@ -27,13 +27,11 @@ class RefreshTokenQueryTest {
         RefreshToken input1 = RefreshToken.builder()
             .userId(UUID.randomUUID().toString())
             .value("refreshTokenValue")
-            .timeout(3600L)
             .build();
 
         RefreshToken input2 = RefreshToken.builder()
             .userId(UUID.randomUUID().toString())
             .value("refreshTokenValue2")
-            .timeout(3601L)
             .build();
 
         when(refreshTokenRepository.findByValue(eq(input1.getValue()))).thenReturn(Optional.of(input1));
@@ -59,13 +57,11 @@ class RefreshTokenQueryTest {
         RefreshToken input1 = RefreshToken.builder()
             .userId(UUID.randomUUID().toString())
             .value("refreshTokenValue")
-            .timeout(3600L)
             .build();
 
         RefreshToken input2 = RefreshToken.builder()
             .userId(UUID.randomUUID().toString())
             .value("refreshTokenValue2")
-            .timeout(3601L)
             .build();
 
         when(refreshTokenRepository.existsByValue(eq(input1.getValue()))).thenReturn(true);

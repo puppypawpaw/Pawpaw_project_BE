@@ -96,7 +96,7 @@ class SocialSignUpRequestTest {
     }
 
     @Test
-    @DisplayName("toUser 메소드 테스트")
+    @DisplayName("toUser 메서드 테스트")
     void toUser() {
         //given
         SocialSignUpRequest request = SocialSignUpRequest.builder()
@@ -130,7 +130,7 @@ class SocialSignUpRequestTest {
     }
 
     @Test
-    @DisplayName("toPet 메소드 테스트")
+    @DisplayName("toPet 메서드 테스트")
     void toPet() {
         //given
         List<CreatePetRequest> petInfos = List.of(

@@ -6,7 +6,7 @@ import kr.co.pawpaw.api.config.auth.repository.CookieAuthorizationRequestReposit
 import kr.co.pawpaw.api.config.property.CookieProperties;
 import kr.co.pawpaw.api.config.property.JwtProperties;
 import kr.co.pawpaw.api.config.property.OAuth2Properties;
-import kr.co.pawpaw.api.util.CookieUtil;
+import kr.co.pawpaw.api.util.cookie.CookieUtil;
 import kr.co.pawpaw.domainredis.auth.domain.OAuth2TempAttributes;
 import kr.co.pawpaw.domainredis.auth.domain.RefreshToken;
 import kr.co.pawpaw.domainredis.auth.domain.TokenType;
@@ -22,18 +22,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final OAuth2Properties oAuth2Properties;
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtProperties jwtProperties;
     private final RefreshTokenCommand refreshTokenCommand;
     private final CookieProperties cookieProperties;
     private final CookieAuthorizationRequestRepository cookieAuthorizationRequestRepository;
     private final OAuth2TempAttributesCommand oAuth2TempAttributesCommand;
+    private final JwtProperties jwtProperties;
 
     @Override
     public void onAuthenticationSuccess(
@@ -63,7 +62,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
             RefreshToken refreshToken = RefreshToken.builder()
                 .userId(authentication.getName())
                 .value(refreshTokenValue)
-                .timeout(jwtProperties.getRefreshTokenLifeTime())
                 .build();
 
             refreshTokenCommand.save(refreshToken);

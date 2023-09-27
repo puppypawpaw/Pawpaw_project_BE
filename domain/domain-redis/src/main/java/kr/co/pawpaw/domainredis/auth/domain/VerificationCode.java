@@ -18,6 +18,7 @@ public class VerificationCode {
     private String id;
     @Indexed
     private String code;
+    private String name;
     @TimeToLive
     private Long ttl;
 
@@ -25,9 +26,11 @@ public class VerificationCode {
     public VerificationCode(
         final String phoneNumber,
         final String usagePurpose,
+        final String name,
         final String code
     ) {
         this.id = getCompositeKey(phoneNumber, usagePurpose);
+        this.name = name;
         this.code = code;
     }
 

@@ -22,7 +22,7 @@ class TermRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAllByOrderIsIn 메소드 테스트")
+    @DisplayName("findAllByOrderIsIn 메서드 테스트")
     void findAllByOrderIsIn() {
         //given
         Term term1 = Term.builder()

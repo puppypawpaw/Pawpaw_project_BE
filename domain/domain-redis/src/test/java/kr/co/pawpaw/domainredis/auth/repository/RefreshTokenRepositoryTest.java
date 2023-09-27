@@ -35,20 +35,25 @@ class RefreshTokenRepositoryTest {
     }
 
     @Test
-    @DisplayName("findByValue 메소드 테스트")
+    @DisplayName("findByValue 메서드 테스트")
     void findByValue() {
         //given
         RefreshToken refreshToken = RefreshToken.builder()
             .userId(UUID.randomUUID().toString())
             .value("refreshTokenValue")
-            .timeout(3600L)
             .build();
+
+        Long ttl1 = 1L;
+        Long ttl2 = 2L;
+
+        refreshToken.updateTtl(ttl1);
 
         RefreshToken refreshToken2 = RefreshToken.builder()
             .userId(UUID.randomUUID().toString())
             .value("refreshTokenValue2")
-            .timeout(3601L)
             .build();
+
+        refreshToken2.updateTtl(ttl2);
 
         refreshTokenRepository.saveAll(List.of(refreshToken, refreshToken2));
 
@@ -59,26 +64,24 @@ class RefreshTokenRepositoryTest {
         assertThat(newRefreshToken.isPresent()).isTrue();
         assertThat(newRefreshToken.get().getValue()).isEqualTo(refreshToken.getValue());
         assertThat(newRefreshToken.get().getUserId()).isEqualTo(refreshToken.getUserId());
-        assertThat(newRefreshToken.get().getTimeout()).isEqualTo(refreshToken.getTimeout());
+        assertThat(newRefreshToken.get().getTtl()).isEqualTo(refreshToken.getTtl());
         assertThat(newRefreshToken.get().getValue()).isNotEqualTo(refreshToken2.getValue());
         assertThat(newRefreshToken.get().getUserId()).isNotEqualTo(refreshToken2.getUserId());
-        assertThat(newRefreshToken.get().getTimeout()).isNotEqualTo(refreshToken2.getTimeout());
+        assertThat(newRefreshToken.get().getTtl()).isNotEqualTo(refreshToken2.getTtl());
     }
 
     @Test
-    @DisplayName("existsByValue 메소드 테스트")
+    @DisplayName("existsByValue 메서드 테스트")
     void existsByValue() {
         //given
         RefreshToken refreshToken = RefreshToken.builder()
             .userId(UUID.randomUUID().toString())
             .value("refreshTokenValue")
-            .timeout(3600L)
             .build();
 
         RefreshToken refreshToken2 = RefreshToken.builder()
             .userId(UUID.randomUUID().toString())
             .value("refreshTokenValue2")
-            .timeout(3601L)
             .build();
 
         refreshTokenRepository.saveAll(List.of(refreshToken));
@@ -90,34 +93,5 @@ class RefreshTokenRepositoryTest {
         //then
         assertThat(result1).isTrue();
         assertThat(result2).isFalse();
-    }
-
-    @Test
-    @DisplayName("timeout 테스트")
-    void timeoutTest() throws InterruptedException {
-        //given
-        RefreshToken refreshToken1 = RefreshToken.builder()
-            .userId(UUID.randomUUID().toString())
-            .value("refreshTokenValue")
-            .timeout(3L)
-            .build();
-
-        RefreshToken refreshToken2 = RefreshToken.builder()
-            .userId(UUID.randomUUID().toString())
-            .value("refreshTokenValue2")
-            .timeout(1L)
-            .build();
-
-        refreshTokenRepository.saveAll(List.of(refreshToken1, refreshToken2));
-
-        //when
-        Thread.sleep(2000L);
-
-        Optional<RefreshToken> findRefreshToken1 = refreshTokenRepository.findByValue(refreshToken1.getValue());
-        Optional<RefreshToken> findRefreshToken2 = refreshTokenRepository.findByValue(refreshToken2.getValue());
-
-        //then
-        assertThat(findRefreshToken1.isPresent()).isTrue();
-        assertThat(findRefreshToken2.isPresent()).isFalse();
     }
 }

@@ -31,7 +31,7 @@ class SmsFeignServiceImplTest {
     }
 
     @Test
-    @DisplayName("sendSmsMessage 메소드 테스트")
+    @DisplayName("sendSmsMessage 메서드 테스트")
     void sendSmsMessage() {
         //given
         Recipient recipient = Recipient.builder()

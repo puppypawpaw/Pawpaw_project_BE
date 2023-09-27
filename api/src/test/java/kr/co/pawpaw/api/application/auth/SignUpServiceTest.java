@@ -1,6 +1,7 @@
-package kr.co.pawpaw.api.application.auth;
+package kr.co.pawpaw.api.service.auth;
 
-import kr.co.pawpaw.api.application.file.FileService;
+import kr.co.pawpaw.api.service.auth.SignUpService;
+import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.auth.DuplicateEmailResponse;
 import kr.co.pawpaw.api.dto.auth.SignUpRequest;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpInfoResponse;
@@ -24,11 +25,10 @@ import kr.co.pawpaw.domainrdb.term.service.query.TermQuery;
 import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import kr.co.pawpaw.domainrdb.user.domain.UserImage;
 import kr.co.pawpaw.domainrdb.user.service.command.UserCommand;
-import kr.co.pawpaw.domainrdb.user.service.command.UserImageCommand;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import kr.co.pawpaw.domainredis.auth.domain.OAuth2TempAttributes;
+import kr.co.pawpaw.domainredis.auth.domain.VerifiedPhoneNumber;
 import kr.co.pawpaw.domainredis.auth.service.command.OAuth2TempAttributesCommand;
 import kr.co.pawpaw.domainredis.auth.service.query.OAuth2TempAttributesQuery;
 import kr.co.pawpaw.domainredis.auth.service.query.VerifiedPhoneNumberQuery;
@@ -70,8 +70,6 @@ class SignUpServiceTest {
     @Mock
     private FileService fileService;
     @Mock
-    private UserImageCommand userImageCommand;
-    @Mock
     private OAuth2TempAttributesQuery oAuth2TempAttributesQuery;
     @Mock
     private OAuth2TempAttributesCommand oAuth2TempAttributesCommand;
@@ -80,8 +78,8 @@ class SignUpServiceTest {
     private SignUpService signUpService;
 
     @Test
-    @DisplayName("일반 회원가입 메소드 유저 중복 테스트")
-    void 일반_회원가입_메소드_유저_중복_테스트() {
+    @DisplayName("일반 회원가입 메서드 유저 중복 테스트")
+    void 일반_회원가입_메서드_유저_중복_테스트() {
         //given
         String alreadyExistEmail = "aee";
         SignUpRequest request = SignUpRequest.builder()
@@ -98,8 +96,8 @@ class SignUpServiceTest {
     }
 
     @Test
-    @DisplayName("일반 회원가입 메소드 필수 약관 동의 테스트")
-    void 일반_회원가입_메소드_필수_약관_동의_테스트() {
+    @DisplayName("일반 회원가입 메서드 필수 약관 동의 테스트")
+    void 일반_회원가입_메서드_필수_약관_동의_테스트() {
         //given
         List<Long> termAgrees = List.of(1L, 2L, 4L);
         Set<Long> termAgreesSet = new HashSet<>(termAgrees);
@@ -120,8 +118,8 @@ class SignUpServiceTest {
     }
 
     @Test
-    @DisplayName("일반 회원가입 메소드 핸드폰 번호 유효성 테스트")
-    void 일반_회원가입_메소드_핸드폰_번호_유효성_테스트() {
+    @DisplayName("일반 회원가입 메서드 핸드폰 번호 유효성 테스트")
+    void 일반_회원가입_메서드_핸드폰_번호_유효성_테스트() {
         //given
         List<Long> termAgrees = List.of(1L, 2L, 3L);
         Set<Long> termAgreesSet = new HashSet<>(termAgrees);
@@ -159,8 +157,8 @@ class SignUpServiceTest {
     }
 
     @Test
-    @DisplayName("일반 회원가입 메소드 이미지 없이 작동 테스트")
-    void 일반_회원가입_메소드_이미지_없이_작동_테스트() {
+    @DisplayName("일반 회원가입 메서드 이미지 없이 작동 테스트")
+    void 일반_회원가입_메서드_이미지_없이_작동_테스트() {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
@@ -208,27 +206,32 @@ class SignUpServiceTest {
             .build();
 
         String passwordEncoded = "passwordEncoded";
+        String name = "userName";
 
-        User savedUser = request.toUser(passwordEncoded);
+        User savedUser = request.toUser(passwordEncoded, name);
 
         File file = File.builder()
+            .fileName(UUID.randomUUID().toString())
             .contentType("image/png")
             .byteSize(1234L)
             .uploader(savedUser)
+            .build();
+
+        VerifiedPhoneNumber vPhoneNo = VerifiedPhoneNumber.builder()
+            .phoneNumber(request.getPhoneNumber())
+            .usagePurpose(SmsUsagePurpose.SIGN_UP.name())
+            .userName(name)
             .build();
 
         when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
         when(termQuery.isAllRequiredTermIds(eq(termAgreesOrderSet))).thenReturn(true);
         when(userQuery.existsByPhoneNumber(eq(request.getPhoneNumber()))).thenReturn(false);
         when(verifiedPhoneNumberQuery.existsByPhoneNumberAndUsagePurpose(eq(request.getPhoneNumber()), eq(SmsUsagePurpose.SIGN_UP.name()))).thenReturn(true);
+        when(verifiedPhoneNumberQuery.findByPhoneNumberAndUsagePurpose(eq(request.getPhoneNumber()), eq(SmsUsagePurpose.SIGN_UP.name()))).thenReturn(Optional.of(vPhoneNo));
         when(passwordEncoder.encode(request.getPassword())).thenReturn(passwordEncoded);
         when(userCommand.save(any(User.class))).thenReturn(savedUser);
         when(termQuery.findAllByOrderIsIn(eq(termAgreeOrders))).thenReturn(termAgrees);
 
-        UserImage userImage = UserImage.builder()
-            .user(savedUser)
-            .file(file)
-            .build();
         //when
         signUpService.signUp(request, null);
 
@@ -237,6 +240,7 @@ class SignUpServiceTest {
         verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesOrderSet);
         verify(userQuery, times(1)).existsByPhoneNumber(request.getPhoneNumber());
         verify(verifiedPhoneNumberQuery, times(1)).existsByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name());
+        verify(verifiedPhoneNumberQuery, times(1)).findByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name());
 
         verify(passwordEncoder, times(1)).encode(request.getPassword());
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
@@ -245,7 +249,6 @@ class SignUpServiceTest {
         assertThat(capturedUser).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(savedUser);
 
         verify(fileService, times(0)).saveFileByMultipartFile(any(), any());
-        verify(userImageCommand, times(0)).save(any());
 
         ArgumentCaptor<List<Pet>> petListCaptor = ArgumentCaptor.forClass(List.class);
         verify(petCommand, times(1)).saveAll(petListCaptor.capture());
@@ -267,8 +270,8 @@ class SignUpServiceTest {
     }
 
     @Test
-    @DisplayName("일반 회원가입 메소드 작동 테스트")
-    void 일반_회원가입_메소드_작동_테스트() {
+    @DisplayName("일반 회원가입 메서드 작동 테스트")
+    void 일반_회원가입_메서드_작동_테스트() throws IOException {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
@@ -316,28 +319,34 @@ class SignUpServiceTest {
             .build();
 
         String passwordEncoded = "passwordEncoded";
+        String name = "userName";
 
-        User savedUser = request.toUser(passwordEncoded);
+        User savedUser = request.toUser(passwordEncoded, name);
 
         File file = File.builder()
+            .fileName(UUID.randomUUID().toString())
             .contentType("image/png")
             .byteSize(1234L)
             .uploader(savedUser)
+            .build();
+
+        VerifiedPhoneNumber vPhoneNo = VerifiedPhoneNumber.builder()
+            .phoneNumber(request.getPhoneNumber())
+            .usagePurpose(SmsUsagePurpose.SIGN_UP.name())
+            .userName(name)
             .build();
 
         when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
         when(termQuery.isAllRequiredTermIds(eq(termAgreesOrderSet))).thenReturn(true);
         when(userQuery.existsByPhoneNumber(eq(request.getPhoneNumber()))).thenReturn(false);
         when(verifiedPhoneNumberQuery.existsByPhoneNumberAndUsagePurpose(eq(request.getPhoneNumber()), eq(SmsUsagePurpose.SIGN_UP.name()))).thenReturn(true);
+        when(verifiedPhoneNumberQuery.findByPhoneNumberAndUsagePurpose(eq(request.getPhoneNumber()), eq(SmsUsagePurpose.SIGN_UP.name()))).thenReturn(Optional.of(vPhoneNo));
         when(passwordEncoder.encode(request.getPassword())).thenReturn(passwordEncoded);
         when(userCommand.save(any(User.class))).thenReturn(savedUser);
         when(termQuery.findAllByOrderIsIn(eq(termAgreeOrders))).thenReturn(termAgrees);
+        when(multipartFile.getBytes()).thenReturn(new byte[123]);
         when(fileService.saveFileByMultipartFile(eq(multipartFile), eq(savedUser.getUserId()))).thenReturn(file);
 
-        UserImage userImage = UserImage.builder()
-            .user(savedUser)
-            .file(file)
-            .build();
         //when
         signUpService.signUp(request, multipartFile);
 
@@ -346,17 +355,16 @@ class SignUpServiceTest {
         verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesOrderSet);
         verify(userQuery, times(1)).existsByPhoneNumber(request.getPhoneNumber());
         verify(verifiedPhoneNumberQuery, times(1)).existsByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name());
+        verify(verifiedPhoneNumberQuery, times(1)).findByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name());
 
         verify(passwordEncoder, times(1)).encode(request.getPassword());
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userCommand, times(1)).save(userCaptor.capture());
         User capturedUser = userCaptor.getValue();
+        capturedUser.updateImage(file);
         assertThat(capturedUser).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(savedUser);
 
         verify(fileService).saveFileByMultipartFile(multipartFile, savedUser.getUserId());
-        ArgumentCaptor<UserImage> userImageCaptor = ArgumentCaptor.forClass(UserImage.class);
-        verify(userImageCommand).save(userImageCaptor.capture());
-        assertThat(userImageCaptor.getValue()).usingRecursiveComparison().isEqualTo(userImage);
 
         ArgumentCaptor<List<Pet>> petListCaptor = ArgumentCaptor.forClass(List.class);
         verify(petCommand, times(1)).saveAll(petListCaptor.capture());
@@ -378,8 +386,8 @@ class SignUpServiceTest {
     }
 
     @Test
-    @DisplayName("소셜 회원가입 메소드 필수 약관 동의 테스트")
-    void 소셜_회원가입_메소드_필수_약관_동의_테스트() {
+    @DisplayName("소셜 회원가입 메서드 필수 약관 동의 테스트")
+    void 소셜_회원가입_메서드_필수_약관_동의_테스트() {
         //given
         List<Long> termAgrees = List.of(1L, 2L, 4L);
         Set<Long> termAgreesSet = new HashSet<>(termAgrees);
@@ -396,8 +404,8 @@ class SignUpServiceTest {
     }
 
     @Test
-    @DisplayName("소셜 회원가입 메소드 키 유효성 테스트")
-    void 소셜_회원가입_메소드_키_유효성_테스트() {
+    @DisplayName("소셜 회원가입 메서드 키 유효성 테스트")
+    void 소셜_회원가입_메서드_키_유효성_테스트() {
         //given
         List<Long> termAgrees = List.of(1L, 2L, 3L);
         Set<Long> termAgreesSet = new HashSet<>(termAgrees);
@@ -418,8 +426,8 @@ class SignUpServiceTest {
     }
 
     @Test
-    @DisplayName("소셜 회원가입 메소드 이미지 저장 안함 테스트")
-    void 소셜_회원가입_메소드_이미지_저장_안함_테스트() {
+    @DisplayName("소셜 회원가입 메서드 이미지 저장 안함 테스트")
+    void 소셜_회원가입_메서드_이미지_저장_안함_테스트() {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
@@ -511,8 +519,8 @@ class SignUpServiceTest {
     }
 
     @Test
-    @DisplayName("소셜 회원가입 메소드 MultipartFile 이미지 저장 테스트")
-    void 소셜_회원가입_메소드_MultipartFile_이미지_저장_테스트() throws IOException {
+    @DisplayName("소셜 회원가입 메서드 MultipartFile 이미지 저장 테스트")
+    void 소셜_회원가입_메서드_MultipartFile_이미지_저장_테스트() throws IOException {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(
@@ -605,8 +613,8 @@ class SignUpServiceTest {
     }
 
     @Test
-    @DisplayName("소셜 회원가입 메소드 URL 이미지 저장 테스트")
-    void 소셜_회원가입_메소드_URL_이미지_저장_테스트() {
+    @DisplayName("소셜 회원가입 메서드 URL 이미지 저장 테스트")
+    void 소셜_회원가입_메서드_URL_이미지_저장_테스트() {
         //given
         List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
         List<Term> termAgrees = List.of(

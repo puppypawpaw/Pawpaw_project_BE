@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.pawpaw.api.application.term.TermService;
+import kr.co.pawpaw.api.service.term.TermService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.config.annotation.CheckPermission;
 import kr.co.pawpaw.api.dto.term.CreateTermRequest;
@@ -63,7 +63,7 @@ public class TermController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
         @ApiResponse(
-            responseCode = "400",
+            responseCode = "403",
             description = "권한이 부족합니다.",
             content = @Content
         )
@@ -87,7 +87,7 @@ public class TermController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
         @ApiResponse(
-            responseCode = "400",
+            responseCode = "403",
             description = "권한이 부족합니다.",
             content = @Content
         )
@@ -116,7 +116,7 @@ public class TermController {
             content = @Content
         ),
         @ApiResponse(
-            responseCode = "400",
+            responseCode = "403",
             description = "권한이 부족합니다.",
             content = @Content
         )

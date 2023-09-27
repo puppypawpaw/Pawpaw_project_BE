@@ -25,7 +25,7 @@ class OAuth2AttributesTest {
     private static final String naverPassword = "naverPassword";
 
     @Test
-    @DisplayName("of 메소드 테스트")
+    @DisplayName("of 메서드 테스트")
     void of() {
         //given
         Map<String, Object> kakaoAttributes = Map.of(
@@ -60,7 +60,7 @@ class OAuth2AttributesTest {
     }
 
     @Test
-    @DisplayName("toEntity 메소드 테스트")
+    @DisplayName("toEntity 메서드 테스트")
     void toEntity() {
         //given
         Map<String, Object> kakaoAttributes = Map.of(

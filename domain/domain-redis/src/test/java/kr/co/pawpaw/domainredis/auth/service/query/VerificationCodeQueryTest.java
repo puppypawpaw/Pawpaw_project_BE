@@ -9,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -20,8 +22,8 @@ class VerificationCodeQueryTest {
     private VerificationCodeQuery verificationCodeQuery;
 
     @Test
-    @DisplayName("existsByPhoneNumberAndUsagePurposeAndCode 메소드 테스트")
-    void existsByPhoneNumberAndUsagePurposeAndCode() {
+    @DisplayName("findByIdAndCode 메서드 테스트")
+    void findByIdAndCode() {
         //given
         String phoneNumber = "123321";
         String usagePurpose = "SIGN_UP";
@@ -31,12 +33,13 @@ class VerificationCodeQueryTest {
             .phoneNumber(phoneNumber)
             .usagePurpose(usagePurpose)
             .build();
-        when(verificationCodeRepository.existsByIdAndCode(eq(vCode.getId()), eq(vCode.getCode()))).thenReturn(true);
+        when(verificationCodeRepository.findByIdAndCode(eq(vCode.getId()), eq(vCode.getCode()))).thenReturn(Optional.of(vCode));
         //when
-        boolean result = verificationCodeQuery.existsByPhoneNumberAndUsagePurposeAndCode(phoneNumber, usagePurpose, code);
+        Optional<VerificationCode> result = verificationCodeQuery.findByPhoneNumberAndUsagePurposeAndCode(phoneNumber, usagePurpose, code);
 
         //then
-        verify(verificationCodeRepository).existsByIdAndCode(vCode.getId(), code);
-        assertThat(result).isTrue();
+        verify(verificationCodeRepository).findByIdAndCode(vCode.getId(), code);
+        assertThat(result.isPresent()).isTrue();
+        assertThat(result.get()).usingRecursiveComparison().isEqualTo(vCode);
     }
 }

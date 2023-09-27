@@ -19,7 +19,6 @@ public class UserResponse {
     @Schema(description = "유저 이미지 URL", type = "STRING")
     private String imageUrl;
 
-
     private UserResponse(
         final String email,
         final Role role,
@@ -34,7 +33,10 @@ public class UserResponse {
         this.imageUrl = imageUrl;
     }
 
-    public static UserResponse of(final User user, final String imageUrl) {
+    public static UserResponse of(
+        final User user,
+        final String imageUrl
+    ) {
         return new UserResponse(
             user.getEmail(),
             user.getRole(),

@@ -3,3 +3,10 @@ spring:
     host: ${properties.data.redis.host}
     port: ${properties.data.redis.port}
     password: ${properties.data.redis.password}
+    ttl:
+      refresh-token: 604800
+      verification-lifetime-code: 600
+      verification-lifetime-signup: 86400
+      verification-lifetime-default: 86400
+      oauth2-temp-attributes: 86400
+      change-password-temp-key: 600

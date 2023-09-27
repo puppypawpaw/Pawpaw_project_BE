@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -16,7 +15,12 @@ import java.util.UUID;
 public class File extends BaseTimeEntity {
     @Id
     private String fileName;
+
+    @Column(nullable = false)
+    private String fileUrl;
+    @Column(nullable = false)
     private String contentType;
+    @Column(nullable = false)
     private Long byteSize;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,11 +28,14 @@ public class File extends BaseTimeEntity {
 
     @Builder
     public File(
+        final String fileName,
+        final String fileUrl,
         final String contentType,
         final Long byteSize,
         final User uploader
     ) {
-        this.fileName = UUID.randomUUID().toString();
+        this.fileName = fileName;
+        this.fileUrl = fileUrl;
         this.contentType = contentType;
         this.byteSize = byteSize;
         this.uploader = uploader;

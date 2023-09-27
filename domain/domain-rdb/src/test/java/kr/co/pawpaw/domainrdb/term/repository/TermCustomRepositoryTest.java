@@ -27,7 +27,7 @@ class TermCustomRepositoryTest {
     }
 
     @Test
-    @DisplayName("findIdByOrderNotNullAndRequiredIsTrue 메소드 테스트")
+    @DisplayName("findIdByOrderNotNullAndRequiredIsTrue 메서드 테스트")
     void findIdByOrderNotNullAndRequiredIsTrue() {
         //given
         Term term1 = Term.builder()

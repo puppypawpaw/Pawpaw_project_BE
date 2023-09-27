@@ -1,9 +1,11 @@
-package kr.co.pawpaw.api.application.sms;
+package kr.co.pawpaw.api.service.sms;
 
 import kr.co.pawpaw.api.config.property.VerificationProperties;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeResponse;
 import kr.co.pawpaw.api.dto.sms.SendVerificationCodeRequest;
+import kr.co.pawpaw.api.service.sms.SmsService;
+import kr.co.pawpaw.common.exception.sms.InvalidVerificationCodeException;
 import kr.co.pawpaw.common.exception.sms.OutOfSmsLimitException;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsLog;
 import kr.co.pawpaw.domainrdb.sms.domain.SmsUsagePurpose;
@@ -24,6 +26,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -107,23 +111,22 @@ class SmsServiceTest {
 
         SmsUsagePurpose usagePurpose = SmsUsagePurpose.SIGN_UP;
 
-        when(verificationCodeQuery.existsByPhoneNumberAndUsagePurposeAndCode(
+        when(verificationCodeQuery.findByPhoneNumberAndUsagePurposeAndCode(
             checkVerificationCodeRequest.getPhoneNumber(),
             usagePurpose.name(),
             checkVerificationCodeRequest.getCode()
-        )).thenReturn(false);
+        )).thenReturn(Optional.empty());
 
         //when
-        CheckVerificationCodeResponse result = smsService.checkVerificationCode(checkVerificationCodeRequest, usagePurpose);
+        assertThatThrownBy(() -> smsService.checkVerificationCode(checkVerificationCodeRequest, usagePurpose))
+            .isInstanceOf(InvalidVerificationCodeException.class);
 
         //then
-        verify(verificationCodeQuery).existsByPhoneNumberAndUsagePurposeAndCode(
+        verify(verificationCodeQuery).findByPhoneNumberAndUsagePurposeAndCode(
             checkVerificationCodeRequest.getPhoneNumber(),
             usagePurpose.name(),
             checkVerificationCodeRequest.getCode()
         );
-
-        assertThat(result.isSuccess()).isFalse();
     }
 
     @Test
@@ -137,28 +140,36 @@ class SmsServiceTest {
 
         SmsUsagePurpose usagePurpose = SmsUsagePurpose.SIGN_UP;
 
-        when(verificationCodeQuery.existsByPhoneNumberAndUsagePurposeAndCode(
+        VerificationCode vCode = VerificationCode.builder()
+            .code(checkVerificationCodeRequest.getCode())
+            .phoneNumber(checkVerificationCodeRequest.getPhoneNumber())
+            .name("userName")
+            .usagePurpose(usagePurpose.name())
+            .build();
+
+        when(verificationCodeQuery.findByPhoneNumberAndUsagePurposeAndCode(
             checkVerificationCodeRequest.getPhoneNumber(),
             usagePurpose.name(),
             checkVerificationCodeRequest.getCode()
-        )).thenReturn(true);
+        )).thenReturn(Optional.of(vCode));
 
         VerifiedPhoneNumber expectedVerificationPhoneNumber = VerifiedPhoneNumber.builder()
             .phoneNumber(checkVerificationCodeRequest.getPhoneNumber())
             .usagePurpose(usagePurpose.name())
+            .userName(vCode.getName())
             .build();
 
         //when
         CheckVerificationCodeResponse result = smsService.checkVerificationCode(checkVerificationCodeRequest, usagePurpose);
 
         //then
-        verify(verificationCodeQuery).existsByPhoneNumberAndUsagePurposeAndCode(
+        verify(verificationCodeQuery).findByPhoneNumberAndUsagePurposeAndCode(
             checkVerificationCodeRequest.getPhoneNumber(),
             usagePurpose.name(),
             checkVerificationCodeRequest.getCode()
         );
 
-        verify(verificationCodeCommand).deleteByPhoneNumberAndUsagePurpose(checkVerificationCodeRequest.getPhoneNumber(), usagePurpose.name());
+        verify(verificationCodeCommand).deleteById(VerifiedPhoneNumber.getCompositeKey(checkVerificationCodeRequest.getPhoneNumber(), usagePurpose.name()));
         ArgumentCaptor<VerifiedPhoneNumber> verifiedPhoneNumberCaptor = ArgumentCaptor.forClass(VerifiedPhoneNumber.class);
         verify(verifiedPhoneNumberCommand).save(verifiedPhoneNumberCaptor.capture());
         assertThat(verifiedPhoneNumberCaptor.getValue()).usingRecursiveComparison().isEqualTo(expectedVerificationPhoneNumber);

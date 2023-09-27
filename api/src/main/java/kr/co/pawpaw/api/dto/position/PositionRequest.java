@@ -13,13 +13,13 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PositionRequest {
     @NotNull
-    @Schema(description = "위도")
+    @Schema(description = "위도", example = "36.5")
     private Double latitude;
     @NotNull
-    @Schema(description = "경도")
+    @Schema(description = "경도", example = "36.4")
     private Double longitude;
     @NotBlank
-    @Schema(description = "장소 이름")
+    @Schema(description = "장소 이름", example = "서울특별시 강동구 고덕동")
     private String name;
 
     public Position toEntity() {
