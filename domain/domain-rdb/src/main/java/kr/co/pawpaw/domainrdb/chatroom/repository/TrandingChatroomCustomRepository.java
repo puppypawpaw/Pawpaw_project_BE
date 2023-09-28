@@ -69,7 +69,7 @@ public class TrandingChatroomCustomRepository {
             .leftJoin(qChatroom.chatroomParticipants, qChatroomParticipant)
             .where(condition)
             .groupBy(qChatroom.id)
-            .orderBy(qTrandingChatroom.id.asc())
+            .orderBy(qTrandingChatroom.id.desc())
             .limit(size+1)
             .fetch();
 
