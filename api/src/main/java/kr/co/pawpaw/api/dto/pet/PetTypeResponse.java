@@ -6,16 +6,12 @@ import lombok.Getter;
 
 @Getter
 public class PetTypeResponse {
-    @Schema(description = "반려동물 유형의 한글명", example="강아지")
-    private String koreanName;
-
-    @Schema(description = "반려동물 유형의 영문명", example="DOG")
-    private String englishName;
+    @Schema(description = "반려동물 유형", example="강아지")
+    private PetType type;
 
     public static PetTypeResponse of(final PetType petType) {
         PetTypeResponse response = new PetTypeResponse();
-        response.koreanName = petType.getKoreanName();
-        response.englishName = petType.name();
+        response.type = petType;
 
         return response;
     }
