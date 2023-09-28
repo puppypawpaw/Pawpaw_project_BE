@@ -9,6 +9,7 @@ import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.api.dto.pet.CreatePetResponse;
 import kr.co.pawpaw.api.dto.pet.PetResponse;
+import kr.co.pawpaw.api.dto.pet.PetTypeResponse;
 import kr.co.pawpaw.api.service.pet.PetService;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
@@ -83,6 +84,11 @@ public class PetController {
             content = @Content
         )
     })
+    @Operation(
+        method = "DELETE",
+        summary = "유저 반려동물 삭제",
+        description = "유저 반려동물 삭제"
+    )
     @DeleteMapping("/{petId}")
     public ResponseEntity<Void> deletePet(
         @AuthenticatedUserId final UserId userId,
@@ -92,4 +98,18 @@ public class PetController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200")
+    })
+    @Operation(
+        method = "GET",
+        summary = "반려동물 종류 조회",
+        description = "반려동물 종류 조회"
+    )
+    @GetMapping("/types")
+    public ResponseEntity<List<PetTypeResponse>> getPetTypeList() {
+        return ResponseEntity.ok(petService.getPetTypeList());
+    }
+
 }

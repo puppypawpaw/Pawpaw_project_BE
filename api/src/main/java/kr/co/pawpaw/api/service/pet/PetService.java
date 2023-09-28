@@ -3,9 +3,11 @@ package kr.co.pawpaw.api.service.pet;
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.api.dto.pet.CreatePetResponse;
 import kr.co.pawpaw.api.dto.pet.PetResponse;
+import kr.co.pawpaw.api.dto.pet.PetTypeResponse;
 import kr.co.pawpaw.common.exception.pet.NotFoundPetException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.pet.domain.Pet;
+import kr.co.pawpaw.domainrdb.pet.domain.PetType;
 import kr.co.pawpaw.domainrdb.pet.service.command.PetCommand;
 import kr.co.pawpaw.domainrdb.pet.service.query.PetQuery;
 import kr.co.pawpaw.domainrdb.user.domain.User;
@@ -15,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +36,12 @@ public class PetService {
         return petQuery.findByParent(user)
             .stream()
             .map(PetResponse::of)
+            .collect(Collectors.toList());
+    }
+
+    public List<PetTypeResponse> getPetTypeList() {
+        return Arrays.stream(PetType.values())
+            .map(PetTypeResponse::of)
             .collect(Collectors.toList());
     }
 

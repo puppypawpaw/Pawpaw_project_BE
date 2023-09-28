@@ -3,6 +3,7 @@ package kr.co.pawpaw.api.service.pet;
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.api.dto.pet.CreatePetResponse;
 import kr.co.pawpaw.api.dto.pet.PetResponse;
+import kr.co.pawpaw.api.dto.pet.PetTypeResponse;
 import kr.co.pawpaw.common.exception.pet.NotFoundPetException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.pet.domain.Pet;
@@ -21,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -212,6 +214,25 @@ class PetServiceTest {
 
             //then
             verify(petCommand).delete(pet);
+        }
+    }
+
+    @Nested
+    @DisplayName("getPetTypeList 메서드는")
+    class GetPetTypeList {
+        @Test
+        @DisplayName("PetType의 가능한 값 목록을 PetTypeResponse로 변환하여 반환한다.")
+        void getPetTypeList() {
+            //given
+            List<PetTypeResponse> expectedResult = Arrays.stream(PetType.values())
+                .map(PetTypeResponse::of)
+                .collect(Collectors.toList());
+
+            //when
+            List<PetTypeResponse> result = petService.getPetTypeList();
+
+            //then
+            assertThat(result).usingRecursiveComparison().isEqualTo(expectedResult);
         }
     }
 }
