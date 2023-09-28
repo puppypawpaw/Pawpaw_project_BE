@@ -1,7 +1,9 @@
 package kr.co.pawpaw.api.dto.pet;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import kr.co.pawpaw.domainrdb.pet.domain.Pet;
 import kr.co.pawpaw.domainrdb.pet.domain.PetType;
+import kr.co.pawpaw.domainrdb.user.domain.User;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -20,4 +22,12 @@ public class CreatePetRequest {
     @NotNull
     @Schema(description = "펫 유형", example = "DOG|CAT|FISH|BIRD|HAMSTER|RABBIT|GUINEA_PIG|LIZARD|FROG")
     private PetType petType;
+
+    public Pet toEntity(final User parent) {
+        return Pet.builder()
+            .parent(parent)
+            .name(petName)
+            .petType(petType)
+            .build();
+    }
 }
