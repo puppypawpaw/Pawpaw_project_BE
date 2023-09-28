@@ -2,6 +2,7 @@ package kr.co.pawpaw.api.application.user;
 
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.api.dto.pet.CreatePetResponse;
+import kr.co.pawpaw.api.dto.pet.PetResponse;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.api.service.user.UserService;
@@ -9,6 +10,7 @@ import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.pet.domain.Pet;
 import kr.co.pawpaw.domainrdb.pet.domain.PetType;
 import kr.co.pawpaw.domainrdb.pet.service.command.PetCommand;
+import kr.co.pawpaw.domainrdb.pet.service.query.PetQuery;
 import kr.co.pawpaw.domainrdb.position.Position;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
@@ -24,8 +26,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -40,6 +45,8 @@ class UserServiceTest {
     private FileService fileService;
     @Mock
     private PetCommand petCommand;
+    @Mock
+    private PetQuery petQuery;
     @Mock
     private EntityManager em;
     @Mock
@@ -77,6 +84,66 @@ class UserServiceTest {
         assertThat(userResponse.getEmail()).isEqualTo(user.getEmail());
         assertThat(userResponse.getRole()).isEqualTo(user.getRole());
         assertThat(userResponse.getPosition()).usingRecursiveComparison().isEqualTo(user.getPosition());
+    }
+
+    @Nested
+    @DisplayName("getPetList 메서드는")
+    class getPetList {
+        User user = User.builder().build();
+        List<Pet> petList = List.of(
+            Pet.builder()
+                .petType(PetType.DOG)
+                .name("강아지 이름")
+                .introduction("강아지 소개")
+                .parent(user)
+                .build(),
+            Pet.builder()
+                .petType(PetType.CAT)
+                .name("고양이 이름")
+                .introduction("고양이 소개")
+                .parent(user)
+                .build()
+        );
+
+        @Test
+        @DisplayName("존재하지 않는 유저 아이디를 입력받으면 예외가 발생한다.")
+        void NotFoundUserException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
+
+            //when
+            assertThatThrownBy(() -> userService.getPetList(user.getUserId())).isInstanceOf(NotFoundUserException.class);
+
+            //then
+        }
+
+        @Test
+        @DisplayName("등록된 반려동물 목록을 PetResponse 목록으로 변환하여 반환한다.")
+        void returnPetResponseList() throws NoSuchFieldException {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            Field idField = Pet.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            AtomicLong id = new AtomicLong(1L);
+            petList.forEach(pet -> {
+                try {
+                    idField.set(pet, id.getAndIncrement());
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+            when(petQuery.findByParent(user)).thenReturn(petList);
+            List<PetResponse> expectedResult = petList.stream()
+                .map(PetResponse::of)
+                .collect(Collectors.toList());
+
+            //when
+            List<PetResponse> result = userService.getPetList(user.getUserId());
+
+            //then
+            assertThat(result).usingRecursiveComparison().isEqualTo(expectedResult);
+        }
     }
 
     @Test

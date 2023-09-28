@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.api.dto.pet.CreatePetResponse;
+import kr.co.pawpaw.api.dto.pet.PetResponse;
 import kr.co.pawpaw.api.dto.user.UpdateUserRequest;
 import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
@@ -16,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Tag(name = "user")
 @RestController
@@ -109,5 +112,25 @@ public class UserController {
         @RequestBody final CreatePetRequest request
     ) {
         return ResponseEntity.ok(userService.createPet(userId, request));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 유저입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "GET",
+        summary = "유저 반려동물 목록 조회",
+        description = "유저 반려동물 목록 조회"
+    )
+    @GetMapping("/pet")
+    public ResponseEntity<List<PetResponse>> getPetList(
+        @AuthenticatedUserId final UserId userId
+    ) {
+        return ResponseEntity.ok(userService.getPetList(userId));
     }
 }
