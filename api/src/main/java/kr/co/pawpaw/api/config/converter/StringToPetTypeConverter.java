@@ -8,7 +8,7 @@ public class StringToPetTypeConverter implements Converter<String, PetType> {
     @Override
     public PetType convert(final String source) {
         try {
-            return PetType.valueOf(source.toUpperCase());
+            return PetType.koreanNameOf(source);
         } catch (final IllegalArgumentException e) {
             throw new InvalidPetTypeException();
         }

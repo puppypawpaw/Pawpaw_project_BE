@@ -18,10 +18,10 @@ class StringToPetTypeConverterTest {
         private StringToPetTypeConverter converter = new StringToPetTypeConverter();
         @ParameterizedTest
         @EnumSource(PetType.class)
-        @DisplayName("PetType에 해당하는 String값이 아닌 경우 예외가 발생한다.")
+        @DisplayName("PetType의 koreanName 해당하는 String값이 아닌 경우 예외가 발생한다.")
         void InvalidPetTypeException(final PetType petType) {
             //given
-            String petTypeString = petType.name() + " ";
+            String petTypeString = petType.getKoreanName() + " ";
 
             //when
             assertThatThrownBy(() -> converter.convert(petTypeString)).isInstanceOf(InvalidPetTypeException.class);
@@ -29,19 +29,30 @@ class StringToPetTypeConverterTest {
             //then
         }
         @ParameterizedTest
-        @DisplayName("PetType에 해당하는 String값의 경우 정상작동한다.")
         @EnumSource(PetType.class)
-        void success(final PetType petType) {
+        @DisplayName("PetType의 name 해당하는 String값인 경우 예외가 발생한다.")
+        void InvalidPetTypeNameException(final PetType petType) {
             //given
             String petTypeString = petType.name();
 
             //when
-            PetType convertResult = converter.convert(petTypeString.toUpperCase());
-            PetType convertResult2 = converter.convert(petTypeString.toLowerCase());
+            assertThatThrownBy(() -> converter.convert(petTypeString)).isInstanceOf(InvalidPetTypeException.class);
+
+            //then
+        }
+
+        @ParameterizedTest
+        @DisplayName("PetType의 koreanName에 해당하는 String값의 경우 정상작동한다.")
+        @EnumSource(PetType.class)
+        void success(final PetType petType) {
+            //given
+            String petTypeString = petType.getKoreanName();
+
+            //when
+            PetType convertResult = converter.convert(petTypeString);
 
             //then
             assertThat(convertResult).isEqualTo(petType);
-            assertThat(convertResult2).isEqualTo(petType);
         }
     }
 }

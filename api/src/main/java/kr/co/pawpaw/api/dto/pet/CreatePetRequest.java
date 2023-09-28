@@ -20,7 +20,7 @@ public class CreatePetRequest {
     @Schema(description = "펫 이름", example = "루이")
     private String petName;
     @NotNull
-    @Schema(description = "펫 유형", example = "DOG|CAT|FISH|BIRD|HAMSTER|RABBIT|GUINEA_PIG|LIZARD|FROG")
+    @Schema(description = "펫 유형", example = "강아지|고양이|물고기|새|햄스터|토끼|기니피그|도마뱀|개구리")
     private PetType petType;
 
     public Pet toEntity(final User parent) {
