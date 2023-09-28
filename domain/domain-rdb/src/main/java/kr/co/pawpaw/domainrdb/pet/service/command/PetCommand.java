@@ -19,4 +19,8 @@ public class PetCommand {
     public Pet save(final Pet pet) {
         return petRepository.save(pet);
     }
+
+    public void delete(final Pet pet) {
+        petRepository.delete(pet);
+    }
 }

@@ -6,7 +6,9 @@ import kr.co.pawpaw.api.dto.pet.PetResponse;
 import kr.co.pawpaw.api.dto.user.UpdateUserRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.api.service.file.FileService;
+import kr.co.pawpaw.common.exception.pet.NotFoundPetException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
+import kr.co.pawpaw.domainrdb.pet.domain.Pet;
 import kr.co.pawpaw.domainrdb.pet.service.command.PetCommand;
 import kr.co.pawpaw.domainrdb.pet.service.query.PetQuery;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
@@ -46,6 +48,20 @@ public class UserService {
             .stream()
             .map(PetResponse::of)
             .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deletePet(
+        final UserId userId,
+        final Long petId
+    ) {
+        User user = userQuery.findByUserId(userId)
+            .orElseThrow(NotFoundUserException::new);
+
+        Pet pet = petQuery.findByParentAndId(user, petId)
+            .orElseThrow(NotFoundPetException::new);
+
+        petCommand.delete(pet);
     }
 
     @Transactional

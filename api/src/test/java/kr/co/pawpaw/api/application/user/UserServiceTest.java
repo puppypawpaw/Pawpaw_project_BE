@@ -3,9 +3,10 @@ package kr.co.pawpaw.api.application.user;
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.api.dto.pet.CreatePetResponse;
 import kr.co.pawpaw.api.dto.pet.PetResponse;
-import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.user.UserResponse;
+import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.service.user.UserService;
+import kr.co.pawpaw.common.exception.pet.NotFoundPetException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.pet.domain.Pet;
 import kr.co.pawpaw.domainrdb.pet.domain.PetType;
@@ -15,6 +16,7 @@ import kr.co.pawpaw.domainrdb.position.Position;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -143,6 +145,71 @@ class UserServiceTest {
 
             //then
             assertThat(result).usingRecursiveComparison().isEqualTo(expectedResult);
+        }
+    }
+
+    @Nested
+    @DisplayName("deletePet 메서드는")
+    class DeletePet {
+        User user = User.builder().build();
+        Pet pet = Pet.builder()
+            .name("루이")
+            .petType(PetType.DOG)
+            .introduction("루이는 비숑 2살 남자아이에요")
+            .parent(user)
+            .build();
+
+        @BeforeEach
+        void setup() throws NoSuchFieldException, IllegalAccessException {
+            Field idField = Pet.class.getDeclaredField("id");
+            idField.setAccessible(true);
+            idField.set(pet, 1234L);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 유저면 예외가 발생한다.")
+        void IfNotExistsUserThenRaiseException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId()))
+                .thenReturn(Optional.empty());
+
+            //when
+            assertThatThrownBy(() -> userService.deletePet(user.getUserId(), pet.getId()))
+                .isInstanceOf(NotFoundUserException.class);
+
+            //then
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 반려동물이면 예외가 발생한다.")
+        void IfNotExistsPetThenRaiseException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId()))
+                .thenReturn(Optional.of(user));
+            when(petQuery.findByParentAndId(user, pet.getId()))
+                .thenReturn(Optional.empty());
+            
+            //when
+            assertThatThrownBy(() -> userService.deletePet(user.getUserId(), pet.getId()))
+                .isInstanceOf(NotFoundPetException.class);
+
+            //then
+        }
+
+        @Test
+        @DisplayName("pet 엔티티를 petCommand의 delete 메서드에 인자로 전달한다.")
+        void deletePetByPetCommand() {
+            //given
+            when(userQuery.findByUserId(user.getUserId()))
+                .thenReturn(Optional.of(user));
+            when(petQuery.findByParentAndId(user, pet.getId()))
+                .thenReturn(Optional.of(pet));
+
+            //when
+            userService.deletePet(user.getUserId(), pet.getId());
+
+            //then
+            verify(petCommand).delete(pet);
         }
     }
 

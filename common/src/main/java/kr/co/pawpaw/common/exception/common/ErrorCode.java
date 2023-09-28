@@ -53,7 +53,8 @@ public enum ErrorCode {
     BOARD_IMG_CANNOT_VIEW_EXCEPTION(400, "BOARD_IMG_CANNOT_VIEW_EXCEPTION", "이미지 조회를 실패했습니다"),
     BOARD_IMG_CANNOT_REMOVE_EXCEPTION(400, "BOARD_IMG_CANNOT_REMOVE_EXCEPTION", "이미지 삭제를 실패했습니다"),
     // 반려동물
-    INVALID_PET_TYPE(400, "PE001", "유효하지 않은 반려동물 종류입니다.");
+    INVALID_PET_TYPE(400, "PE001", "유효하지 않은 반려동물 종류입니다."),
+    NOT_FOUND_PET(404, "PE002", "존재하지 않는 반려동물 입니다.");
 
     private final int status;
     private final String code;

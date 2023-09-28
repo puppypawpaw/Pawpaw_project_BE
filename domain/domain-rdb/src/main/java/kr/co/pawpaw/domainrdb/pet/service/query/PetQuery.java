@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +16,10 @@ public class PetQuery {
 
     public List<Pet> findByParent(final User user) {
         return petRepository.findByParent(user);
+    }
+
+    public Optional<Pet> findByParentAndId(final User user, final Long petId) {
+        return petRepository.findByParentAndId(user, petId);
     }
 
 }

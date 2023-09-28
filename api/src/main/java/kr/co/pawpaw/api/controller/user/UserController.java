@@ -133,4 +133,27 @@ public class UserController {
     ) {
         return ResponseEntity.ok(userService.getPetList(userId));
     }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 유저입니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 반려동물 입니다.",
+            content = @Content
+        )
+    })
+    @DeleteMapping("/pet/{petId}")
+    public ResponseEntity<Void> deletePet(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long petId
+    ) {
+        userService.deletePet(userId, petId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
