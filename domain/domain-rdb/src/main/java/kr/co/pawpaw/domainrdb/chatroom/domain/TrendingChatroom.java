@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class TrandingChatroom extends BaseTimeEntity {
+public class TrendingChatroom extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,7 +20,7 @@ public class TrandingChatroom extends BaseTimeEntity {
     private Chatroom chatroom;
 
     @Builder
-    public TrandingChatroom(final Chatroom chatroom) {
+    public TrendingChatroom(final Chatroom chatroom) {
         this.chatroom = chatroom;
     }
 }

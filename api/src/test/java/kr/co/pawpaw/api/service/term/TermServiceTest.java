@@ -3,7 +3,6 @@ package kr.co.pawpaw.api.service.term;
 import kr.co.pawpaw.api.dto.term.CreateTermRequest;
 import kr.co.pawpaw.api.dto.term.TermResponse;
 import kr.co.pawpaw.api.dto.term.UpdateTermRequest;
-import kr.co.pawpaw.api.service.term.TermService;
 import kr.co.pawpaw.common.exception.term.NotFoundTermException;
 import kr.co.pawpaw.domainrdb.term.domain.Term;
 import kr.co.pawpaw.domainrdb.term.service.command.TermCommand;
@@ -19,8 +18,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TermServiceTest {

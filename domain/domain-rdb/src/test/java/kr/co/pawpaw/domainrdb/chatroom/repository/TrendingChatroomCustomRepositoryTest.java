@@ -3,8 +3,8 @@ package kr.co.pawpaw.domainrdb.chatroom.repository;
 import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
-import kr.co.pawpaw.domainrdb.chatroom.domain.TrandingChatroom;
-import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.domain.TrendingChatroom;
+import kr.co.pawpaw.domainrdb.chatroom.dto.TrendingChatroomResponse;
 import kr.co.pawpaw.domainrdb.config.QuerydslConfig;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.storage.repository.FileRepository;
@@ -23,11 +23,11 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(value = { TrandingChatroomCustomRepository.class, QuerydslConfig.class })
+@Import(value = { TrendingChatroomCustomRepository.class, QuerydslConfig.class })
 @DataJpaTest
-class TrandingChatroomCustomRepositoryTest {
+class TrendingChatroomCustomRepositoryTest {
     @Autowired
-    private TrandingChatroomCustomRepository trandingChatroomCustomRepository;
+    private TrendingChatroomCustomRepository trendingChatroomCustomRepository;
     @Autowired
     private ChatroomRepository chatroomRepository;
     @Autowired
@@ -37,7 +37,7 @@ class TrandingChatroomCustomRepositoryTest {
     @Autowired
     private FileRepository fileRepository;
     @Autowired
-    private TrandingChatroomRepository trandingChatroomRepository;
+    private TrendingChatroomRepository trendingChatroomRepository;
 
     User user1 = User.builder()
         .name("user1-name")
@@ -120,15 +120,15 @@ class TrandingChatroomCustomRepositoryTest {
         .user(user2)
         .build();
 
-    TrandingChatroom trandingChatroom1 = TrandingChatroom.builder()
+    TrendingChatroom trendingChatroom1 = TrendingChatroom.builder()
         .chatroom(chatroom1)
         .build();
 
-    TrandingChatroom trandingChatroom2 = TrandingChatroom.builder()
+    TrendingChatroom trendingChatroom2 = TrendingChatroom.builder()
         .chatroom(chatroom2)
         .build();
 
-    TrandingChatroom trandingChatroom3 = TrandingChatroom.builder()
+    TrendingChatroom trendingChatroom3 = TrendingChatroom.builder()
         .chatroom(chatroom3)
         .build();
 
@@ -164,18 +164,18 @@ class TrandingChatroomCustomRepositoryTest {
         chatroom1 = chatroomRepository.save(chatroom1);
         chatroom2 = chatroomRepository.save(chatroom2);
 
-        trandingChatroom1 = trandingChatroomRepository.save(trandingChatroom1);
-        trandingChatroom2 = trandingChatroomRepository.save(trandingChatroom2);
+        trendingChatroom1 = trendingChatroomRepository.save(trendingChatroom1);
+        trendingChatroom2 = trendingChatroomRepository.save(trendingChatroom2);
     }
 
     @Test
-    @DisplayName("findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize 메서드는 beforeId 가 null이면 제외 없이 결과를 반환한다.")
-    void findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSizeBeforeIdIsNull() {
+    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 beforeId 가 null이면 제외 없이 결과를 반환한다.")
+    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeBeforeIdIsNull() {
         //given
 
         //when
-        Slice<TrandingChatroomResponse> result1 = trandingChatroomCustomRepository.findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(user1.getUserId(), null, 12);
-        Slice<TrandingChatroomResponse> result2 = trandingChatroomCustomRepository.findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 12);
+        Slice<TrendingChatroomResponse> result1 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user1.getUserId(), null, 12);
+        Slice<TrendingChatroomResponse> result2 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 12);
 
         //then
         assertThat(result1.getContent().size()).isEqualTo(1);
@@ -183,25 +183,25 @@ class TrandingChatroomCustomRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize 메서드는 참여하지 않은 채팅방만 검색한다.")
-    void findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSizeNotParticipated() {
+    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 참여하지 않은 채팅방만 검색한다.")
+    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeNotParticipated() {
         //given
 
         //when
-        Slice<TrandingChatroomResponse> result = trandingChatroomCustomRepository.findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(user2.getUserId(), null, 12);
+        Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user2.getUserId(), null, 12);
 
         //then
         assertThat(result.getContent().size()).isEqualTo(0);
     }
 
     @Test
-    @DisplayName("findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize 메서드는 hashNext로 다음 entity가 존재하는지 파악 가능하다.")
-    void findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSizeHasNext() {
+    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 hashNext로 다음 entity가 존재하는지 파악 가능하다.")
+    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeHasNext() {
         //given
 
         //when
-        Slice<TrandingChatroomResponse> result1 = trandingChatroomCustomRepository.findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 1);
-        Slice<TrandingChatroomResponse> result2 = trandingChatroomCustomRepository.findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 2);
+        Slice<TrendingChatroomResponse> result1 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 1);
+        Slice<TrendingChatroomResponse> result2 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 2);
 
         //then
         assertThat(result1.getContent().size()).isEqualTo(1);
@@ -211,12 +211,12 @@ class TrandingChatroomCustomRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize 메서드는 beforeId 미만의 id를 가진 뜨고있는 채팅방만 검색한다.")
-    void findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSizeBeforeBeforeId() {
+    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 beforeId 미만의 id를 가진 뜨고있는 채팅방만 검색한다.")
+    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeBeforeBeforeId() {
         //given
 
         //when
-        Slice<TrandingChatroomResponse> result = trandingChatroomCustomRepository.findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), trandingChatroom2.getId(), 2);
+        Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), trendingChatroom2.getId(), 2);
 
         //then
         assertThat(result.getContent().size()).isEqualTo(1);
@@ -224,12 +224,12 @@ class TrandingChatroomCustomRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize 메서드는 searchable이 true인 chatroom만 검색한다.")
-    void findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSizeSearchableTest() {
+    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 searchable이 true인 chatroom만 검색한다.")
+    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeSearchableTest() {
         //given
 
         //when
-        Slice<TrandingChatroomResponse> result = trandingChatroomCustomRepository.findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 2);
+        Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 2);
 
         //then
         assertThat(result.getContent().size()).isEqualTo(2);
@@ -237,12 +237,12 @@ class TrandingChatroomCustomRepositoryTest {
     }
 
     @Test
-    @DisplayName("findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize 메서드는 필드 값 테스트")
-    void findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSizeFieldTest() {
+    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 필드 값 테스트")
+    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeFieldTest() {
         //given
-        TrandingChatroomResponse resultExpected = new TrandingChatroomResponse(
+        TrendingChatroomResponse resultExpected = new TrendingChatroomResponse(
             chatroom1.getId(),
-            trandingChatroom1.getId(),
+            trendingChatroom1.getId(),
             chatroom1.getName(),
             chatroom1.getDescription(),
             chatroom1.getHashTagList(),
@@ -252,7 +252,7 @@ class TrandingChatroomCustomRepositoryTest {
         );
 
         //when
-        Slice<TrandingChatroomResponse> result = trandingChatroomCustomRepository.findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), trandingChatroom2.getId(), 2);
+        Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), trendingChatroom2.getId(), 2);
 
         //then
         assertThat(result.getContent().get(0)).usingRecursiveComparison().isEqualTo(resultExpected);

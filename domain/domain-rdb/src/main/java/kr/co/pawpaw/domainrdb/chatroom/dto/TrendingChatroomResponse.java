@@ -7,11 +7,11 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class TrandingChatroomResponse {
+public class TrendingChatroomResponse {
     @Schema(description = "채팅방 아이디")
     private Long id;
     @Schema(description = "뜨고 있음 아이디")
-    private Long trandingId;
+    private Long trendingId;
     @Schema(description = "채팅방 이름")
     private String name;
     @Schema(description = "채팅방 소개")
@@ -26,9 +26,9 @@ public class TrandingChatroomResponse {
     private Long participantNumber;
 
     @QueryProjection
-    public TrandingChatroomResponse(
+    public TrendingChatroomResponse(
         final Long id,
-        final Long trandingId,
+        final Long trendingId,
         final String name,
         final String description,
         final List<String> hashTagList,
@@ -37,7 +37,7 @@ public class TrandingChatroomResponse {
         final Long participantNumber
     ) {
         this.id = id;
-        this.trandingId = trandingId;
+        this.trendingId = trendingId;
         this.name = name;
         this.description = description;
         this.hashTagList = hashTagList;

@@ -1,10 +1,9 @@
 package kr.co.pawpaw.api.service.auth;
 
-import kr.co.pawpaw.api.service.auth.ChangePasswordService;
-import kr.co.pawpaw.api.service.mail.MailService;
 import kr.co.pawpaw.api.config.property.MailProperties;
 import kr.co.pawpaw.api.dto.auth.ChangePasswordMailRequest;
 import kr.co.pawpaw.api.dto.auth.ChangePasswordRequest;
+import kr.co.pawpaw.api.service.mail.MailService;
 import kr.co.pawpaw.api.util.mail.ChangePasswordMailContent;
 import kr.co.pawpaw.common.exception.auth.NotFoundChangePasswordTempKeyException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
@@ -27,7 +26,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

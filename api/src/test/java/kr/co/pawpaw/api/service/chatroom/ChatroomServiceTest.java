@@ -1,4 +1,4 @@
-package kr.co.pawpaw.api.application.chatroom;
+package kr.co.pawpaw.api.service.chatroom;
 
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
 import kr.co.pawpaw.api.service.chatroom.ChatroomService;
@@ -17,11 +17,11 @@ import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomDetailData;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
-import kr.co.pawpaw.domainrdb.chatroom.service.command.TrandingChatroomCommand;
+import kr.co.pawpaw.domainrdb.chatroom.service.command.TrendingChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomDefaultCoverQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomQuery;
-import kr.co.pawpaw.domainrdb.chatroom.service.query.TrandingChatroomQuery;
+import kr.co.pawpaw.domainrdb.chatroom.service.query.TrendingChatroomQuery;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
@@ -62,9 +62,9 @@ class ChatroomServiceTest {
     @Mock
     private ChatroomDefaultCoverQuery chatroomDefaultCoverQuery;
     @Mock
-    private TrandingChatroomCommand trandingChatroomCommand;
+    private TrendingChatroomCommand trendingChatroomCommand;
     @Mock
-    private TrandingChatroomQuery trandingChatroomQuery;
+    private TrendingChatroomQuery trendingChatroomQuery;
     @Mock
     private ChatroomQuery chatroomQuery;
     @Mock
@@ -316,7 +316,7 @@ class ChatroomServiceTest {
                 //given
                 when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
                 when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(false);
-                when(trandingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(true);
+                when(trendingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(true);
                 //when
                 chatroomService.joinChatroom(user.getUserId(), chatroom.getId());
 
@@ -332,20 +332,20 @@ class ChatroomServiceTest {
         class ParticipatedChatroom {
             @Test
             @DisplayName("뜨고있는 채팅방으로 설정한다.")
-            void setTrandingChatroom() throws NoSuchFieldException, IllegalAccessException {
+            void setTrendingChatroom() throws NoSuchFieldException, IllegalAccessException {
                 //given
                 when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
                 when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(false);
-                when(trandingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(false);
+                when(trendingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(false);
                 when(chatroomQuery.getReferenceById(chatroom.getId())).thenReturn(chatroom);
 
                 //when
                 chatroomService.joinChatroom(user.getUserId(), chatroom.getId());
 
                 //then
-                ArgumentCaptor<TrandingChatroom> trandingChatroomArgumentCaptor = ArgumentCaptor.forClass(TrandingChatroom.class);
-                verify(trandingChatroomCommand).save(trandingChatroomArgumentCaptor.capture());
-                assertThat(trandingChatroomArgumentCaptor.getValue().getChatroom().getId()).isEqualTo(chatroom.getId());
+                ArgumentCaptor<TrendingChatroom> trendingChatroomArgumentCaptor = ArgumentCaptor.forClass(TrendingChatroom.class);
+                verify(trendingChatroomCommand).save(trendingChatroomArgumentCaptor.capture());
+                assertThat(trendingChatroomArgumentCaptor.getValue().getChatroom().getId()).isEqualTo(chatroom.getId());
             }
         }
     }
@@ -466,21 +466,21 @@ class ChatroomServiceTest {
     }
 
     @Test
-    @DisplayName("getTrandingChatroomList 메서드는 chatroomQuery의 getAccessibleTrandingChatroom를 호출한다.")
-    void getTrandingChatroomList() {
+    @DisplayName("getTrendingChatroomList 메서드는 chatroomQuery의 getAccessibleTrendingChatroom를 호출한다.")
+    void getTrendingChatroomList() {
         //given
         UserId userId = UserId.create();
         Long beforeId = null;
         int size = 10;
 
-        when(chatroomQuery.getAccessibleTrandingChatroom(userId, beforeId, size)).thenReturn(new SliceImpl<>(
+        when(chatroomQuery.getAccessibleTrendingChatroom(userId, beforeId, size)).thenReturn(new SliceImpl<>(
             List.of(), PageRequest.of(0, 10),  false
         ));
 
         //when
-        chatroomService.getTrandingChatroomList(userId, beforeId, size);
+        chatroomService.getTrendingChatroomList(userId, beforeId, size);
 
         //then
-        verify(chatroomQuery).getAccessibleTrandingChatroom(userId, beforeId, size);
+        verify(chatroomQuery).getAccessibleTrendingChatroom(userId, beforeId, size);
     }
 }

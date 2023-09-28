@@ -1,7 +1,6 @@
 package kr.co.pawpaw.api.service.auth;
 
 import kr.co.pawpaw.api.dto.user.UserEmailResponse;
-import kr.co.pawpaw.api.service.auth.FindEmailService;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;

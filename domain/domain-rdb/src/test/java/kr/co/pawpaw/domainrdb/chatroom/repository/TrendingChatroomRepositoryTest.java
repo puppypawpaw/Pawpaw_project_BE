@@ -1,7 +1,7 @@
 package kr.co.pawpaw.domainrdb.chatroom.repository;
 
 import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
-import kr.co.pawpaw.domainrdb.chatroom.domain.TrandingChatroom;
+import kr.co.pawpaw.domainrdb.chatroom.domain.TrendingChatroom;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,9 +11,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
-class TrandingChatroomRepositoryTest {
+class TrendingChatroomRepositoryTest {
     @Autowired
-    private TrandingChatroomRepository trandingChatroomRepository;
+    private TrendingChatroomRepository trendingChatroomRepository;
     @Autowired
     private ChatroomRepository chatroomRepository;
 
@@ -30,17 +30,17 @@ class TrandingChatroomRepositoryTest {
 
         chatroom = chatroomRepository.save(chatroom);
 
-        TrandingChatroom trandingChatroom = TrandingChatroom.builder()
+        TrendingChatroom trendingChatroom = TrendingChatroom.builder()
             .chatroom(chatroom)
             .build();
 
         //when
-        trandingChatroom = trandingChatroomRepository.save(trandingChatroom);
-        TrandingChatroom result = trandingChatroomRepository.findById(trandingChatroom.getId())
+        trendingChatroom = trendingChatroomRepository.save(trendingChatroom);
+        TrendingChatroom result = trendingChatroomRepository.findById(trendingChatroom.getId())
             .orElseThrow(RuntimeException::new);
 
         //then
-        assertThat(result).usingRecursiveComparison().isEqualTo(trandingChatroom);
+        assertThat(result).usingRecursiveComparison().isEqualTo(trendingChatroom);
     }
 
     @Nested
@@ -59,12 +59,12 @@ class TrandingChatroomRepositoryTest {
 
             chatroom = chatroomRepository.save(chatroom);
 
-            trandingChatroomRepository.save(TrandingChatroom.builder()
+            trendingChatroomRepository.save(TrendingChatroom.builder()
                 .chatroom(chatroom)
                 .build());
 
             //when
-            boolean result = trandingChatroomRepository.existsByChatroomId(chatroom.getId());
+            boolean result = trendingChatroomRepository.existsByChatroomId(chatroom.getId());
 
             //then
             assertThat(result).isTrue();

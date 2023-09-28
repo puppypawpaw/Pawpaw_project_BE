@@ -1,6 +1,5 @@
 package kr.co.pawpaw.api.service.mail;
 
-import kr.co.pawpaw.api.service.mail.MailService;
 import kr.co.pawpaw.domainrdb.email.domain.EmailLog;
 import kr.co.pawpaw.domainrdb.email.domain.EmailType;
 import kr.co.pawpaw.domainrdb.email.service.command.EmailLogCommand;
@@ -15,8 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class MailServiceTest {

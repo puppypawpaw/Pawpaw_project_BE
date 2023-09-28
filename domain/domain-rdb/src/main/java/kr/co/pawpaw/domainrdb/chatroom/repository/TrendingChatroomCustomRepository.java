@@ -1,15 +1,13 @@
 package kr.co.pawpaw.domainrdb.chatroom.repository;
 
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroom;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroomParticipant;
-import kr.co.pawpaw.domainrdb.chatroom.domain.QTrandingChatroom;
-import kr.co.pawpaw.domainrdb.chatroom.dto.QTrandingChatroomResponse;
-import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.domain.QTrendingChatroom;
+import kr.co.pawpaw.domainrdb.chatroom.dto.QTrendingChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.TrendingChatroomResponse;
 import kr.co.pawpaw.domainrdb.storage.domain.QFile;
 import kr.co.pawpaw.domainrdb.user.domain.QUser;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
@@ -26,16 +24,16 @@ import java.util.Objects;
 @Repository
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class TrandingChatroomCustomRepository {
+public class TrendingChatroomCustomRepository {
     private final JPAQueryFactory queryFactory;
     private static final QChatroom qChatroom = QChatroom.chatroom;
     private static final QChatroomParticipant qChatroomParticipant = new QChatroomParticipant("qChatroomParticipant");
     private static final QChatroomParticipant qChatroomParticipantManager = new QChatroomParticipant("qChatroomParticipantManager");
     private static final QUser qUserManager = QUser.user;
     private static final QFile qFileManager = new QFile("qFileManager");
-    private static final QTrandingChatroom qTrandingChatroom = QTrandingChatroom.trandingChatroom;
+    private static final QTrendingChatroom qTrendingChatroom = QTrendingChatroom.trendingChatroom;
 
-    public Slice<TrandingChatroomResponse> findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(
+    public Slice<TrendingChatroomResponse> findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(
         final UserId userId,
         final Long beforeId,
         final int size
@@ -47,13 +45,13 @@ public class TrandingChatroomCustomRepository {
             .and(qChatroom.searchable.isTrue());
 
         if (Objects.nonNull(beforeId)) {
-            condition = condition.and(qTrandingChatroom.id.lt(beforeId));
+            condition = condition.and(qTrendingChatroom.id.lt(beforeId));
         }
 
-        List<TrandingChatroomResponse> chatroomResponseList = queryFactory.select(
-            new QTrandingChatroomResponse(
+        List<TrendingChatroomResponse> chatroomResponseList = queryFactory.select(
+            new QTrendingChatroomResponse(
                 qChatroom.id,
-                qTrandingChatroom.id,
+                qTrendingChatroom.id,
                 qChatroom.name,
                 qChatroom.description,
                 qChatroom.hashTagList,
@@ -61,15 +59,15 @@ public class TrandingChatroomCustomRepository {
                 qFileManager.fileUrl,
                 qChatroomParticipant.count()
             ))
-            .from(qTrandingChatroom)
-            .innerJoin(qTrandingChatroom.chatroom, qChatroom)
+            .from(qTrendingChatroom)
+            .innerJoin(qTrendingChatroom.chatroom, qChatroom)
             .innerJoin(qChatroom.manager, qChatroomParticipantManager)
             .innerJoin(qChatroomParticipantManager.user, qUserManager)
             .innerJoin(qUserManager.userImage, qFileManager)
             .leftJoin(qChatroom.chatroomParticipants, qChatroomParticipant)
             .where(condition)
             .groupBy(qChatroom.id)
-            .orderBy(qTrandingChatroom.id.desc())
+            .orderBy(qTrendingChatroom.id.desc())
             .limit(size+1)
             .fetch();
 

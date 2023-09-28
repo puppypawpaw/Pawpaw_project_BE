@@ -2,7 +2,7 @@ package kr.co.pawpaw.domainrdb.chatroom.service.query;
 
 import kr.co.pawpaw.domainrdb.chatroom.repository.ChatroomCustomRepository;
 import kr.co.pawpaw.domainrdb.chatroom.repository.ChatroomRepository;
-import kr.co.pawpaw.domainrdb.chatroom.repository.TrandingChatroomCustomRepository;
+import kr.co.pawpaw.domainrdb.chatroom.repository.TrendingChatroomCustomRepository;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class ChatroomQueryTest {
     @Mock
     private ChatroomRepository chatroomRepository;
     @Mock
-    private TrandingChatroomCustomRepository trandingChatroomCustomRepository;
+    private TrendingChatroomCustomRepository trendingChatroomCustomRepository;
     @Mock
     private ChatroomCustomRepository chatroomCustomRepository;
     @InjectMocks
@@ -86,18 +86,18 @@ class ChatroomQueryTest {
     }
 
     @Test
-    @DisplayName("getAccessibleTrandingChatroom 메서드는 trandingChatroomCustomRepository 의 findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize 메서드를 호출한다.")
-    void getAccessibleTrandingChatroom() {
+    @DisplayName("getAccessibleTrendingChatroom 메서드는 trendingChatroomCustomRepository 의 findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드를 호출한다.")
+    void getAccessibleTrendingChatroom() {
         //given
         UserId userId = UserId.create();
         Pageable pageable = PageRequest.of(0, 10, Sort.by("createdDate"));
 
-        when(trandingChatroomCustomRepository.findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(userId, null, 10)).thenReturn(new SliceImpl<>(List.of(), PageRequest.of(0, 10), false));
+        when(trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(userId, null, 10)).thenReturn(new SliceImpl<>(List.of(), PageRequest.of(0, 10), false));
         //when
-        Slice<?> result = chatroomQuery.getAccessibleTrandingChatroom(userId, null, 10);
+        Slice<?> result = chatroomQuery.getAccessibleTrendingChatroom(userId, null, 10);
 
         //then
-        verify(trandingChatroomCustomRepository).findAccessibleTrandingChatroomByUserIdAndBeforeIdAndSize(userId, null, 10);
+        verify(trendingChatroomCustomRepository).findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(userId, null, 10);
         assertThat(result.getNumber()).isEqualTo(0);
     }
 }
