@@ -1,8 +1,8 @@
 package kr.co.pawpaw.domainrdb.pet.domain;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@Getter
 public enum PetType {
     DOG("강아지"),
     CAT("고양이"),
@@ -20,6 +20,12 @@ public enum PetType {
         this.koreanName = koreanName;
     }
 
+    @JsonValue
+    public String getKoreanName() {
+        return this.koreanName;
+    }
+
+    @JsonCreator
     public static PetType koreanNameOf(final String koreanName) {
         for (PetType type : PetType.values()) {
             if (type.koreanName.equals(koreanName)) {
