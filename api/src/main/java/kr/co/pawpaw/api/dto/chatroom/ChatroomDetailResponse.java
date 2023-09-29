@@ -12,6 +12,8 @@ import java.util.List;
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatroomDetailResponse {
+    @Schema(description = "채팅방 아이디")
+    private Long id;
     @Schema(description = "채팅방 이름")
     private String name;
     @Schema(description = "채팅방 소개")
@@ -35,6 +37,7 @@ public class ChatroomDetailResponse {
 
     public static ChatroomDetailResponse of(final ChatroomDetailData beforeProcessDto) {
         return new ChatroomDetailResponse(
+            beforeProcessDto.getId(),
             beforeProcessDto.getName(),
             beforeProcessDto.getDescription(),
             beforeProcessDto.getCoverUrl(),
