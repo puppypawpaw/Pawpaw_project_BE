@@ -39,7 +39,6 @@ public class ChatroomScheduleService {
     private final ChatroomScheduleCommand chatroomScheduleCommand;
     private final ChatroomScheduleParticipantCommand chatroomScheduleParticipantCommand;
     private final ChatroomScheduleParticipantQuery chatroomScheduleParticipantQuery;
-    private final ChatroomParticipantQuery chatroomParticipantQuery;
     private final UserService userService;
     private final UserQuery userQuery;
     private final ChatroomQuery chatroomQuery;
@@ -50,8 +49,6 @@ public class ChatroomScheduleService {
         final Long chatroomId,
         final CreateChatroomScheduleRequest request
     ) {
-        checkChatroomParticipant(userId, chatroomId);
-
         ChatroomSchedule chatroomSchedule = createChatroomSchedule(
             userQuery.getReferenceById(userId),
             chatroomQuery.getReferenceById(chatroomId),
@@ -67,7 +64,6 @@ public class ChatroomScheduleService {
         final Long chatroomId,
         final Long chatroomScheduleId
     ) {
-        checkChatroomParticipant(userId, chatroomId);
         checkChatroomSchedule(chatroomId, chatroomScheduleId);
         createChatroomScheduleParticipant(userId, chatroomScheduleId);
     }
@@ -78,7 +74,6 @@ public class ChatroomScheduleService {
         final Long chatroomId,
         final Long chatroomScheduleId
     ) {
-        checkChatroomParticipant(userId, chatroomId);
         checkChatroomSchedule(chatroomId, chatroomScheduleId);
         deleteChatroomScheduleParticipant(userId, chatroomScheduleId);
     }
@@ -90,8 +85,6 @@ public class ChatroomScheduleService {
     ) {
         String userImageDefaultUrl = userService.getUserDefaultImageUrl();
 
-        checkChatroomParticipant(userId, chatroomId);
-
         List<ChatroomScheduleData> scheduleDataList =
             chatroomScheduleQuery.findNotEndChatroomScheduleByChatroomId(chatroomId);
 
@@ -100,6 +93,16 @@ public class ChatroomScheduleService {
         return scheduleDataList.stream()
             .map(ChatroomScheduleResponse::of)
             .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteChatroomSchedule(
+        final Long chatroomId,
+        final Long chatroomScheduleId
+    )  {
+        checkChatroomSchedule(chatroomId, chatroomScheduleId);
+
+        chatroomScheduleCommand.deleteById(chatroomId);
     }
 
     private void changeNullImageUrlToUserDefaultImageUrl(
@@ -122,15 +125,6 @@ public class ChatroomScheduleService {
             chatroom,
             user
         ));
-    }
-
-    private void checkChatroomParticipant(
-        final UserId userId,
-        final Long chatroomId
-    ) {
-        if (!chatroomParticipantQuery.existsByUserIdAndChatroomId(userId, chatroomId)) {
-            throw new NotAChatroomParticipantException();
-        }
     }
 
     private void checkChatroomSchedule(

@@ -57,8 +57,6 @@ class ChatroomScheduleServiceTest {
     @Mock
     private ChatroomScheduleParticipantCommand chatroomScheduleParticipantCommand;
     @Mock
-    private ChatroomParticipantQuery chatroomParticipantQuery;
-    @Mock
     private UserService userService;
     @Mock
     private UserQuery userQuery;
@@ -70,27 +68,10 @@ class ChatroomScheduleServiceTest {
     User user = User.builder().build();
 
     @Test
-    @DisplayName("createChatroomSchedule 메서드는 채팅방 참여자가 아니면 예외를 발생시킨다.")
-    void createChatroomScheduleNotAChatroomParticipantException() {
-        //given
-        Long chatroomId = 123L;
-        when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(false);
-        CreateChatroomScheduleRequest request = CreateChatroomScheduleRequest.builder()
-            .build();
-
-        //when
-        assertThatThrownBy(() -> chatroomScheduleService.createChatroomSchedule(user.getUserId(), chatroomId, request)).isInstanceOf(NotAChatroomParticipantException.class);
-
-        //then
-        verify(chatroomParticipantQuery).existsByUserIdAndChatroomId(user.getUserId(), chatroomId);
-    }
-
-    @Test
     @DisplayName("createChatroomSchedule 메서드는 chatroomScheduleCommand로 저장한 엔티티의 id를 필드로 가지는 createChatroomScheduleResponse를 반환한다.")
     void createChatroomSchedule() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
         //given
         Long chatroomId = 123L;
-        when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(true);
         ChatroomSchedule chatroomSchedule = ChatroomSchedule.builder()
             .build();
 
@@ -119,34 +100,17 @@ class ChatroomScheduleServiceTest {
     }
 
     @Test
-    @DisplayName("participateChatroomSchedule 메서드는 채팅방 참여자가 아니면 예외를 발생시킨다.")
-    void participateChatroomScheduleNotAChatroomParticipantException() {
-        //given
-        Long chatroomId = 123L;
-        Long chatroomScheduleId = 1234L;
-        when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(false);
-
-        //when
-        assertThatThrownBy(() -> chatroomScheduleService.participateChatroomSchedule(user.getUserId(), chatroomId, chatroomScheduleId)).isInstanceOf(NotAChatroomParticipantException.class);
-
-        //then
-        verify(chatroomParticipantQuery).existsByUserIdAndChatroomId(user.getUserId(), chatroomId);
-    }
-
-    @Test
     @DisplayName("participateChatroomSchedule 메서드는 존재하는 채팅방 스케줄이 아닌 경우에 예외를 발생시킨다.")
     void participateChatroomScheduleNotFoundChatroomScheduleException() {
         //given
         Long chatroomId = 123L;
         Long chatroomScheduleId = 1234L;
-        when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(true);
         when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(false);
 
         //when
         assertThatThrownBy(() -> chatroomScheduleService.participateChatroomSchedule(user.getUserId(), chatroomId, chatroomScheduleId)).isInstanceOf(NotFoundChatroomScheduleException.class);
 
         //then
-        verify(chatroomParticipantQuery).existsByUserIdAndChatroomId(user.getUserId(), chatroomId);
         verify(chatroomScheduleQuery).existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId);
     }
 
@@ -156,14 +120,12 @@ class ChatroomScheduleServiceTest {
         //given
         Long chatroomId = 123L;
         Long chatroomScheduleId = 1234L;
-        when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(true);
         when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(true);
 
         //when
         chatroomScheduleService.participateChatroomSchedule(user.getUserId(), chatroomId, chatroomScheduleId);
 
         //then
-        verify(chatroomParticipantQuery).existsByUserIdAndChatroomId(user.getUserId(), chatroomId);
         verify(chatroomScheduleQuery).existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId);
         verify(chatroomScheduleParticipantCommand).save(any(ChatroomScheduleParticipant.class));
     }
@@ -213,25 +175,10 @@ class ChatroomScheduleServiceTest {
         }
 
         @Test
-        @DisplayName("채팅방 참여자가 아니면 예외를 발생시킨다.")
-        void NotAChatroomParticipantException() {
-            //given
-            when(userService.getUserDefaultImageUrl()).thenReturn(defaultUserImage.getFileUrl());
-            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(false);
-
-            //when
-            assertThatThrownBy(() -> chatroomScheduleService.getNotEndChatroomScheduleList(user.getUserId(), chatroomId)).isInstanceOf(NotAChatroomParticipantException.class);
-
-            //then
-            verify(chatroomParticipantQuery).existsByUserIdAndChatroomId(user.getUserId(), chatroomId);
-        }
-
-        @Test
         @DisplayName("null인 채팅방 스케줄 참가자 이미지 url을 기본 이미지 url로 변경하고 LocalDateTime을 string으로 변환한다.")
         void changeNullParticipantImageUrlToDefaultImageUrl() {
             //given
             when(userService.getUserDefaultImageUrl()).thenReturn(defaultUserImage.getFileUrl());
-            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(true);
             when(chatroomScheduleQuery.findNotEndChatroomScheduleByChatroomId(chatroomId)).thenReturn(responseDataList);
 
             List<ChatroomScheduleResponse> resultExpected = responseDataList.stream()
@@ -264,78 +211,84 @@ class ChatroomScheduleServiceTest {
     }
 
     @Nested
-    @DisplayName("채팅방 스케줄 나가기 메서드는")
+    @DisplayName("leaveChatroomSchedule 메서드는")
     class LeaveChatroomSchedule {
         Long chatroomId = 123L;
         Long chatroomScheduleId = 1234L;
         UserId userId = UserId.create();
         ChatroomScheduleParticipant chatroomScheduleParticipant = ChatroomScheduleParticipant.builder().build();
 
-        @Nested
-        @DisplayName("채팅방 참가자가")
-        class ChatroomParticipant {
-            @Test
-            @DisplayName("아니면 예외를 발생시킨다.")
-            void NotAChatroomParticipantException() {
-                //given
+        @Test
+        @DisplayName("채팅방 스케줄이 존재하지 않으면 에외를 발생시킨다.")
+        void NotFoundChatroomScheduleException() {
+            //given
+            when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(false);
 
-                when(chatroomParticipantQuery.existsByUserIdAndChatroomId(userId, chatroomId)).thenReturn(false);
+            //when
+            assertThatThrownBy(() -> chatroomScheduleService.leaveChatroomSchedule(userId, chatroomId, chatroomScheduleId))
+                .isInstanceOf(NotFoundChatroomScheduleException.class);
 
-                //when
-                assertThatThrownBy(() -> chatroomScheduleService.leaveChatroomSchedule(userId, chatroomId, chatroomScheduleId))
-                    .isInstanceOf(NotAChatroomParticipantException.class);
+            //then
+        }
+        @Test
+        @DisplayName("채팅방 스케줄 참가자가 아니면 예외를 발생시킨다.")
+        void NotAChatroomScheduleParticipantException() {
+            //given
+            when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(true);
+            when(chatroomScheduleParticipantQuery.findByChatroomScheduleIdAndUserUserId(chatroomScheduleId, userId)).thenReturn(Optional.empty());
 
-                //then
-            }
-            @Nested
-            @DisplayName("맞고 채팅방 스케줄이")
-            class ChatroomSchedule {
-                @Test
-                @DisplayName("존재하지 않으면 에외를 발생시킨다.")
-                void NotFoundChatroomScheduleException() {
-                    //given
-                    when(chatroomParticipantQuery.existsByUserIdAndChatroomId(userId, chatroomId)).thenReturn(true);
-                    when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(false);
+            //when
+            assertThatThrownBy(() -> chatroomScheduleService.leaveChatroomSchedule(userId, chatroomId, chatroomScheduleId))
+                .isInstanceOf(NotAChatroomScheduleParticipantException.class);
 
-                    //when
-                    assertThatThrownBy(() -> chatroomScheduleService.leaveChatroomSchedule(userId, chatroomId, chatroomScheduleId))
-                        .isInstanceOf(NotFoundChatroomScheduleException.class);
+            //then
+        }
+        @Test
+        @DisplayName("chatroomScheduleParticipantCommand의 delete 메서드를 호출한다.")
+        void callDeleteMethod() {
+            //given
+            when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(true);
+            when(chatroomScheduleParticipantQuery.findByChatroomScheduleIdAndUserUserId(chatroomScheduleId, userId)).thenReturn(Optional.of(chatroomScheduleParticipant));
 
-                    //then
-                }
-                @Nested
-                @DisplayName("존재하고 채팅방 스케줄 참가자가")
-                class ChatroomScheduleParticipant {
-                    @Test
-                    @DisplayName("아니면 예외를 발생시킨다.")
-                    void NotAChatroomScheduleParticipantException() {
-                        //given
-                        when(chatroomParticipantQuery.existsByUserIdAndChatroomId(userId, chatroomId)).thenReturn(true);
-                        when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(true);
-                        when(chatroomScheduleParticipantQuery.findByChatroomScheduleIdAndUserUserId(chatroomScheduleId, userId)).thenReturn(Optional.empty());
+            //when
+            chatroomScheduleService.leaveChatroomSchedule(userId, chatroomId, chatroomScheduleId);
 
-                        //when
-                        assertThatThrownBy(() -> chatroomScheduleService.leaveChatroomSchedule(userId, chatroomId, chatroomScheduleId))
-                            .isInstanceOf(NotAChatroomScheduleParticipantException.class);
+            //then
+            verify(chatroomScheduleParticipantCommand).delete(chatroomScheduleParticipant);
+        }
+    }
 
-                        //then
-                    }
-                    @Test
-                    @DisplayName("맞으면 chatroomScheduleParticipantCommand의 delete 메서드를 호출한다.")
-                    void callDeleteMethod() {
-                        //given
-                        when(chatroomParticipantQuery.existsByUserIdAndChatroomId(userId, chatroomId)).thenReturn(true);
-                        when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(true);
-                        when(chatroomScheduleParticipantQuery.findByChatroomScheduleIdAndUserUserId(chatroomScheduleId, userId)).thenReturn(Optional.of(chatroomScheduleParticipant));
+    @Nested
+    @DisplayName("deleteChatroomSchedule 메서드는")
+    class DeleteChatroomSchedule {
+        Long chatroomId = 123L;
+        Long chatroomScheduleId = 1234L;
+        ChatroomSchedule chatroomSchedule = ChatroomSchedule.builder()
+            .build();
+        @Test
+        @DisplayName("존재하는 채팅방 스케줄이 아니면 예외가 발생한다.")
+        void notFoundChatroomScheduleException() {
+            //given
+            when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(false);
 
-                        //when
-                        chatroomScheduleService.leaveChatroomSchedule(userId, chatroomId, chatroomScheduleId);
+            //when
+            assertThatThrownBy(() -> chatroomScheduleService.deleteChatroomSchedule(chatroomId, chatroomScheduleId))
+                .isInstanceOf(NotFoundChatroomScheduleException.class);
 
-                        //then
-                        verify(chatroomScheduleParticipantCommand).delete(chatroomScheduleParticipant);
-                    }
-                }
-            }
+            //then
+        }
+
+        @Test
+        @DisplayName("chatroomScheduleCommand 의 deleteById 메서드를 호출한다.")
+        void deleteById() {
+            //given
+            when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(true);
+
+            //when
+            chatroomScheduleService.deleteChatroomSchedule(chatroomId, chatroomScheduleId);
+
+            //then
+            verify(chatroomScheduleCommand).deleteById(chatroomId);
         }
     }
 }
