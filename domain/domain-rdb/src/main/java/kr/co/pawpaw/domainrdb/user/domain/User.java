@@ -23,6 +23,7 @@ public class User extends BaseTimeEntity {
     @Column(name="real_name")
     private String name;
     private String nickname;
+    private String briefIntroduction;
     private String phoneNumber;
     @Embedded
     private Position position;
@@ -39,6 +40,7 @@ public class User extends BaseTimeEntity {
         final String password,
         final String name,
         final String nickname,
+        final String briefIntroduction,
         final String phoneNumber,
         final Position position,
         final OAuth2Provider provider,
@@ -54,6 +56,7 @@ public class User extends BaseTimeEntity {
         this.role = Role.USER;
         this.name = name;
         this.nickname = nickname;
+        this.briefIntroduction = briefIntroduction;
         this.phoneNumber = phoneNumber;
         this.position = position;
         this.provider = provider;
@@ -66,5 +69,13 @@ public class User extends BaseTimeEntity {
 
     public void updatePassword(final String password) {
         this.password = password;
+    }
+
+    public void updateProfile(
+        final String nickname,
+        final String briefIntroduction
+    ) {
+        this.nickname = nickname;
+        this.briefIntroduction = briefIntroduction;
     }
 }

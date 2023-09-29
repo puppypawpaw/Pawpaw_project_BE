@@ -5,9 +5,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
+import kr.co.pawpaw.api.dto.user.UpdateUserRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
+import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +56,29 @@ public class UserController {
         @RequestParam final MultipartFile file
     ) {
         userService.updateUserImage(userId, file);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode= "204"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 유저입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "PATCH",
+        summary = "유저 프로필 수정",
+        description = "유저 프로필 중 닉네임, 한줄 소개 수정"
+    )
+    @PatchMapping
+    public ResponseEntity<Void> updateUser(
+        @AuthenticatedUserId final UserId userId,
+        @RequestBody final UpdateUserRequest request
+    ) {
+        userService.updateUser(userId, request);
 
         return ResponseEntity.noContent().build();
     }

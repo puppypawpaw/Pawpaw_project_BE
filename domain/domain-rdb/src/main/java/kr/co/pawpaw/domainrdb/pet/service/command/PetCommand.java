@@ -15,4 +15,12 @@ public class PetCommand {
     public List<Pet> saveAll(final Iterable<Pet> pets) {
         return petRepository.saveAll(pets);
     }
+
+    public Pet save(final Pet pet) {
+        return petRepository.save(pet);
+    }
+
+    public void delete(final Pet pet) {
+        petRepository.delete(pet);
+    }
 }

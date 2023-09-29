@@ -1,7 +1,8 @@
 package kr.co.pawpaw.api.service.user;
 
-import kr.co.pawpaw.api.service.file.FileService;
+import kr.co.pawpaw.api.dto.user.UpdateUserRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
+import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
@@ -20,6 +21,7 @@ public class UserService {
     private final UserQuery userQuery;
     private final FileService fileService;
 
+    @Transactional(readOnly = true)
     public UserResponse whoAmI(final UserId userId) {
         return userQuery.findByUserId(userId)
             .map(this::getUserResponse)
@@ -40,6 +42,17 @@ public class UserService {
             fileService.deleteFileByName(user.getUserImage().getFileName());
         }
         user.updateImage(newFile);
+    }
+
+    @Transactional
+    public void updateUser(
+        final UserId userId,
+        final UpdateUserRequest updateUserRequest
+    ) {
+        User user = userQuery.findByUserId(userId)
+            .orElseThrow(NotFoundUserException::new);
+
+        user.updateProfile(updateUserRequest.getNickname(), updateUserRequest.getBriefIntroduction());
     }
 
     private UserResponse getUserResponse(final User user) {
