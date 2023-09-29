@@ -1,7 +1,9 @@
 package kr.co.pawpaw.api.service.user;
 
+import kr.co.pawpaw.api.dto.user.UpdateUserRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.api.service.file.FileService;
+import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.pet.service.command.PetCommand;
 import kr.co.pawpaw.domainrdb.pet.service.query.PetQuery;
 import kr.co.pawpaw.domainrdb.position.Position;
@@ -9,6 +11,7 @@ import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +24,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @DisplayName("UserService의")
@@ -102,6 +106,41 @@ class UserServiceTest {
 
         //then
         verify(fileService).deleteFileByName(file.getFileName());
+    }
+
+    @Nested
+    @DisplayName("updateUser 메서드는")
+    class UpdateUser {
+        private User user = User.builder().build();
+        private UpdateUserRequest request = UpdateUserRequest.builder()
+            .briefIntroduction("한줄 소개입니다.")
+            .nickname("닉네임 입니다.")
+            .build();
+        @Test
+        @DisplayName("유저가 존재하지 않으면 예외가 발생한다.")
+        void NotFoundUserException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
+
+            //when
+            assertThatThrownBy(() -> userService.updateUser(user.getUserId(), request))
+                .isInstanceOf(NotFoundUserException.class);
+
+            //then
+        }
+
+        @Test
+        @DisplayName("유저의 닉네임과 한줄 소개를 변경한다.")
+        void changeNicknameAndBriefIntroduction() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+
+            //when
+            userService.updateUser(user.getUserId(), request);
+
+            //then
+            assertThat(request).usingRecursiveComparison().isEqualTo(user);
+        }
     }
 
     @Test

@@ -14,6 +14,8 @@ public class UserResponse {
     private Role role;
     @Schema(description = "유저 닉네임", type = "STRING")
     private String nickname;
+    @Schema(description = "유저 한줄 소개", type="STRING", example="3살 강쥐 수박이, 2살 앵무새 메론")
+    private String briefIntroduction;
     @Schema(description = "유저 위치", type = "STRING")
     private PositionResponse position;
     @Schema(description = "유저 이미지 URL", type = "STRING")
@@ -23,12 +25,14 @@ public class UserResponse {
         final String email,
         final Role role,
         final String nickname,
+        final String briefIntroduction,
         final PositionResponse position,
         final String imageUrl
     ) {
         this.email = email;
         this.role = role;
         this.nickname = nickname;
+        this.briefIntroduction = briefIntroduction;
         this.position = position;
         this.imageUrl = imageUrl;
     }
@@ -41,6 +45,7 @@ public class UserResponse {
             user.getEmail(),
             user.getRole(),
             user.getNickname(),
+            user.getBriefIntroduction(),
             PositionResponse.of(user.getPosition()),
             imageUrl
         );
