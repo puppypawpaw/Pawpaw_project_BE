@@ -2,7 +2,7 @@ package kr.co.pawpaw.domainrdb.board.service.query;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pawpaw.domainrdb.board.domain.Board;
-import kr.co.pawpaw.domainrdb.board.repository.CustomBoardRepository;
+import kr.co.pawpaw.domainrdb.board.repository.BoardRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +21,18 @@ import static kr.co.pawpaw.domainrdb.user.domain.QUser.user;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class CustomBoardRepositoryImpl implements CustomBoardRepository {
+public class BoardRepositoryCustomImpl implements BoardRepositoryCustom {
 
-    private final JPAQueryFactory query;
+    private final JPAQueryFactory queryFactory;
 
     @Autowired
-    public CustomBoardRepositoryImpl(EntityManager em) {
-        this.query = new JPAQueryFactory(em);
+    public BoardRepositoryCustomImpl(EntityManager em) {
+        this.queryFactory = new JPAQueryFactory(em);
     }
 
     @Override
     public Slice<Board> getBoardListWithRepliesBy(Pageable pageable) {
-        List<Board> boards = query.selectFrom(board)
+        List<Board> boards = queryFactory.selectFrom(board)
                 .leftJoin(board.user, user).fetchJoin()
                 .leftJoin(board.reply, reply).fetchJoin()
                 .orderBy(
