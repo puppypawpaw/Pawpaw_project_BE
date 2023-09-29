@@ -2,7 +2,6 @@ package kr.co.pawpaw.api.controller.board;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -41,11 +40,11 @@ public class BoardRestController {
             @ApiResponse(responseCode = "200", description = "게시글 등록 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = BoardDto.RegisterResponseDto.class))),
-            @ApiResponse(responseCode = "400", description = "게시글 등록에 실패했습니다")
+            @ApiResponse(responseCode = "400", description = "게시글 등록에 실패했습니다", content = @Content)
     })
     @PostMapping("/register")
     public ResponseEntity<BoardDto.RegisterResponseDto> register(
-            @Parameter(description = "인증된 사용자 ID", in = ParameterIn.HEADER, required = true) @AuthenticatedUserId UserId userId,
+            @AuthenticatedUserId UserId userId,
             @RequestBody BoardDto.BoardRegisterDto registerDto) {
         BoardDto.RegisterResponseDto boardResponseDto = boardService.register(userId, registerDto);
         return ResponseEntity.ok(boardResponseDto);
@@ -60,19 +59,19 @@ public class BoardRestController {
             @ApiResponse(responseCode = "200", description = "게시글 수정 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = BoardDto.BoardUpdateDto.class))),
-            @ApiResponse(responseCode = "400", description = "게시글 수정에 실패했습니다")
+            @ApiResponse(responseCode = "400", description = "게시글 수정에 실패했습니다", content = @Content)
     })
-    @PostMapping("/update")
+    @PatchMapping("/update/{boardId}")
     public ResponseEntity<BoardDto.BoardUpdateDto> updateBoard(
-            @Parameter(description = "인증된 사용자 ID", in = ParameterIn.HEADER, required = true) @AuthenticatedUserId UserId userId,
-            @Parameter(description = "게시글 ID", required = true) @RequestParam Long boardId,
+            @AuthenticatedUserId UserId userId,
+            @Parameter(description = "게시글 ID", required = true) @PathVariable Long boardId,
             @RequestBody BoardDto.BoardUpdateDto updateDto) {
         BoardDto.BoardUpdateDto boardUpdateDto = boardService.update(userId, boardId, updateDto);
         return ResponseEntity.ok(boardUpdateDto);
     }
 
     @Operation(
-            method = "PATCH",
+            method = "DELETE",
             summary = "게시글 삭제",
             description = "게시글을 삭제한다."
     )
@@ -80,12 +79,12 @@ public class BoardRestController {
             @ApiResponse(responseCode = "200", description = "게시글 삭제 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = Boolean.class))),
-            @ApiResponse(responseCode = "400", description = "게시글 삭제에 실패했습니다")
+            @ApiResponse(responseCode = "400", description = "게시글 삭제에 실패했습니다", content = @Content)
     })
-    @PatchMapping("/remove")
+    @DeleteMapping("/remove/{boardId}")
     public ResponseEntity<Boolean> removeBoard(
-            @Parameter(description = "인증된 사용자 ID", in = ParameterIn.HEADER, required = true) @AuthenticatedUserId UserId userId,
-            @Parameter(description = "게시글 ID", required = true) @RequestParam Long boardId) {
+            @AuthenticatedUserId UserId userId,
+            @Parameter(description = "게시글 ID", required = true) @PathVariable Long boardId) {
         return ResponseEntity.ok(boardService.removeBoard(userId, boardId));
     }
 
@@ -98,11 +97,11 @@ public class BoardRestController {
             @ApiResponse(responseCode = "200", description = "게시글 리스트 조회 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = BoardListDto.class))),
-            @ApiResponse(responseCode = "400", description = "게시글 리스트 조회에 실패한다.")
+            @ApiResponse(responseCode = "400", description = "게시글 리스트 조회에 실패했습니다.", content = @Content)
     })
     @GetMapping("/list")
     public ResponseEntity<Slice<BoardListDto>> getList(
-            @Parameter(description = "인증된 사용자 ID", in = ParameterIn.HEADER, required = true) @AuthenticatedUserId UserId userId,
+            @AuthenticatedUserId UserId userId,
             @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
             @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "2") int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
@@ -118,9 +117,9 @@ public class BoardRestController {
             @ApiResponse(responseCode = "200", description = "게시글 검색 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = BoardListDto.class))),
-            @ApiResponse(responseCode = "400", description = "게시글 검색에 실패한다.")
+            @ApiResponse(responseCode = "400", description = "게시글 검색에 실패했습니다.", content = @Content)
     })
-    @GetMapping("/search/list")
+    @GetMapping("/search")
     public ResponseEntity<Slice<BoardListDto>> getSearchList(
             @AuthenticatedUserId UserId userId,
             @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,

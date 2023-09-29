@@ -13,9 +13,9 @@ public class BoardDto {
     @Schema(description = "게시글 등록 DTO")
     @Getter
     public static class BoardRegisterDto {
-        @Schema(name = "게시글 제목")
+        @Schema(name = "게시글 제목", example = "우리 댕댕이 귀엽죠?")
         private String title;
-        @Schema(name = "게시글 내용")
+        @Schema(name = "게시글 내용", example = "나이는 1살 입니다.")
         private String content;
         @Builder
         public BoardRegisterDto(String title, String content) {
@@ -49,9 +49,9 @@ public class BoardDto {
     @Schema(name = "게시글 수정 DTO")
     @Getter
     public static class BoardUpdateDto {
-        @Schema(name = "게시글 제목")
+        @Schema(name = "게시글 제목", example = "우리 냥이 귀엽죠?")
         private String title;
-        @Schema(name = "게시글 내용")
+        @Schema(name = "게시글 내용", example = "나이는 2살 입니다")
         private String content;
         @Builder
         public BoardUpdateDto(String title, String content) {

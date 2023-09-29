@@ -2,7 +2,6 @@ package kr.co.pawpaw.api.controller.boardImg;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,7 +11,6 @@ import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.boardImg.BoardImgDto;
 import kr.co.pawpaw.api.service.boardImg.BoardImgService;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -33,7 +31,7 @@ public class BoardImgRestController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 이미지 등록 성공", content = @Content(
                     schema = @Schema(implementation = BoardImgDto.BoardImgUploadDto.class))),
-            @ApiResponse(responseCode = "400", description = "이미지 업로드를 실패했습니다")
+            @ApiResponse(responseCode = "400", description = "이미지 업로드를 실패했습니다", content = @Content)
     })
     @Operation(
             method = "POST",
@@ -42,8 +40,8 @@ public class BoardImgRestController {
     )
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> upload(@Parameter(description = "게시글 ID", required = true, example = "1") @RequestParam Long boardId,
-                                       @NonNull BoardImgDto.BoardImgUploadDto uploadDto,
-                                       @Parameter(description = "인증된 사용자 ID", in = ParameterIn.HEADER, required = true) @AuthenticatedUserId UserId userId) {
+                                       @RequestBody BoardImgDto.BoardImgUploadDto uploadDto,
+                                       @AuthenticatedUserId UserId userId) {
         imgService.upload(boardId, uploadDto, userId);
         return ResponseEntity.noContent().build();
     }
@@ -51,32 +49,32 @@ public class BoardImgRestController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 이미지 수정 성공", content = @Content(
                     schema = @Schema(implementation = BoardImgDto.BoardImgUploadDto.class))),
-            @ApiResponse(responseCode = "400", description = "이미지 수정에 실패했습니다")
+            @ApiResponse(responseCode = "400", description = "이미지 수정에 실패했습니다", content = @Content)
     })
     @Operation(
             method = "Patch",
             summary = "이미지 수정",
             description = "이미지를 수정한다."
     )
-    @PatchMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> update(@Parameter(description = "게시글 ID", required = true, example = "1") @RequestParam Long boardId,
-                                       @NonNull BoardImgDto.BoardImgUploadDto uploadDto,
-                                       @Parameter(description = "인증된 사용자 ID", in = ParameterIn.HEADER, required = true) @AuthenticatedUserId UserId userId) {
+    @PatchMapping(value = "/update/{boardId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> update(@Parameter(description = "게시글 ID", required = true, example = "1") @PathVariable Long boardId,
+                                       @RequestBody BoardImgDto.BoardImgUploadDto uploadDto,
+                                       @AuthenticatedUserId UserId userId) {
         imgService.update(boardId, uploadDto, userId);
         return ResponseEntity.noContent().build();
     }
 
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200"),
-            @ApiResponse(responseCode = "400", description = "이미지 삭제를 실패했습니다")
+            @ApiResponse(responseCode = "400", description = "이미지 삭제를 실패했습니다", content = @Content)
     })
     @Operation(
             method = "DELETE",
             summary = "이미지 삭제",
             description = "이미지를 삭제 한다."
     )
-    @DeleteMapping("/remove")
-    public ResponseEntity<Void> removeImg(@Parameter(description = "게시글 ID", required = true, example = "1") @RequestParam Long boardId) {
+    @DeleteMapping("/remove/{boardId}")
+    public ResponseEntity<Void> removeImg(@Parameter(description = "게시글 ID", required = true, example = "1") @PathVariable Long boardId) {
         imgService.removeBoardImgFiles(boardId);
         return ResponseEntity.noContent().build();
     }
@@ -84,7 +82,7 @@ public class BoardImgRestController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이미지 조회 성공", content = @Content(
                     schema = @Schema(type = "array", implementation = String.class))),
-            @ApiResponse(responseCode = "400", description = "이미지 조회를 실패했습니다")
+            @ApiResponse(responseCode = "400", description = "이미지 조회를 실패했습니다", content = @Content)
     })
     @Operation(
             method = "GET",

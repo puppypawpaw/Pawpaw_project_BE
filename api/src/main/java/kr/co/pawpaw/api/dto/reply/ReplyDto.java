@@ -12,11 +12,11 @@ public class ReplyDto {
     @Getter
     @Schema(description = "댓글 등록 DTO")
     public static class ReplyRegisterDto {
-        @Schema(name = "게시글 id")
+        @Schema(name = "게시글 id", example = "1")
         private Long boardId;
-        @Schema(name = "부모 댓글 id", nullable = true)
+        @Schema(name = "부모 댓글 id", nullable = true, example = "1")
         private Long parentId;
-        @Schema(name = "댓글 내용")
+        @Schema(name = "댓글 내용", example = "댕댕이 귀엽네요")
         private String content;
     }
 
@@ -24,7 +24,7 @@ public class ReplyDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @Schema(description = "댓글 수정 DTO")
     public static class ReplyUpdateDto {
-        @Schema(name = "댓글 내용")
+        @Schema(name = "댓글 내용", example = "냥이 귀엽네요")
         private String content;
     }
 
