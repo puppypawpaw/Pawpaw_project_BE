@@ -102,20 +102,38 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<BoardListDto> getBoardListWithReplies(UserId userId, Pageable pageable) {
+    public Slice<BoardListDto> getBoardListWithRepliesBy(UserId userId, Pageable pageable) {
         userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
+
         Slice<Board> boardListWithReplies = boardQuery.getBoardListWithRepliesBy(pageable);
+
+        List<BoardListDto> boardListDtos = getBoardListDtos(userId, pageable, boardListWithReplies);
+        return new SliceImpl<>(boardListDtos, pageable, boardListWithReplies.hasNext());
+    }
+    @Transactional(readOnly = true)
+    public Slice<BoardListDto> searchBoardsByQuery(UserId userId, Pageable pageable, String query){
+        userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
+        if (!StringUtils.hasText(query) || query.isBlank())
+            throw new BoardException.BoardSearchQueryException();
+
+        Slice<Board> boardListWithRepliesForSearch = boardQuery.searchBoardsByQuery(query, pageable);
+
+        List<BoardListDto> boardListDtos = getBoardListDtos(userId, pageable, boardListWithRepliesForSearch);
+
+        return new SliceImpl<>(boardListDtos, pageable, boardListWithRepliesForSearch.hasNext());
+    }
+
+    private List<BoardListDto> getBoardListDtos(UserId userId, Pageable pageable, Slice<Board> boards) {
         // 게시글 리스트를 DTO로 변환
-        List<BoardListDto> boardListDtos = boardListWithReplies.stream()
+        List<BoardListDto> boardListDtos = boards.stream()
                 .map(this::convertBoardToDto)
                 .collect(Collectors.toList());
 
-        // 각 게시글에 대한 댓글 리스트를 가져와서 설정
         boardListDtos.forEach(boardDto -> {
             List<ReplyListDto> replyList = replyService.findReplyListByBoardId(userId, boardDto.getId(), pageable).getContent();
             boardDto.setReplyListToBoard(replyList);
         });
-        return new SliceImpl<>(boardListDtos, pageable, boardListWithReplies.hasNext());
+        return boardListDtos;
     }
 
     private BoardListDto convertBoardToDto(Board board) {

@@ -30,4 +30,10 @@ public class BoardException{
             super(ErrorCode.BOARD_DELETE_EXCEPTION);
         }
     }
+
+    public static class BoardSearchQueryException extends BusinessException{
+        public BoardSearchQueryException() {
+            super(ErrorCode.BOARD_SEARCH_QUERY_EMPTY_EXCEPTION);
+        }
+    }
 }
