@@ -13,7 +13,7 @@ import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
 import kr.co.pawpaw.api.service.chatroom.ChatroomService;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
-import kr.co.pawpaw.domainrdb.chatroom.dto.TrandingChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.TrendingChatroomResponse;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -197,11 +197,11 @@ public class ChatroomController {
         description = "뜨고있는 채팅방 목록 조회"
     )
     @GetMapping("/trending")
-    public ResponseEntity<Slice<TrandingChatroomResponse>> getTrandingChatroomList(
+    public ResponseEntity<Slice<TrendingChatroomResponse>> getTrendingChatroomList(
         @AuthenticatedUserId final UserId userId,
         @RequestParam(name = "beforeId", required = false) final Long beforeId,
         @RequestParam(name = "size", defaultValue = "12") final int size
     ) {
-        return ResponseEntity.ok(chatroomService.getTrandingChatroomList(userId, beforeId, size));
+        return ResponseEntity.ok(chatroomService.getTrendingChatroomList(userId, beforeId, size));
     }
 }
