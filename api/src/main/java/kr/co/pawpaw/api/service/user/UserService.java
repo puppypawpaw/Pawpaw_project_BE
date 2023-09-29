@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -35,10 +36,8 @@ public class UserService {
     ) {
         User user = userQuery.findByUserId(userId)
             .orElseThrow(NotFoundUserException::new);
-
         File newFile = fileService.saveFileByMultipartFile(file, userId);
-
-        if (user.getUserImage() != null) {
+        if (needDeleteFile(user.getUserImage())) {
             fileService.deleteFileByName(user.getUserImage().getFileName());
         }
         user.updateImage(newFile);
@@ -53,6 +52,10 @@ public class UserService {
             .orElseThrow(NotFoundUserException::new);
 
         user.updateProfile(updateUserRequest.getNickname(), updateUserRequest.getBriefIntroduction());
+    }
+
+    private boolean needDeleteFile(final File file) {
+        return Objects.nonNull(file) && file.getType().isNeedDelete();
     }
 
     private UserResponse getUserResponse(final User user) {

@@ -51,7 +51,11 @@ public class FileService {
         return storageRepository.getUrl(fileName);
     }
 
-    private File saveFileByInputStream(final InputStream inputStream, final ObjectMetadata metadata, final UserId userId) {
+    private File saveFileByInputStream(
+        final InputStream inputStream,
+        final ObjectMetadata metadata,
+        final UserId userId
+    ) {
         String fileName = FileUtil.createNewFileName();
 
         File file = fileCommand.save(File.builder()

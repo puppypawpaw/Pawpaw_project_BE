@@ -8,6 +8,7 @@ import kr.co.pawpaw.domainrdb.pet.service.command.PetCommand;
 import kr.co.pawpaw.domainrdb.pet.service.query.PetQuery;
 import kr.co.pawpaw.domainrdb.position.Position;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
+import kr.co.pawpaw.domainrdb.storage.domain.FileType;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import org.junit.jupiter.api.DisplayName;
@@ -77,35 +78,74 @@ class UserServiceTest {
         assertThat(userResponse.getPosition()).usingRecursiveComparison().isEqualTo(user.getPosition());
     }
 
-    @Test
-    @DisplayName("updateUserImage 기존 이미지 있을때 테스트")
-    void updateUserImageAlreadyExists() {
-        //given
+    @Nested
+    @DisplayName("updateUserImage 메서드는")
+    class updateUserImage {
         Position position = Position.builder()
             .name("name")
             .latitude(36.8)
             .longitude(36.7)
             .build();
-        File file = File.builder()
+        File defaultFile = File.builder()
             .fileName(UUID.randomUUID().toString())
+            .type(FileType.DEFAULT)
+            .build();
+        File customFile = File.builder()
+            .fileName(UUID.randomUUID().toString())
+            .type(FileType.CUSTOM)
             .build();
         User user = User.builder()
             .position(position)
-            .userImage(file)
             .build();
 
         File newFile = File.builder()
             .fileName(UUID.randomUUID().toString())
             .build();
 
-        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-        when(fileService.saveFileByMultipartFile(multipartFile, user.getUserId())).thenReturn(newFile);
+        @Test
+        @DisplayName("유저가 존재하지 않으면 예외가 발생한다.")
+        void NotFoundUserException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
 
-        //when
-        userService.updateUserImage(user.getUserId(), multipartFile);
+            //when
+            assertThatThrownBy(() -> userService.updateUserImage(user.getUserId(), multipartFile))
+                .isInstanceOf(NotFoundUserException.class);
 
-        //then
-        verify(fileService).deleteFileByName(file.getFileName());
+            //then
+        }
+
+        @Test
+        @DisplayName("기본 이미지는 이미지를 삭제하지 않고 업데이트만 수행한다.")
+        void notDeleteDefaultImageFile() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            when(fileService.saveFileByMultipartFile(multipartFile, user.getUserId())).thenReturn(newFile);
+            user.updateImage(defaultFile);
+
+            //when
+            userService.updateUserImage(user.getUserId(), multipartFile);
+
+            //then
+            verify(fileService, times(0)).deleteFileByName(any());
+            assertThat(user.getUserImage()).usingRecursiveComparison().isEqualTo(newFile);
+        }
+
+        @Test
+        @DisplayName("기본이 아닌 이미지는 이미지를 삭제하지 않고 업데이트만 수행한다.")
+        void deleteDefaultImageFile() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            when(fileService.saveFileByMultipartFile(multipartFile, user.getUserId())).thenReturn(newFile);
+            user.updateImage(customFile);
+
+            //when
+            userService.updateUserImage(user.getUserId(), multipartFile);
+
+            //then
+            verify(fileService).deleteFileByName(customFile.getFileName());
+            assertThat(user.getUserImage()).usingRecursiveComparison().isEqualTo(newFile);
+        }
     }
 
     @Nested

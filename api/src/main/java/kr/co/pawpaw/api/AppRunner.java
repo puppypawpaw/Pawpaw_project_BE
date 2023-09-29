@@ -4,7 +4,9 @@ import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomDefaultCover;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomDefaultCoverCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomDefaultCoverQuery;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
+import kr.co.pawpaw.domainrdb.storage.domain.FileType;
 import kr.co.pawpaw.domainrdb.storage.service.command.FileCommand;
+import kr.co.pawpaw.domainrdb.storage.service.query.FileQuery;
 import kr.co.pawpaw.domainrdb.term.domain.Term;
 import kr.co.pawpaw.domainrdb.term.service.command.TermCommand;
 import kr.co.pawpaw.domainrdb.term.service.query.TermQuery;
@@ -29,13 +31,28 @@ public class AppRunner implements ApplicationRunner {
     private final ChatroomDefaultCoverQuery chatroomDefaultCoverQuery;
     private final ChatroomDefaultCoverCommand chatroomDefaultCoverCommand;
     private final FileCommand fileCommand;
+    private final FileQuery fileQuery;
     private final StorageRepository storageRepository;
+    private static final String userDefaultImageName = "유저 기본 이미지.jpg";
 
     @Override
     @Transactional
     public void run(final ApplicationArguments args) {
         insertTerm();
         insertChatroomDefaultCover();
+        insertUserDefaultImage();
+    }
+
+    private void insertUserDefaultImage() {
+        if (!fileQuery.existsByFileName(userDefaultImageName)) {
+            fileCommand.save(File.builder()
+                    .byteSize(74649L)
+                    .type(FileType.DEFAULT)
+                    .contentType("image/jpeg")
+                    .fileName(userDefaultImageName)
+                    .fileUrl(storageRepository.getUrl(userDefaultImageName))
+                .build());
+        }
     }
 
     private void insertChatroomDefaultCover() {
@@ -63,42 +80,49 @@ public class AppRunner implements ApplicationRunner {
                 .fileName("채팅방 커버1.jpg")
                 .fileUrl(storageRepository.getUrl("채팅방 커버1.jpg"))
                 .contentType("image/jpeg")
+                .type(FileType.DEFAULT)
                 .byteSize(7772L)
                 .build(),
             File.builder()
                 .fileName("채팅방 커버2.jpg")
                 .fileUrl(storageRepository.getUrl("채팅방 커버2.jpg"))
                 .contentType("image/jpeg")
+                .type(FileType.DEFAULT)
                 .byteSize(9195L)
                 .build(),
             File.builder()
                 .fileName("채팅방 커버3.jpg")
                 .fileUrl(storageRepository.getUrl("채팅방 커버3.jpg"))
                 .contentType("image/jpeg")
+                .type(FileType.DEFAULT)
                 .byteSize(11069L)
                 .build(),
             File.builder()
                 .fileName("채팅방 커버4.jpg")
                 .fileUrl(storageRepository.getUrl("채팅방 커버4.jpg"))
                 .contentType("image/jpeg")
+                .type(FileType.DEFAULT)
                 .byteSize(93163L)
                 .build(),
             File.builder()
                 .fileName("채팅방 커버5.jpg")
                 .fileUrl(storageRepository.getUrl("채팅방 커버5.jpg"))
                 .contentType("image/jpeg")
+                .type(FileType.DEFAULT)
                 .byteSize(13394L)
                 .build(),
             File.builder()
                 .fileName("채팅방 커버6.jpg")
                 .fileUrl(storageRepository.getUrl("채팅방 커버6.jpg"))
                 .contentType("image/jpeg")
+                .type(FileType.DEFAULT)
                 .byteSize(10321L)
                 .build(),
             File.builder()
                 .fileName("채팅방 커버7.jpg")
                 .fileUrl(storageRepository.getUrl("채팅방 커버7.jpg"))
                 .contentType("image/jpeg")
+                .type(FileType.DEFAULT)
                 .byteSize(20592L)
                 .build()
         ));
