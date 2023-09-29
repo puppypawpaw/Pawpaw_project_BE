@@ -1,5 +1,6 @@
 package kr.co.pawpaw.api;
 
+import kr.co.pawpaw.api.util.user.UserUtil;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomDefaultCover;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomDefaultCoverCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomDefaultCoverQuery;
@@ -33,8 +34,6 @@ public class AppRunner implements ApplicationRunner {
     private final FileCommand fileCommand;
     private final FileQuery fileQuery;
     private final StorageRepository storageRepository;
-    private static final String userDefaultImageName = "유저 기본 이미지.jpg";
-
     @Override
     @Transactional
     public void run(final ApplicationArguments args) {
@@ -44,13 +43,13 @@ public class AppRunner implements ApplicationRunner {
     }
 
     private void insertUserDefaultImage() {
-        if (!fileQuery.existsByFileName(userDefaultImageName)) {
+        if (!fileQuery.existsByFileName(UserUtil.getUserDefaultImageName())) {
             fileCommand.save(File.builder()
                     .byteSize(74649L)
                     .type(FileType.DEFAULT)
                     .contentType("image/jpeg")
-                    .fileName(userDefaultImageName)
-                    .fileUrl(storageRepository.getUrl(userDefaultImageName))
+                    .fileName(UserUtil.getUserDefaultImageName())
+                    .fileUrl(storageRepository.getUrl(UserUtil.getUserDefaultImageName()))
                 .build());
         }
     }

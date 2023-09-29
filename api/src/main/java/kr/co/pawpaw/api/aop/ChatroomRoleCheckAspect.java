@@ -24,10 +24,10 @@ public class ChatroomRoleCheckAspect {
     private final ChatroomParticipantQuery chatroomParticipantQuery;
 
     @Around("@annotation(chatroomRoleCheck)")
-    public void chatroomRoleCheck(
+    public Object chatroomRoleCheck(
         final ProceedingJoinPoint joinPoint,
         final ChatroomRoleCheck chatroomRoleCheck
-    ) {
+    ) throws Throwable {
         ChatroomParticipantRole role = chatroomRoleCheck.role();
         Object[] args = joinPoint.getArgs();
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();;
@@ -56,5 +56,7 @@ public class ChatroomRoleCheckAspect {
         if (!isManager && role.equals(ChatroomParticipantRole.MANAGER)) {
             throw new PermissionRequiredException();
         }
+
+        return joinPoint.proceed();
     }
 }

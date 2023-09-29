@@ -1,10 +1,8 @@
 package kr.co.pawpaw.api.service.chatroom;
 
-import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
+import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.file.FileService;
+import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.api.util.file.FileUtil;
 import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
@@ -13,6 +11,7 @@ import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverExcept
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.chatroom.domain.*;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomParticipantResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.TrendingChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
@@ -33,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,6 +48,7 @@ public class ChatroomService {
     private final ChatroomQuery chatroomQuery;
     private final UserQuery userQuery;
     private final FileService fileService;
+    private final UserService userService;
 
     @Transactional
     public CreateChatroomResponse createChatroom(
@@ -114,6 +116,21 @@ public class ChatroomService {
         }
 
         chatroomParticipantCommand.delete(chatroomParticipant);
+    }
+
+    public List<ChatroomParticipantResponse> getChatroomParticipantResponseList(final Long chatroomId) {
+        String defaultImageUrl = userService.getUserDefaultImageUrl();
+
+        return chatroomParticipantQuery.getChatroomParticipantResponseList(chatroomId)
+            .stream()
+            .peek(updateToDefaultIfNull(defaultImageUrl))
+            .collect(Collectors.toList());
+    }
+
+    private static Consumer<ChatroomParticipantResponse> updateToDefaultIfNull(String defaultImageUrl) {
+        return response -> {
+            if (Objects.isNull(response.getImageUrl())) response.updateImageUrl(defaultImageUrl);
+        };
     }
 
     public List<ChatroomDetailResponse> getParticipatedChatroomList(final UserId userId) {

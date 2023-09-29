@@ -5,13 +5,16 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import kr.co.pawpaw.api.aop.ChatroomRoleCheck;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
 import kr.co.pawpaw.api.service.chatroom.ChatroomService;
+import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomParticipantResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.TrendingChatroomResponse;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
@@ -203,5 +206,27 @@ public class ChatroomController {
         @RequestParam(name = "size", defaultValue = "12") final int size
     ) {
         return ResponseEntity.ok(chatroomService.getTrendingChatroomList(userId, beforeId, size));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "GET",
+        summary = "채팅방 참여자 목록 조회",
+        description = "채팅방 참여자 목록 조회"
+    )
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.PARTICIPANT)
+    @GetMapping("/{chatroomId}/participants")
+    public ResponseEntity<List<ChatroomParticipantResponse>> getChatroomParticipantList(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long chatroomId
+    ) {
+        return ResponseEntity.ok(chatroomService.getChatroomParticipantResponseList(chatroomId));
     }
 }

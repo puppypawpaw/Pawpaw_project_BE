@@ -3,22 +3,28 @@ package kr.co.pawpaw.api.service.chatroom;
 import kr.co.pawpaw.api.dto.chatroom.ChatroomScheduleResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleResponse;
+import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.api.util.time.TimeUtil;
+import kr.co.pawpaw.api.util.user.UserUtil;
 import kr.co.pawpaw.common.exception.chatroom.NotAChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAChatroomScheduleParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomScheduleException;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomSchedule;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomScheduleParticipant;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomScheduleData;
+import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomScheduleParticipantResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomScheduleCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomScheduleParticipantCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomScheduleParticipantQuery;
 import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomScheduleQuery;
+import kr.co.pawpaw.domainrdb.storage.domain.File;
+import kr.co.pawpaw.domainrdb.storage.service.query.FileQuery;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,6 +40,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -51,6 +58,8 @@ class ChatroomScheduleServiceTest {
     private ChatroomScheduleParticipantCommand chatroomScheduleParticipantCommand;
     @Mock
     private ChatroomParticipantQuery chatroomParticipantQuery;
+    @Mock
+    private UserService userService;
     @Mock
     private UserQuery userQuery;
     @Mock
@@ -159,36 +168,32 @@ class ChatroomScheduleServiceTest {
         verify(chatroomScheduleParticipantCommand).save(any(ChatroomScheduleParticipant.class));
     }
 
-    @Test
-    @DisplayName("getNotEndChatroomScheduleList 메서드는 채팅방 참여자가 아니면 예외를 발생시킨다.")
-    void getNotEndChatroomScheduleListNotAChatroomParticipantException() {
-        //given
+    @Nested
+    @DisplayName("getNotEndChatroomScheduleList")
+    class GetNotEndChatroomScheduleList {
         Long chatroomId = 123L;
-        when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(false);
+        File defaultUserImage = File.builder()
+            .fileName(UserUtil.getUserDefaultImageName())
+            .fileUrl("기본 url")
+            .build();
 
-        //when
-        assertThatThrownBy(() -> chatroomScheduleService.getNotEndChatroomScheduleList(user.getUserId(), chatroomId)).isInstanceOf(NotAChatroomParticipantException.class);
-
-        //then
-        verify(chatroomParticipantQuery).existsByUserIdAndChatroomId(user.getUserId(), chatroomId);
-    }
-
-    @Test
-    @DisplayName("getNotEndChatroomScheduleList 메서드는 chatroomScheduleQuery의 findNotEndChatroomScheduleByChatroomId 를 호출하고 ChatroomScheduleData의 LocalDateTime을 string으로 변환한다.")
-    void getNotEndChatroomScheduleList() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        //given
-        Long chatroomId = 123L;
-        when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(true);
-        ChatroomScheduleData responseData = new ChatroomScheduleData(
+        List<ChatroomScheduleData> responseDataList = List.of(new ChatroomScheduleData(
             1L,
             "name",
             "schedule",
             LocalDateTime.now(),
             LocalDateTime.now(),
-            List.of()
-        );
-
-        List<ChatroomScheduleData> responseDataList = List.of(responseData);
+            List.of(
+                new ChatroomScheduleParticipantResponse(
+                    "null image",
+                    null
+                ),
+                new ChatroomScheduleParticipantResponse(
+                    "not null image",
+                    "imageUrl"
+                )
+            )
+        ));
 
         Constructor<ChatroomScheduleResponse> constructor = ChatroomScheduleResponse.class.getDeclaredConstructor(
             Long.class,
@@ -199,28 +204,63 @@ class ChatroomScheduleServiceTest {
             Collection.class
         );
 
-        constructor.setAccessible(true);
+        GetNotEndChatroomScheduleList() throws NoSuchMethodException {
+        }
 
-        List<ChatroomScheduleResponse> resultExpected = List.of(
-            constructor.newInstance(
-                responseData.getId(),
-                responseData.getName(),
-                responseData.getDescription(),
-                TimeUtil.localDateTimeToDefaultTimeString(responseData.getStartDate()),
-                TimeUtil.localDateTimeToDefaultTimeString(responseData.getEndDate()),
-                List.of()
-            )
-        );
+        @BeforeEach
+        void setup() {
+            constructor.setAccessible(true);
+        }
 
-        when(chatroomScheduleQuery.findNotEndChatroomScheduleByChatroomId(chatroomId)).thenReturn(responseDataList);
+        @Test
+        @DisplayName("채팅방 참여자가 아니면 예외를 발생시킨다.")
+        void NotAChatroomParticipantException() {
+            //given
+            when(userService.getUserDefaultImageUrl()).thenReturn(defaultUserImage.getFileUrl());
+            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(false);
 
-        //when
-        List<ChatroomScheduleResponse> result = chatroomScheduleService.getNotEndChatroomScheduleList(user.getUserId(), chatroomId);
+            //when
+            assertThatThrownBy(() -> chatroomScheduleService.getNotEndChatroomScheduleList(user.getUserId(), chatroomId)).isInstanceOf(NotAChatroomParticipantException.class);
 
-        //then
-        verify(chatroomParticipantQuery).existsByUserIdAndChatroomId(user.getUserId(), chatroomId);
-        verify(chatroomScheduleQuery).findNotEndChatroomScheduleByChatroomId(chatroomId);
-        assertThat(result).usingRecursiveComparison().isEqualTo(resultExpected);
+            //then
+            verify(chatroomParticipantQuery).existsByUserIdAndChatroomId(user.getUserId(), chatroomId);
+        }
+
+        @Test
+        @DisplayName("null인 채팅방 스케줄 참가자 이미지 url을 기본 이미지 url로 변경하고 LocalDateTime을 string으로 변환한다.")
+        void changeNullParticipantImageUrlToDefaultImageUrl() {
+            //given
+            when(userService.getUserDefaultImageUrl()).thenReturn(defaultUserImage.getFileUrl());
+            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)).thenReturn(true);
+            when(chatroomScheduleQuery.findNotEndChatroomScheduleByChatroomId(chatroomId)).thenReturn(responseDataList);
+
+            List<ChatroomScheduleResponse> resultExpected = responseDataList.stream()
+                .map(data -> {
+                    data.getParticipants().forEach(
+                        participantResponse -> participantResponse.updateImageUrl(defaultUserImage.getFileUrl())
+                    );
+
+                    try {
+                        return constructor.newInstance(
+                            data.getId(),
+                            data.getName(),
+                            data.getDescription(),
+                            TimeUtil.localDateTimeToDefaultTimeString(data.getStartDate()),
+                            TimeUtil.localDateTimeToDefaultTimeString(data.getEndDate()),
+                            data.getParticipants()
+                        );
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).collect(Collectors.toList());
+
+            //when
+            List<ChatroomScheduleResponse> result = chatroomScheduleService.getNotEndChatroomScheduleList(user.getUserId(), chatroomId);
+
+            //then
+            assertThat(result).usingRecursiveComparison()
+                .isEqualTo(resultExpected);
+        }
     }
 
     @Nested

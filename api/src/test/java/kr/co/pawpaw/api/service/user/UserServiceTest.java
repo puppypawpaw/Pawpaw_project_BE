@@ -3,12 +3,14 @@ package kr.co.pawpaw.api.service.user;
 import kr.co.pawpaw.api.dto.user.UpdateUserRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.api.service.file.FileService;
+import kr.co.pawpaw.api.util.user.UserUtil;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.pet.service.command.PetCommand;
 import kr.co.pawpaw.domainrdb.pet.service.query.PetQuery;
 import kr.co.pawpaw.domainrdb.position.Position;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.storage.domain.FileType;
+import kr.co.pawpaw.domainrdb.storage.service.query.FileQuery;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
 import org.junit.jupiter.api.DisplayName;
@@ -36,13 +38,9 @@ class UserServiceTest {
     @Mock
     private FileService fileService;
     @Mock
-    private PetCommand petCommand;
-    @Mock
-    private PetQuery petQuery;
-    @Mock
-    private EntityManager em;
-    @Mock
     private MultipartFile multipartFile;
+    @Mock
+    private FileQuery fileQuery;
     @InjectMocks
     private UserService userService;
 
@@ -180,6 +178,41 @@ class UserServiceTest {
 
             //then
             assertThat(request).usingRecursiveComparison().isEqualTo(user);
+        }
+    }
+
+    @Nested
+    @DisplayName("getUserDefaultImageUrl 메서드는")
+    class GetUserDefaultImageUrl {
+        File userDefaultImage = File.builder()
+            .fileName("기본 이미지")
+            .fileUrl("파일 URL")
+            .build();
+
+        @Test
+        @DisplayName("fileRepository에 userDefaultImage파일이 없으면 null을 반환한다.")
+        void returnNull() {
+            //given
+            when(fileQuery.findByFileName(UserUtil.getUserDefaultImageName())).thenReturn(Optional.empty());
+
+            //when
+            String result = userService.getUserDefaultImageUrl();
+
+            //then
+            assertThat(result).isNull();
+        }
+
+        @Test
+        @DisplayName("fileRepository에 userDefaultImage파일이 존재하면 file의 url을 반환한다.")
+        void returnUrl() {
+            //given
+            when(fileQuery.findByFileName(UserUtil.getUserDefaultImageName())).thenReturn(Optional.of(userDefaultImage));
+
+            //when
+            String result = userService.getUserDefaultImageUrl();
+
+            //then
+            assertThat(result).isEqualTo(userDefaultImage.getFileUrl());
         }
     }
 
