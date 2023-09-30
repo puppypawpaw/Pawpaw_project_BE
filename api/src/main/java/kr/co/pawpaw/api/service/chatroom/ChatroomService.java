@@ -255,6 +255,7 @@ public class ChatroomService {
             ChatroomParticipant.builder()
                 .chatroom(chatroomQuery.getReferenceById(chatroomId))
                 .user(userQuery.getReferenceById(request.getUserId()))
+                .role(ChatroomParticipantRole.PARTICIPANT)
                 .build());
     }
 }

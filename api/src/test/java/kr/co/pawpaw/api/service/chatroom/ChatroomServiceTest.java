@@ -582,6 +582,7 @@ class ChatroomServiceTest {
         private ChatroomParticipant chatroomParticipant = ChatroomParticipant.builder()
             .chatroom(chatroom)
             .user(user)
+            .role(ChatroomParticipantRole.PARTICIPANT)
             .build();
 
         @Test
@@ -611,7 +612,7 @@ class ChatroomServiceTest {
             //then
             ArgumentCaptor<ChatroomParticipant> captor = ArgumentCaptor.forClass(ChatroomParticipant.class);
             verify(chatroomParticipantCommand).save(captor.capture());
-            assertThat(captor.getValue()).usingRecursiveComparison().isEqualTo(chatroomParticipant);
+            assertThat(chatroomParticipant).usingRecursiveComparison().isEqualTo(captor.getValue());
         }
     }
 }

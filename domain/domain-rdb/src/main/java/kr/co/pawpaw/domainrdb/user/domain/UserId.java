@@ -1,5 +1,7 @@
 package kr.co.pawpaw.domainrdb.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -15,7 +17,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserId implements Serializable {
-    @Column(name = "user_id")
+    @JsonValue @Column(name = "user_id")
     private String value;
 
     private UserId(final String value) {
@@ -26,6 +28,7 @@ public class UserId implements Serializable {
         return new UserId(UUID.randomUUID().toString());
     }
 
+    @JsonCreator
     public static UserId of(final String uuid) {
         return new UserId(uuid);
     }
