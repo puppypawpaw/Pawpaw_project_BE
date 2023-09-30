@@ -1,19 +1,27 @@
 package kr.co.pawpaw.domainrdb.user.service.query;
 
+import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomNonParticipantResponse;
 import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
 import kr.co.pawpaw.domainrdb.user.domain.Role;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.domainrdb.user.repository.UserCustomRepository;
 import kr.co.pawpaw.domainrdb.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserQuery {
     private final UserRepository userRepository;
+    private final UserCustomRepository userCustomRepository;
+
+    public List<ChatroomNonParticipantResponse> searchChatroomNonParticipant(final Long chatroomId, final String nicknameSearchKeyword) {
+        return userCustomRepository.searchChatroomNonParticipant(chatroomId, nicknameSearchKeyword);
+    }
 
     public boolean existsByEmailAndProvider(final String email, final OAuth2Provider provider) {
         return userRepository.existsByEmailAndProvider(email, provider);
