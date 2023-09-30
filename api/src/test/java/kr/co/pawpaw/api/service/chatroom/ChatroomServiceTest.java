@@ -1,9 +1,6 @@
 package kr.co.pawpaw.api.service.chatroom;
 
-import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
+import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomParticipantException;
@@ -557,6 +554,64 @@ class ChatroomServiceTest {
 
             //then
             assertThat(result).usingRecursiveComparison().isEqualTo(nonNullResponseList);
+        }
+    }
+
+    @Nested
+    @DisplayName("inviteUser 메서드는")
+    class InviteUser {
+        private InviteChatroomUserRequest request = InviteChatroomUserRequest.builder()
+            .userId(UserId.create())
+            .build();
+        private Long chatroomId = 123L;
+        private Chatroom chatroom = Chatroom.builder()
+            .name("chatroom-name")
+            .description("chatroom-description")
+            .hashTagList(List.of("hashtag-1", "hashtag-2"))
+            .searchable(true)
+            .locationLimit(false)
+            .build();
+        private User user = User.builder()
+            .email("user-email")
+            .password("user-password")
+            .name("user-name")
+            .nickname("user-nickname")
+            .briefIntroduction("user-briefIntroduction")
+            .phoneNumber("user-phoneNumber")
+            .build();
+        private ChatroomParticipant chatroomParticipant = ChatroomParticipant.builder()
+            .chatroom(chatroom)
+            .user(user)
+            .build();
+
+        @Test
+        @DisplayName("이미 참여한 유저를 초대하면 예외가 발생한다.")
+        void AlreadyChatroomParticipantException() {
+            //given
+            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(request.getUserId(), chatroomId)).thenReturn(true);
+
+            //when
+            assertThatThrownBy(() -> chatroomService.inviteUser(chatroomId, request))
+                .isInstanceOf(AlreadyChatroomParticipantException.class);
+
+            //then
+        }
+
+        @Test
+        @DisplayName("ChatroomParticipantCommand의 save메서드를 호출한다.")
+        void callSaveMethod() {
+            //given
+            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(request.getUserId(), chatroomId)).thenReturn(false);
+            when(chatroomQuery.getReferenceById(chatroomId)).thenReturn(chatroom);
+            when(userQuery.getReferenceById(request.getUserId())).thenReturn(user);
+
+            //when
+            chatroomService.inviteUser(chatroomId, request);
+
+            //then
+            ArgumentCaptor<ChatroomParticipant> captor = ArgumentCaptor.forClass(ChatroomParticipant.class);
+            verify(chatroomParticipantCommand).save(captor.capture());
+            assertThat(captor.getValue()).usingRecursiveComparison().isEqualTo(chatroomParticipant);
         }
     }
 }

@@ -1,9 +1,6 @@
 package kr.co.pawpaw.api.service.chatroom;
 
-import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
+import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.api.util.file.FileUtil;
@@ -50,6 +47,16 @@ public class ChatroomService {
     private final UserService userService;
 
     @Transactional
+    public void inviteUser(
+        final Long chatroomId,
+        final InviteChatroomUserRequest request
+    ) {
+        checkAlreadyChatroomParticipant(chatroomId, request.getUserId());
+
+        createChatroomParticipantByChatroomIdAndInviteChatroomUserRequest(chatroomId, request);
+    }
+
+    @Transactional
     public CreateChatroomResponse createChatroom(
         final UserId userId,
         final CreateChatroomRequest request,
@@ -92,7 +99,7 @@ public class ChatroomService {
         User user = userQuery.findByUserId(userId)
             .orElseThrow(NotFoundUserException::new);
 
-        checkAlreadyChatroomParticipant(chatroomId, user);
+        checkAlreadyChatroomParticipant(chatroomId, user.getUserId());
 
         joinChatroomAsParticipant(chatroomId, user);
 
@@ -181,9 +188,9 @@ public class ChatroomService {
 
     private void checkAlreadyChatroomParticipant(
         final Long chatroomId,
-        final User user
+        final UserId userId
     ) {
-        if (chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroomId)) {
+        if (chatroomParticipantQuery.existsByUserIdAndChatroomId(userId, chatroomId)) {
             throw new AlreadyChatroomParticipantException();
         }
     }
@@ -238,5 +245,16 @@ public class ChatroomService {
         final File coverFile
     ) {
         return chatroomCommand.save(request.toChatroom(coverFile));
+    }
+
+    private void createChatroomParticipantByChatroomIdAndInviteChatroomUserRequest(
+        final Long chatroomId,
+        final InviteChatroomUserRequest request
+    ) {
+        chatroomParticipantCommand.save(
+            ChatroomParticipant.builder()
+                .chatroom(chatroomQuery.getReferenceById(chatroomId))
+                .user(userQuery.getReferenceById(request.getUserId()))
+                .build());
     }
 }

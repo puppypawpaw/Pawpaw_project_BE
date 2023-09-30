@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pawpaw.api.aop.ChatroomRoleCheck;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
-import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
+import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.chatroom.ChatroomService;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.domainrdb.chatroom.dto.*;
@@ -106,7 +103,7 @@ public class ChatroomController {
         ),
         @ApiResponse(
             responseCode= "409",
-            description = "이미 참여한 채팅방입니다.",
+            description = "이미 채팅방에 참여하였습니다.",
             content = @Content
         )
     })
@@ -233,6 +230,11 @@ public class ChatroomController {
             responseCode = "400",
             description = "채팅방 참여자가 아닙니다.",
             content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "권한이 부족합니다.",
+            content = @Content
         )
     })
     @Operation(
@@ -240,7 +242,7 @@ public class ChatroomController {
         summary = "채팅방 미참여 유저 검색",
         description = "채팅방 미참여 유저 검색"
     )
-    @ChatroomRoleCheck(role = ChatroomParticipantRole.PARTICIPANT)
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.MANAGER)
     @GetMapping("/{chatroomId}/non-participants")
     public ResponseEntity<List<ChatroomNonParticipantResponse>> searchChatroomNonParticipants(
         @AuthenticatedUserId final UserId userId,
@@ -248,5 +250,40 @@ public class ChatroomController {
         @RequestParam final String nickname
     ) {
         return ResponseEntity.ok(chatroomService.searchChatroomNonParticipants(chatroomId, nickname));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "권한이 부족합니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode= "409",
+            description = "이미 채팅방에 참여하였습니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "POST",
+        summary = "채팅방 유저 초대",
+        description = "채팅방 유저 초대"
+    )
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.MANAGER)
+    @PostMapping("/{chatroomId}/invite")
+    public ResponseEntity<Void> inviteUser(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long chatroomId,
+        @Valid @RequestBody final InviteChatroomUserRequest request
+    ) {
+        chatroomService.inviteUser(chatroomId, request);
+
+        return ResponseEntity.noContent().build();
     }
 }
