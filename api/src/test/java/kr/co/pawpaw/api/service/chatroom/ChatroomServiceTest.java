@@ -528,6 +528,7 @@ class ChatroomServiceTest {
         String nicknameKeyword = "nickname";
         List<ChatroomNonParticipantResponse> nullResponseList = List.of(
             new ChatroomNonParticipantResponse(
+                UserId.create(),
                 "nickname",
                 "briefIntroduction",
                 null
@@ -537,6 +538,7 @@ class ChatroomServiceTest {
         List<ChatroomNonParticipantResponse> nonNullResponseList = nullResponseList
             .stream()
             .map(response -> new ChatroomNonParticipantResponse(
+                response.getUserId(),
                 response.getNickname(),
                 response.getBriefIntroduction(),
                 defaultImageUrl

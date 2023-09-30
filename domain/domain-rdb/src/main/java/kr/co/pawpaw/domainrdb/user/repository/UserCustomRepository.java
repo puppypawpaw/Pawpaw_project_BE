@@ -28,6 +28,7 @@ public class UserCustomRepository {
         final String nicknameSearchKeyword
     ) {
         return queryFactory.select(new QChatroomNonParticipantResponse(
+                qUser.userId,
                 qUser.nickname,
                 qUser.briefIntroduction,
                 qFile.fileUrl
