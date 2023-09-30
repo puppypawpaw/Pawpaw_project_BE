@@ -13,10 +13,7 @@ import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
 import kr.co.pawpaw.api.service.chatroom.ChatroomService;
 import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomParticipantResponse;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
-import kr.co.pawpaw.domainrdb.chatroom.dto.TrendingChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.*;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
@@ -228,5 +225,28 @@ public class ChatroomController {
         @PathVariable final Long chatroomId
     ) {
         return ResponseEntity.ok(chatroomService.getChatroomParticipantResponseList(chatroomId));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "GET",
+        summary = "채팅방 미참여 유저 검색",
+        description = "채팅방 미참여 유저 검색"
+    )
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.PARTICIPANT)
+    @GetMapping("/{chatroomId}/non-participants")
+    public ResponseEntity<List<ChatroomNonParticipantResponse>> searchChatroomNonParticipants(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long chatroomId,
+        @RequestParam final String nickname
+    ) {
+        return ResponseEntity.ok(chatroomService.searchChatroomNonParticipants(chatroomId, nickname));
     }
 }

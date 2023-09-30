@@ -1,11 +1,10 @@
 package kr.co.pawpaw.api.service.chatroom;
 
-import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
-import kr.co.pawpaw.api.service.chatroom.ChatroomService;
-import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
+import kr.co.pawpaw.api.dto.chatroom.CreateChatroomWithDefaultCoverRequest;
+import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
@@ -13,10 +12,7 @@ import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
 import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.chatroom.domain.*;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomDetailData;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomParticipantResponse;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.dto.*;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.TrendingChatroomCommand;
@@ -45,12 +41,12 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -501,14 +497,13 @@ class ChatroomServiceTest {
                 ChatroomParticipantRole.PARTICIPANT
             )
         );
-        List<ChatroomParticipantResponse> nonNullresponseList = List.of(
-            new ChatroomParticipantResponse(
-                "nickname",
-                "briefIntroduction",
+        List<ChatroomParticipantResponse> nonNullResponseList = nullResponseList.stream()
+            .map(response -> new ChatroomParticipantResponse(
+                response.getNickname(),
+                response.getBriefIntroduction(),
                 defaultImageUrl,
-                ChatroomParticipantRole.PARTICIPANT
-            )
-        );
+                response.getRole()
+            )).collect(Collectors.toList());
 
         @Test
         @DisplayName("ChatroomParticipantResponse의 ImageUrl이 null이면 기본 이미지 URL로 변경한다.")
@@ -521,7 +516,45 @@ class ChatroomServiceTest {
             List<ChatroomParticipantResponse> result = chatroomService.getChatroomParticipantResponseList(chatroomId);
 
             //then
-            assertThat(nonNullresponseList).usingRecursiveComparison().isEqualTo(result);
+            assertThat(nonNullResponseList).usingRecursiveComparison().isEqualTo(result);
+        }
+    }
+
+    @Nested
+    @DisplayName("searchChatroomNonParticipants 메서드는")
+    class SearchChatroomNonParticipants {
+        String defaultImageUrl = "기본 이미지 URL";
+        Long chatroomId = 1234L;
+        String nicknameKeyword = "nickname";
+        List<ChatroomNonParticipantResponse> nullResponseList = List.of(
+            new ChatroomNonParticipantResponse(
+                "nickname",
+                "briefIntroduction",
+                null
+            )
+        );
+
+        List<ChatroomNonParticipantResponse> nonNullResponseList = nullResponseList
+            .stream()
+            .map(response -> new ChatroomNonParticipantResponse(
+                response.getNickname(),
+                response.getBriefIntroduction(),
+                defaultImageUrl
+            )).collect(Collectors.toList());
+
+        @Test
+        @DisplayName("ChatroomNonParticipantResponse의 ImageUrl이 null이면 기본 이미지 URL로 변경한다.")
+        void changeDefaultImageUrl() {
+            //given
+            when(userService.getUserDefaultImageUrl()).thenReturn(defaultImageUrl);
+            when(userQuery.searchChatroomNonParticipant(chatroomId, nicknameKeyword)).thenReturn(nullResponseList);
+
+
+            //when
+            List<ChatroomNonParticipantResponse> result = chatroomService.searchChatroomNonParticipants(chatroomId, nicknameKeyword);
+
+            //then
+            assertThat(result).usingRecursiveComparison().isEqualTo(nonNullResponseList);
         }
     }
 }
