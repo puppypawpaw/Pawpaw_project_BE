@@ -11,6 +11,7 @@ import kr.co.pawpaw.api.dto.chatroom.ChatroomScheduleResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleResponse;
 import kr.co.pawpaw.api.service.chatroom.ChatroomScheduleService;
+import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,11 @@ public class ChatroomScheduleController {
             description = "채팅방 참여자가 아닙니다.",
             content = @Content
         ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "권한이 부족합니다.",
+            content = @Content
+        )
     })
     @Operation(
         method = "POST",
@@ -67,7 +73,8 @@ public class ChatroomScheduleController {
         summary = "채팅방 스케줄 참가",
         description = "채팅방 스케줄 참가"
     )
-    @PostMapping("/{scheduleId}")
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.PARTICIPANT)
+    @PostMapping("/{scheduleId}/participant")
     public ResponseEntity<Void> participateChatroomSchedule(
         @AuthenticatedUserId final UserId userId,
         @PathVariable(value = "chatroomId") final Long chatroomId,
@@ -91,6 +98,7 @@ public class ChatroomScheduleController {
         summary = "종료되지 않은 채팅방 스케줄 조회",
         description = "종료되지 않은 채팅방 스케줄 조회"
     )
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.PARTICIPANT)
     @GetMapping
     public ResponseEntity<List<ChatroomScheduleResponse>> getNotEndChatroomSchedule(
         @AuthenticatedUserId final UserId userId,
@@ -117,13 +125,49 @@ public class ChatroomScheduleController {
             content = @Content
         )
     })
-    @DeleteMapping("/{scheduleId}")
+    @Operation(
+        method = "DELETE",
+        summary = "채팅방 스케줄 나가기",
+        description = "채팅방 스케줄 나가기"
+    )
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.PARTICIPANT)
+    @DeleteMapping("/{scheduleId}/participant")
     public ResponseEntity<Void> leaveChatroomSchedule(
         @AuthenticatedUserId final UserId userId,
         @PathVariable(value = "chatroomId") final Long chatroomId,
         @PathVariable(value = "scheduleId") final Long scheduleId
     ) {
         chatroomScheduleService.leaveChatroomSchedule(userId, chatroomId, scheduleId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "권한이 부족합니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "DELETE",
+        summary = "채팅방 스케줄 삭제하기",
+        description = "채팅방 스케줄 삭제하기(방장만 가능)"
+    )
+    @ChatroomRoleCheck
+    @DeleteMapping("/{scheduleId}")
+    public ResponseEntity<Void> deleteChatroomSchedule(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable(value = "chatroomId") final Long chatroomId,
+        @PathVariable(value = "scheduleId") final Long scheduleId
+    ) {
+        chatroomScheduleService.deleteChatroomSchedule(chatroomId, scheduleId);
 
         return ResponseEntity.noContent().build();
     }

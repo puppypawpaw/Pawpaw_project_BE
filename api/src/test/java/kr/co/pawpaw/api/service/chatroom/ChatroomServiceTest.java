@@ -6,6 +6,7 @@ import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.dto.chatroom.ChatroomDetailResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomResponse;
+import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
@@ -14,6 +15,7 @@ import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.domainrdb.chatroom.domain.*;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomCoverResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomDetailData;
+import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomParticipantResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
 import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
@@ -71,6 +73,8 @@ class ChatroomServiceTest {
     private UserQuery userQuery;
     @Mock
     private FileService fileService;
+    @Mock
+    private UserService userService;
     @Mock
     private MultipartFile multipartFile;
     @InjectMocks
@@ -482,5 +486,42 @@ class ChatroomServiceTest {
 
         //then
         verify(chatroomQuery).getAccessibleTrendingChatroom(userId, beforeId, size);
+    }
+
+    @Nested
+    @DisplayName("getChatroomParticipantResponseList 메서드는")
+    class GetChatroomParticipantResponseList {
+        String defaultImageUrl = "기본 이미지 URL";
+        Long chatroomId = 12345L;
+        List<ChatroomParticipantResponse> nullResponseList = List.of(
+            new ChatroomParticipantResponse(
+                "nickname",
+                "briefIntroduction",
+                null,
+                ChatroomParticipantRole.PARTICIPANT
+            )
+        );
+        List<ChatroomParticipantResponse> nonNullresponseList = List.of(
+            new ChatroomParticipantResponse(
+                "nickname",
+                "briefIntroduction",
+                defaultImageUrl,
+                ChatroomParticipantRole.PARTICIPANT
+            )
+        );
+
+        @Test
+        @DisplayName("ChatroomParticipantResponse의 ImageUrl이 null이면 기본 이미지 URL로 변경한다.")
+        void changeDefaultImageUrl() {
+            //given
+            when(userService.getUserDefaultImageUrl()).thenReturn(defaultImageUrl);
+            when(chatroomParticipantQuery.getChatroomParticipantResponseList(chatroomId)).thenReturn(nullResponseList);
+
+            //when
+            List<ChatroomParticipantResponse> result = chatroomService.getChatroomParticipantResponseList(chatroomId);
+
+            //then
+            assertThat(nonNullresponseList).usingRecursiveComparison().isEqualTo(result);
+        }
     }
 }

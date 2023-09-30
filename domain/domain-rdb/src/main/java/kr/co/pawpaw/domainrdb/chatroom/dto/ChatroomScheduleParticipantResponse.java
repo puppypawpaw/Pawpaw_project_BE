@@ -16,4 +16,8 @@ public class ChatroomScheduleParticipantResponse {
         this.nickname = nickname;
         this.imageUrl = imageUrl;
     }
+
+    public void updateImageUrl(final String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

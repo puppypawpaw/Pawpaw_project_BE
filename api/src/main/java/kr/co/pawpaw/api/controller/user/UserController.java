@@ -11,6 +11,7 @@ import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,7 +51,10 @@ public class UserController {
         summary = "유저 유저 이미지 생성 또는 업데이트",
         description = "유저 유저 이미지 생성 또는 업데이트"
     )
-    @PutMapping("/image")
+    @PutMapping(
+        value = "/image",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public ResponseEntity<Void> updateUserImage(
         @AuthenticatedUserId final UserId userId,
         @RequestParam final MultipartFile file
