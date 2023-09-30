@@ -1,12 +1,12 @@
 package kr.co.pawpaw.api.service.user;
 
-import kr.co.pawpaw.api.dto.user.UpdateUserRequest;
+import kr.co.pawpaw.api.dto.position.PositionRequest;
+import kr.co.pawpaw.api.dto.user.UpdateUserPositionRequest;
+import kr.co.pawpaw.api.dto.user.UpdateUserProfileRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.util.user.UserUtil;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.domainrdb.pet.service.command.PetCommand;
-import kr.co.pawpaw.domainrdb.pet.service.query.PetQuery;
 import kr.co.pawpaw.domainrdb.position.Position;
 import kr.co.pawpaw.domainrdb.storage.domain.File;
 import kr.co.pawpaw.domainrdb.storage.domain.FileType;
@@ -22,7 +22,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.EntityManager;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -150,7 +149,7 @@ class UserServiceTest {
     @DisplayName("updateUser 메서드는")
     class UpdateUser {
         private User user = User.builder().build();
-        private UpdateUserRequest request = UpdateUserRequest.builder()
+        private UpdateUserProfileRequest request = UpdateUserProfileRequest.builder()
             .briefIntroduction("한줄 소개입니다.")
             .nickname("닉네임 입니다.")
             .build();
@@ -161,7 +160,7 @@ class UserServiceTest {
             when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
 
             //when
-            assertThatThrownBy(() -> userService.updateUser(user.getUserId(), request))
+            assertThatThrownBy(() -> userService.updateUserProfile(user.getUserId(), request))
                 .isInstanceOf(NotFoundUserException.class);
 
             //then
@@ -174,7 +173,7 @@ class UserServiceTest {
             when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
 
             //when
-            userService.updateUser(user.getUserId(), request);
+            userService.updateUserProfile(user.getUserId(), request);
 
             //then
             assertThat(request).usingRecursiveComparison().isEqualTo(user);
@@ -240,5 +239,56 @@ class UserServiceTest {
 
         //then
         verify(fileService, times(0)).deleteFileByName(any());
+    }
+
+    @Nested
+    @DisplayName("updateUserPosition 메서드는")
+    class UpdateUserPosition {
+        private Position oldPosition = Position.builder()
+            .name("old")
+            .latitude(12.3)
+            .longitude(12.4)
+            .build();
+        private Position newPosition = Position.builder()
+            .name("new")
+            .latitude(32.1)
+            .longitude(32.2)
+            .build();
+        private User user = User.builder()
+            .position(oldPosition)
+            .build();
+        private UpdateUserPositionRequest request = UpdateUserPositionRequest.builder()
+            .position(PositionRequest.builder()
+                .name(newPosition.getName())
+                .latitude(newPosition.getLatitude())
+                .longitude(newPosition.getLongitude())
+                .build())
+            .build();
+
+        @Test
+        @DisplayName("존재하지 않는 유저면 예외를 발생한다.")
+        void NotFoundUserException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
+
+            //when
+            assertThatThrownBy(() -> userService.updateUserPosition(user.getUserId(), request))
+                .isInstanceOf(NotFoundUserException.class);
+
+            //then
+        }
+
+        @Test
+        @DisplayName("유저의 position을 request의 내용으로 변경한다.")
+        void changeUserPositionByRequest() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+
+            //when
+            userService.updateUserPosition(user.getUserId(), request);
+
+            //then
+            assertThat(user.getPosition()).usingRecursiveComparison().isEqualTo(newPosition);
+        }
     }
 }

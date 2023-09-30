@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UpdateUserRequest {
+public class UpdateUserProfileRequest {
     @NotBlank
     @Schema(description = "유저 닉네임", example = "수박이")
     private String nickname;

@@ -78,4 +78,10 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
         this.briefIntroduction = briefIntroduction;
     }
+
+    public void updatePosition(
+        final Position position
+    ) {
+        this.position = position;
+    }
 }

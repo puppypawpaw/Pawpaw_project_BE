@@ -1,6 +1,7 @@
 package kr.co.pawpaw.api.service.user;
 
-import kr.co.pawpaw.api.dto.user.UpdateUserRequest;
+import kr.co.pawpaw.api.dto.user.UpdateUserPositionRequest;
+import kr.co.pawpaw.api.dto.user.UpdateUserProfileRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.util.user.UserUtil;
@@ -32,6 +33,17 @@ public class UserService {
     }
 
     @Transactional
+    public void updateUserPosition(
+        final UserId userId,
+        final UpdateUserPositionRequest request
+    ) {
+        User user = userQuery.findByUserId(userId)
+            .orElseThrow(NotFoundUserException::new);
+
+        user.updatePosition(request.getPosition().toEntity());
+    }
+
+    @Transactional
     public void updateUserImage(
         final UserId userId,
         final MultipartFile file
@@ -46,14 +58,14 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(
+    public void updateUserProfile(
         final UserId userId,
-        final UpdateUserRequest updateUserRequest
+        final UpdateUserProfileRequest updateUserProfileRequest
     ) {
         User user = userQuery.findByUserId(userId)
             .orElseThrow(NotFoundUserException::new);
 
-        user.updateProfile(updateUserRequest.getNickname(), updateUserRequest.getBriefIntroduction());
+        user.updateProfile(updateUserProfileRequest.getNickname(), updateUserProfileRequest.getBriefIntroduction());
     }
 
     @Transactional(readOnly = true)
