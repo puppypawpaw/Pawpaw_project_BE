@@ -2,10 +2,10 @@ package kr.co.pawpaw.api.aop;
 
 import kr.co.pawpaw.common.exception.chatroom.NotAChatroomParticipantException;
 import kr.co.pawpaw.common.exception.common.PermissionRequiredException;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipant;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
-import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipant;
+import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
+import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomParticipantQuery;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.jupiter.api.DisplayName;

@@ -2,10 +2,10 @@ package kr.co.pawpaw.api.dto.auth;
 
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.api.dto.position.PositionRequest;
-import kr.co.pawpaw.domainrdb.pet.domain.Pet;
-import kr.co.pawpaw.domainrdb.pet.domain.PetType;
-import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
-import kr.co.pawpaw.domainrdb.user.domain.User;
+import kr.co.pawpaw.mysql.pet.domain.Pet;
+import kr.co.pawpaw.mysql.pet.domain.PetType;
+import kr.co.pawpaw.mysql.user.domain.OAuth2Provider;
+import kr.co.pawpaw.mysql.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

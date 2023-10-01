@@ -1,9 +1,9 @@
 package kr.co.pawpaw.api.service.file;
 
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import kr.co.pawpaw.domainrdb.storage.domain.File;
-import kr.co.pawpaw.domainrdb.storage.service.command.FileCommand;
-import kr.co.pawpaw.domainrdb.user.domain.User;
+import kr.co.pawpaw.mysql.storage.domain.File;
+import kr.co.pawpaw.mysql.storage.service.command.FileCommand;
+import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.objectStorage.repository.StorageRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -2,8 +2,8 @@ package kr.co.pawpaw.api.service.auth;
 
 import kr.co.pawpaw.api.dto.user.UserEmailResponse;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.domainrdb.user.domain.User;
-import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import kr.co.pawpaw.mysql.user.domain.User;
+import kr.co.pawpaw.mysql.user.service.query.UserQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

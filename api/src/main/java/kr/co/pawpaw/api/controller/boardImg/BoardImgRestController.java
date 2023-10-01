@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.boardImg.BoardImgDto;
 import kr.co.pawpaw.api.service.boardImg.BoardImgService;
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;

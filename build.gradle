@@ -56,11 +56,15 @@ project(':domain') {
 
 }
 
-project(':domain:domain-redis') {
+project(':domain:redis') {
 
 }
 
-project(':domain:domain-rdb') {
+project(':domain:mysql') {
+
+}
+
+project(':domain:dynamodb') {
 
 }
 
@@ -86,8 +90,8 @@ project(':infrastructure:mail') {
 
 project(':api') {
     dependencies {
-        implementation project(path: ':domain:domain-rdb', configuration: 'default')
-        implementation project(path: ':domain:domain-redis', configuration: 'default')
+        implementation project(path: ':domain:mysql', configuration: 'default')
+        implementation project(path: ':domain:redis', configuration: 'default')
         implementation project(path: ':common', configuration: 'default')
         implementation project(path: ':infrastructure:feign-client', configuration: 'default')
         implementation project(path: ':infrastructure:object-storage', configuration: 'default')
@@ -97,8 +101,8 @@ project(':api') {
 
 project(':socket') {
     dependencies {
-        implementation project(path: ':domain:domain-rdb', configuration: 'default')
-        implementation project(path: ':domain:domain-redis', configuration: 'default')
+        implementation project(path: ':domain:mysql', configuration: 'default')
+        implementation project(path: ':domain:redis', configuration: 'default')
         implementation project(path: ':common', configuration: 'default')
     }
 }

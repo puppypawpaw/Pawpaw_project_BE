@@ -1,6 +1,6 @@
 package kr.co.pawpaw.api.dto.term;
 
-import kr.co.pawpaw.domainrdb.term.domain.Term;
+import kr.co.pawpaw.mysql.term.domain.Term;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

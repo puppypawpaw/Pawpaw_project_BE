@@ -11,7 +11,7 @@ import kr.co.pawpaw.api.config.annotation.CheckPermission;
 import kr.co.pawpaw.api.dto.term.CreateTermRequest;
 import kr.co.pawpaw.api.dto.term.TermResponse;
 import kr.co.pawpaw.api.dto.term.UpdateTermRequest;
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -4,8 +4,8 @@ import kr.co.pawpaw.api.dto.user.UserEmailResponse;
 import kr.co.pawpaw.api.util.mask.MaskUtil;
 import kr.co.pawpaw.api.util.time.TimeUtil;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.domainrdb.user.domain.User;
-import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import kr.co.pawpaw.mysql.user.domain.User;
+import kr.co.pawpaw.mysql.user.service.query.UserQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

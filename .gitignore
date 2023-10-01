@@ -237,7 +237,7 @@ gradle-app.setting
 src/main/java/com/fc/final7/global/config
 
 # QueryDSL
-domain/domain-rdb/src/main/generated
+domain/mysql/src/main/generated
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,intellij+all,gradle,java
 /docker/data/
@@ -245,3 +245,5 @@ domain/domain-rdb/src/main/generated
 README.md
 api/src/main/resources/application-secret.yml
 socket/src/main/resources/application-secret.yml
+/docker/rabbitmq
+/docker/rabbitmq.conf/

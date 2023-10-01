@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.dto.user;
 
-import kr.co.pawpaw.domainrdb.position.Position;
-import kr.co.pawpaw.domainrdb.user.domain.User;
+import kr.co.pawpaw.mysql.position.Position;
+import kr.co.pawpaw.mysql.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

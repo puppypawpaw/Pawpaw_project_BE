@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.dto.chatroom;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
+import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

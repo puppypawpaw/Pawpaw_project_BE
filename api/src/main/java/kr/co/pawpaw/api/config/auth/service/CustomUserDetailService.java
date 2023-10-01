@@ -1,8 +1,8 @@
 package kr.co.pawpaw.api.config.auth.service;
 
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.domainrdb.user.domain.User;
-import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import kr.co.pawpaw.mysql.user.domain.User;
+import kr.co.pawpaw.mysql.user.service.query.UserQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

@@ -1,6 +1,6 @@
 package kr.co.pawpaw.api.dto.position;
 
-import kr.co.pawpaw.domainrdb.position.Position;
+import kr.co.pawpaw.mysql.position.Position;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;

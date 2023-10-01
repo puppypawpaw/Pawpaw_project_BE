@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.dto.position;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pawpaw.domainrdb.position.Position;
+import kr.co.pawpaw.mysql.position.Position;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;

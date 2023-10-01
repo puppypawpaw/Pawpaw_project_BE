@@ -2,11 +2,11 @@ package kr.co.pawpaw.api.config.auth.service;
 
 import kr.co.pawpaw.api.config.auth.object.OAuth2Attributes;
 import kr.co.pawpaw.api.config.auth.object.OAuth2CustomUser;
-import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
-import kr.co.pawpaw.domainrdb.user.domain.Role;
-import kr.co.pawpaw.domainrdb.user.domain.User;
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import kr.co.pawpaw.mysql.user.domain.OAuth2Provider;
+import kr.co.pawpaw.mysql.user.domain.Role;
+import kr.co.pawpaw.mysql.user.domain.User;
+import kr.co.pawpaw.mysql.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.service.query.UserQuery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

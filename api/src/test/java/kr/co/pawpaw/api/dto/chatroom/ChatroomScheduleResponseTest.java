@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.dto.chatroom;
 
 import kr.co.pawpaw.api.util.time.TimeUtil;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomScheduleData;
+import kr.co.pawpaw.mysql.chatroom.dto.ChatroomScheduleData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

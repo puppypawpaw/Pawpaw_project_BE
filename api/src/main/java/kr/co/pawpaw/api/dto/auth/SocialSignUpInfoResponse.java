@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.dto.auth;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pawpaw.domainredis.auth.domain.OAuth2TempAttributes;
+import kr.co.pawpaw.redis.auth.domain.OAuth2TempAttributes;
 import lombok.Getter;
 
 @Getter
