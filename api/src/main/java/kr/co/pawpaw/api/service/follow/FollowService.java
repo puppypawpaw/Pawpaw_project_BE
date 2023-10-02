@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class FollowService {
@@ -38,9 +41,27 @@ public class FollowService {
                 .toUserId(toUserId)
                 .build();
 
-
-
             return followCommand.save(follow);
+        };
+
+//    @SneakyThrows
+    public void unfollowing(UserId userId, String toUserId){
+        User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
+        String fromUserId = user.getUserId().getValue();
+
+//        JsonNode jsonNode = objectMapper.readTree(toUserId);
+//        toUserId = jsonNode.get("toUserId").asText();
+
+        if(!followQuery.findByFromUserIdAndToUserId(fromUserId,toUserId).isEmpty()) {
+            List<Follow> byFromUserIdAndToUserId = followQuery.findByFromUserIdAndToUserId(fromUserId, toUserId);
+            byFromUserIdAndToUserId.stream().forEach(follow -> {
+                followCommand.delete(follow);
+            });
+
+        }else{
+            throw new RuntimeException("팔로우한 계정만 언팔로우 가능합니다.");
         }
+    }
+
     }
 

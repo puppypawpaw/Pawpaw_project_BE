@@ -14,4 +14,7 @@ public class FollowCommand {
     public Follow save(Follow follow){
         return followRepository.save(follow);
     }
+    public void delete(Follow follow){
+        followRepository.delete(follow);
+    }
 }
