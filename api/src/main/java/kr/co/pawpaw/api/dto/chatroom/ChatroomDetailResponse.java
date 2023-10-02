@@ -2,7 +2,7 @@ package kr.co.pawpaw.api.dto.chatroom;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.api.util.time.TimeUtil;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomDetailData;
+import kr.co.pawpaw.mysql.chatroom.dto.ChatroomDetailData;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

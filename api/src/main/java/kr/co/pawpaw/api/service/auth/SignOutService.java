@@ -1,9 +1,9 @@
 package kr.co.pawpaw.api.service.auth;
 
 import kr.co.pawpaw.api.util.cookie.CookieUtil;
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import kr.co.pawpaw.domainredis.auth.domain.TokenType;
-import kr.co.pawpaw.domainredis.auth.service.command.RefreshTokenCommand;
+import kr.co.pawpaw.mysql.user.domain.UserId;
+import kr.co.pawpaw.redis.auth.domain.TokenType;
+import kr.co.pawpaw.redis.auth.service.command.RefreshTokenCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

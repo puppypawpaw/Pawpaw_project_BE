@@ -8,19 +8,19 @@ import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
 import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.domainrdb.chatroom.domain.*;
-import kr.co.pawpaw.domainrdb.chatroom.dto.*;
-import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomCommand;
-import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomParticipantCommand;
-import kr.co.pawpaw.domainrdb.chatroom.service.command.TrendingChatroomCommand;
-import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomDefaultCoverQuery;
-import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomParticipantQuery;
-import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomQuery;
-import kr.co.pawpaw.domainrdb.chatroom.service.query.TrendingChatroomQuery;
-import kr.co.pawpaw.domainrdb.storage.domain.File;
-import kr.co.pawpaw.domainrdb.user.domain.User;
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import kr.co.pawpaw.mysql.chatroom.domain.*;
+import kr.co.pawpaw.mysql.chatroom.dto.*;
+import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomCommand;
+import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomParticipantCommand;
+import kr.co.pawpaw.mysql.chatroom.service.command.TrendingChatroomCommand;
+import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomDefaultCoverQuery;
+import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomParticipantQuery;
+import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomQuery;
+import kr.co.pawpaw.mysql.chatroom.service.query.TrendingChatroomQuery;
+import kr.co.pawpaw.mysql.storage.domain.File;
+import kr.co.pawpaw.mysql.user.domain.User;
+import kr.co.pawpaw.mysql.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.service.query.UserQuery;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -141,9 +141,9 @@ class ChatroomServiceTest {
                     @DisplayName("null이면 fileService의 saveFileByMultipartFile메서드를 호출하지 않는다.")
                     void nullNotCallSaveFileByMultipartFile() {
                         //given
-                        kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
+                        kr.co.pawpaw.mysql.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
                         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-                        when(chatroomCommand.save(any(kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+                        when(chatroomCommand.save(any(kr.co.pawpaw.mysql.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
                         //when
                         chatroomService.createChatroom(user.getUserId(), request, null);
                         //then
@@ -154,9 +154,9 @@ class ChatroomServiceTest {
                     @DisplayName("길이가 0이면 fileService의 saveFileByMultipartFile메서드를 호출하지 않는다.")
                     void zeroLenNotCallSaveFileByMultipartFile() throws IOException {
                         //given
-                        kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
+                        kr.co.pawpaw.mysql.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
                         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-                        when(chatroomCommand.save(any(kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+                        when(chatroomCommand.save(any(kr.co.pawpaw.mysql.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
                         when(multipartFile.getBytes()).thenReturn(new byte[0]);
 
                         //when
@@ -170,13 +170,13 @@ class ChatroomServiceTest {
                     @DisplayName("정상이면 생성된 chatroom의 Id를 필드로 가지는 CreateChatroomResponse를 반환한다.")
                     void returnCreateChatroomResponse() throws IllegalAccessException, IOException, NoSuchFieldException {
                         //given
-                        kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
+                        kr.co.pawpaw.mysql.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
                         Field idField = chatroom.getClass().getDeclaredField("id");
                         idField.setAccessible(true);
                         Long id = 1234L;
                         idField.set(chatroom, id);
                         when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-                        when(chatroomCommand.save(any(kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+                        when(chatroomCommand.save(any(kr.co.pawpaw.mysql.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
                         when(multipartFile.getBytes()).thenReturn(new byte[file.getByteSize().intValue()]);
                         when(fileService.saveFileByMultipartFile(multipartFile, user.getUserId())).thenReturn(file);
                         //when
@@ -230,13 +230,13 @@ class ChatroomServiceTest {
                 @DisplayName("존재하면 생성된 chatroom의 Id를 필드로 가지는 CreateChatroomResponse를 반환한다.")
                 void returnCreateChatroomResponse() throws NoSuchFieldException, IllegalAccessException {
                     //given
-                    kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom chatroom = requestWithDefaultCover.toChatroom(file);
+                    Chatroom chatroom = requestWithDefaultCover.toChatroom(file);
                     Field idField = chatroom.getClass().getDeclaredField("id");
                     idField.setAccessible(true);
                     idField.set(chatroom, requestWithDefaultCover.getCoverId());
                     when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
                     when(chatroomDefaultCoverQuery.findById(requestWithDefaultCover.getCoverId())).thenReturn(Optional.of(cover));
-                    when(chatroomCommand.save(any(kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+                    when(chatroomCommand.save(any(Chatroom.class))).thenReturn(chatroom);
 
                     //when
                     CreateChatroomResponse response = chatroomService.createChatroomWithDefaultCover(user.getUserId(), requestWithDefaultCover);

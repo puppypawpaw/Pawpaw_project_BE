@@ -1,8 +1,9 @@
 rootProject.name = 'Pawpaw_project_BE'
 
 include 'domain'
-include 'domain:domain-rdb'
-include 'domain:domain-redis'
+include 'domain:mysql'
+include 'domain:redis'
+include 'domain:dynamodb'
 include 'socket'
 include 'api'
 include 'common'

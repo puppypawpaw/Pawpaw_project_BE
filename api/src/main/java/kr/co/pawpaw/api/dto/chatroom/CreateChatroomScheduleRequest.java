@@ -1,9 +1,9 @@
 package kr.co.pawpaw.api.dto.chatroom;
 
 import kr.co.pawpaw.api.util.time.TimeUtil;
-import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomSchedule;
-import kr.co.pawpaw.domainrdb.user.domain.User;
+import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
+import kr.co.pawpaw.mysql.chatroom.domain.ChatroomSchedule;
+import kr.co.pawpaw.mysql.user.domain.User;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;

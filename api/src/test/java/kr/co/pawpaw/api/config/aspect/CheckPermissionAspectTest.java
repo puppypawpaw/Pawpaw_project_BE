@@ -2,9 +2,9 @@ package kr.co.pawpaw.api.config.aspect;
 
 import kr.co.pawpaw.api.config.annotation.CheckPermission;
 import kr.co.pawpaw.common.exception.common.PermissionRequiredException;
-import kr.co.pawpaw.domainrdb.user.domain.Role;
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
-import kr.co.pawpaw.domainrdb.user.service.query.UserQuery;
+import kr.co.pawpaw.mysql.user.domain.Role;
+import kr.co.pawpaw.mysql.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.service.query.UserQuery;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

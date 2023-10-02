@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.config.auth.object;
 
-import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
-import kr.co.pawpaw.domainrdb.user.domain.User;
+import kr.co.pawpaw.mysql.user.domain.OAuth2Provider;
+import kr.co.pawpaw.mysql.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

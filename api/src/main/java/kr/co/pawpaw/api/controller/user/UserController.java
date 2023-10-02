@@ -10,7 +10,7 @@ import kr.co.pawpaw.api.dto.user.UpdateUserPositionRequest;
 import kr.co.pawpaw.api.dto.user.UpdateUserProfileRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.api.service.user.UserService;
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

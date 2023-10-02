@@ -1,6 +1,6 @@
 package kr.co.pawpaw.api.config.auth.object;
 
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;

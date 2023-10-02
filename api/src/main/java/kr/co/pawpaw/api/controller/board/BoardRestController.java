@@ -11,7 +11,7 @@ import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.board.BoardDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;
 import kr.co.pawpaw.api.service.board.BoardService;
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

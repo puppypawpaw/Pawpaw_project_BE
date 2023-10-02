@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.dto.auth;
 
-import kr.co.pawpaw.domainrdb.user.domain.OAuth2Provider;
-import kr.co.pawpaw.domainredis.auth.domain.OAuth2TempAttributes;
+import kr.co.pawpaw.mysql.user.domain.OAuth2Provider;
+import kr.co.pawpaw.redis.auth.domain.OAuth2TempAttributes;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;

@@ -1,6 +1,6 @@
 package kr.co.pawpaw.api.config.annotation;
 
-import kr.co.pawpaw.domainrdb.user.domain.Role;
+import kr.co.pawpaw.mysql.user.domain.Role;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

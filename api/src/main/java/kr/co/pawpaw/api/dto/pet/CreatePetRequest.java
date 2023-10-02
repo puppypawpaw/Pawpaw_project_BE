@@ -1,9 +1,9 @@
 package kr.co.pawpaw.api.dto.pet;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pawpaw.domainrdb.pet.domain.Pet;
-import kr.co.pawpaw.domainrdb.pet.domain.PetType;
-import kr.co.pawpaw.domainrdb.user.domain.User;
+import kr.co.pawpaw.mysql.pet.domain.Pet;
+import kr.co.pawpaw.mysql.pet.domain.PetType;
+import kr.co.pawpaw.mysql.user.domain.User;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;

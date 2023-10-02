@@ -1,9 +1,9 @@
 package kr.co.pawpaw.api.service.mail;
 
-import kr.co.pawpaw.domainrdb.email.domain.EmailLog;
-import kr.co.pawpaw.domainrdb.email.domain.EmailType;
-import kr.co.pawpaw.domainrdb.email.service.command.EmailLogCommand;
-import kr.co.pawpaw.domainrdb.user.domain.User;
+import kr.co.pawpaw.mysql.email.domain.EmailLog;
+import kr.co.pawpaw.mysql.email.domain.EmailType;
+import kr.co.pawpaw.mysql.email.service.command.EmailLogCommand;
+import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mail.dto.SendEmailRequest;
 import kr.co.pawpaw.mail.service.EmailService;
 import org.junit.jupiter.api.DisplayName;

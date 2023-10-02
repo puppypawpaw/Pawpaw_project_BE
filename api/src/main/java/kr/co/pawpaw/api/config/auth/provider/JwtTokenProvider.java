@@ -3,7 +3,7 @@ package kr.co.pawpaw.api.config.auth.provider;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import kr.co.pawpaw.api.config.property.JwtProperties;
-import kr.co.pawpaw.domainredis.auth.domain.TokenType;
+import kr.co.pawpaw.redis.auth.domain.TokenType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;

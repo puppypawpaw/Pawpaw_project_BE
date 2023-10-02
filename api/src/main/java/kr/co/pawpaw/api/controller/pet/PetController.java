@@ -11,7 +11,7 @@ import kr.co.pawpaw.api.dto.pet.CreatePetResponse;
 import kr.co.pawpaw.api.dto.pet.PetResponse;
 import kr.co.pawpaw.api.dto.pet.PetTypeResponse;
 import kr.co.pawpaw.api.service.pet.PetService;
-import kr.co.pawpaw.domainrdb.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -1,8 +1,8 @@
 package kr.co.pawpaw.api.dto.chatroom;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
-import kr.co.pawpaw.domainrdb.storage.domain.File;
+import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
+import kr.co.pawpaw.mysql.storage.domain.File;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;

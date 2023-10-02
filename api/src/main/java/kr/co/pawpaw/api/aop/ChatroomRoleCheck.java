@@ -1,6 +1,6 @@
 package kr.co.pawpaw.api.aop;
 
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomParticipantRole;
+import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

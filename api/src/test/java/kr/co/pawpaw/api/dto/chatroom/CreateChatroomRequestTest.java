@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.dto.chatroom;
 
-import kr.co.pawpaw.domainrdb.chatroom.domain.Chatroom;
-import kr.co.pawpaw.domainrdb.storage.domain.File;
+import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
+import kr.co.pawpaw.mysql.storage.domain.File;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

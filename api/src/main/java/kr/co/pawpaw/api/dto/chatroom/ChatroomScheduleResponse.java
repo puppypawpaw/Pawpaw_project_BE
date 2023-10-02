@@ -1,8 +1,8 @@
 package kr.co.pawpaw.api.dto.chatroom;
 
 import kr.co.pawpaw.api.util.time.TimeUtil;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomScheduleData;
-import kr.co.pawpaw.domainrdb.chatroom.dto.ChatroomScheduleParticipantResponse;
+import kr.co.pawpaw.mysql.chatroom.dto.ChatroomScheduleData;
+import kr.co.pawpaw.mysql.chatroom.dto.ChatroomScheduleParticipantResponse;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

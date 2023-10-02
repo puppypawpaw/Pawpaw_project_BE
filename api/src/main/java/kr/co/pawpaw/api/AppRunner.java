@@ -1,16 +1,16 @@
 package kr.co.pawpaw.api;
 
 import kr.co.pawpaw.api.util.user.UserUtil;
-import kr.co.pawpaw.domainrdb.chatroom.domain.ChatroomDefaultCover;
-import kr.co.pawpaw.domainrdb.chatroom.service.command.ChatroomDefaultCoverCommand;
-import kr.co.pawpaw.domainrdb.chatroom.service.query.ChatroomDefaultCoverQuery;
-import kr.co.pawpaw.domainrdb.storage.domain.File;
-import kr.co.pawpaw.domainrdb.storage.domain.FileType;
-import kr.co.pawpaw.domainrdb.storage.service.command.FileCommand;
-import kr.co.pawpaw.domainrdb.storage.service.query.FileQuery;
-import kr.co.pawpaw.domainrdb.term.domain.Term;
-import kr.co.pawpaw.domainrdb.term.service.command.TermCommand;
-import kr.co.pawpaw.domainrdb.term.service.query.TermQuery;
+import kr.co.pawpaw.mysql.chatroom.domain.ChatroomDefaultCover;
+import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomDefaultCoverCommand;
+import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomDefaultCoverQuery;
+import kr.co.pawpaw.mysql.storage.domain.File;
+import kr.co.pawpaw.mysql.storage.domain.FileType;
+import kr.co.pawpaw.mysql.storage.service.command.FileCommand;
+import kr.co.pawpaw.mysql.storage.service.query.FileQuery;
+import kr.co.pawpaw.mysql.term.domain.Term;
+import kr.co.pawpaw.mysql.term.service.command.TermCommand;
+import kr.co.pawpaw.mysql.term.service.query.TermQuery;
 import kr.co.pawpaw.objectStorage.repository.StorageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;

@@ -2,7 +2,7 @@ package kr.co.pawpaw.api.dto.term;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pawpaw.domainrdb.term.domain.Term;
+import kr.co.pawpaw.mysql.term.domain.Term;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;

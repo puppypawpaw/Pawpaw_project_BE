@@ -1,6 +1,6 @@
 package kr.co.pawpaw.api.dto.pet;
 
-import kr.co.pawpaw.domainrdb.pet.domain.PetType;
+import kr.co.pawpaw.mysql.pet.domain.PetType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

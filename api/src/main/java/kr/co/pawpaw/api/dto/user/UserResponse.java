@@ -2,8 +2,8 @@ package kr.co.pawpaw.api.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.api.dto.position.PositionResponse;
-import kr.co.pawpaw.domainrdb.user.domain.Role;
-import kr.co.pawpaw.domainrdb.user.domain.User;
+import kr.co.pawpaw.mysql.user.domain.Role;
+import kr.co.pawpaw.mysql.user.domain.User;
 import lombok.Getter;
 
 @Getter
