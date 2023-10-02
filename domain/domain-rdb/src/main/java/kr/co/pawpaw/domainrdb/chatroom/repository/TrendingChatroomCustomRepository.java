@@ -5,8 +5,8 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroom;
 import kr.co.pawpaw.domainrdb.chatroom.domain.QChatroomParticipant;
-import kr.co.pawpaw.domainrdb.chatroom.domain.QTrendingChatroom;
-import kr.co.pawpaw.domainrdb.chatroom.dto.QTrendingChatroomResponse;
+import kr.co.pawpaw.domainrdb.chatroom.domain.QTrandingChatroom;
+import kr.co.pawpaw.domainrdb.chatroom.dto.QTrandingChatroomResponse;
 import kr.co.pawpaw.domainrdb.chatroom.dto.TrendingChatroomResponse;
 import kr.co.pawpaw.domainrdb.storage.domain.QFile;
 import kr.co.pawpaw.domainrdb.user.domain.QUser;
@@ -31,7 +31,7 @@ public class TrendingChatroomCustomRepository {
     private static final QChatroomParticipant qChatroomParticipantManager = new QChatroomParticipant("qChatroomParticipantManager");
     private static final QUser qUserManager = QUser.user;
     private static final QFile qFileManager = new QFile("qFileManager");
-    private static final QTrendingChatroom qTrendingChatroom = QTrendingChatroom.trendingChatroom;
+    private static final QTrandingChatroom qTrendingChatroom = QTrandingChatroom.trandingChatroom;
 
     public Slice<TrendingChatroomResponse> findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(
         final UserId userId,
@@ -49,7 +49,7 @@ public class TrendingChatroomCustomRepository {
         }
 
         List<TrendingChatroomResponse> chatroomResponseList = queryFactory.select(
-            new QTrendingChatroomResponse(
+            new QTrandingChatroomResponse(
                 qChatroom.id,
                 qTrendingChatroom.id,
                 qChatroom.name,

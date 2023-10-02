@@ -1,6 +1,8 @@
 package kr.co.pawpaw.domainrdb.follow.domain;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import kr.co.pawpaw.domainrdb.common.BaseTimeEntity;
+import kr.co.pawpaw.domainrdb.follow.dto.FollowDTO;
 import kr.co.pawpaw.domainrdb.user.domain.User;
 import kr.co.pawpaw.domainrdb.user.domain.UserId;
 import lombok.*;
@@ -23,4 +25,8 @@ public class Follow extends BaseTimeEntity {
         this.fromUserId = fromUserId;
         this.toUserId = toUserId;
     }
+
+//    public static FollowDTO convertToDto(){
+//
+//    }
 }
