@@ -1,5 +1,6 @@
 package kr.co.pawpaw.api.service.sms;
 
+import kr.co.pawpaw.api.config.property.SmsSendLimitProperties;
 import kr.co.pawpaw.api.config.property.VerificationProperties;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeResponse;
@@ -30,6 +31,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class SmsService {
+    private final SmsSendLimitProperties smsSendLimitProperties;
     private final SmsFeignService smsFeignService;
     private final VerificationCodeCommand verificationCodeCommand;
     private final VerificationCodeQuery verificationCodeQuery;
@@ -79,7 +81,7 @@ public class SmsService {
             usagePurpose
         );
 
-        if (sendCount >= usagePurpose.getLimitPerDay()) {
+        if (sendCount >= smsSendLimitProperties.getSignUp()) {
             throw new OutOfSmsLimitException();
         }
     }
