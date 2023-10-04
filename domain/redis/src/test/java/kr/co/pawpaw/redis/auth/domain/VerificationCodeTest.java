@@ -1,10 +1,9 @@
 package kr.co.pawpaw.redis.auth.domain;
 
-import kr.co.pawpaw.redis.auth.domain.VerificationCode;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class VerificationCodeTest {
     @Test

@@ -2,7 +2,6 @@ package kr.co.pawpaw.redis.auth.service.command;
 
 import kr.co.pawpaw.redis.auth.domain.RefreshToken;
 import kr.co.pawpaw.redis.auth.repository.RefreshTokenRepository;
-import kr.co.pawpaw.redis.auth.service.command.RefreshTokenCommand;
 import kr.co.pawpaw.redis.config.property.TtlProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

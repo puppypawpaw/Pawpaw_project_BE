@@ -2,7 +2,6 @@ package kr.co.pawpaw.redis.auth.service.command;
 
 import kr.co.pawpaw.redis.auth.domain.OAuth2TempAttributes;
 import kr.co.pawpaw.redis.auth.repository.OAuth2TempAttributesRepository;
-import kr.co.pawpaw.redis.auth.service.command.OAuth2TempAttributesCommand;
 import kr.co.pawpaw.redis.config.property.TtlProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

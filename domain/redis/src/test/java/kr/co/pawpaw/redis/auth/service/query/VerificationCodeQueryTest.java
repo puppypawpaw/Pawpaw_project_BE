@@ -2,7 +2,6 @@ package kr.co.pawpaw.redis.auth.service.query;
 
 import kr.co.pawpaw.redis.auth.domain.VerificationCode;
 import kr.co.pawpaw.redis.auth.repository.VerificationCodeRepository;
-import kr.co.pawpaw.redis.auth.service.query.VerificationCodeQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

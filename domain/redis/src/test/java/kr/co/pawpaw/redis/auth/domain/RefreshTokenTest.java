@@ -1,6 +1,5 @@
 package kr.co.pawpaw.redis.auth.domain;
 
-import kr.co.pawpaw.redis.auth.domain.RefreshToken;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

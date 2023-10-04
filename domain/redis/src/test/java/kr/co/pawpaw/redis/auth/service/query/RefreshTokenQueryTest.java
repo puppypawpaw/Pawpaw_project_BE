@@ -2,7 +2,6 @@ package kr.co.pawpaw.redis.auth.service.query;
 
 import kr.co.pawpaw.redis.auth.domain.RefreshToken;
 import kr.co.pawpaw.redis.auth.repository.RefreshTokenRepository;
-import kr.co.pawpaw.redis.auth.service.query.RefreshTokenQuery;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

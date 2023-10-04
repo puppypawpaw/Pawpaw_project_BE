@@ -2,7 +2,6 @@ package kr.co.pawpaw.redis.auth.service.query;
 
 import kr.co.pawpaw.redis.auth.domain.VerifiedPhoneNumber;
 import kr.co.pawpaw.redis.auth.repository.VerifiedPhoneNumberRepository;
-import kr.co.pawpaw.redis.auth.service.query.VerifiedPhoneNumberQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
