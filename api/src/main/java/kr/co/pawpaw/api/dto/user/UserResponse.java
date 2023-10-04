@@ -4,10 +4,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.api.dto.position.PositionResponse;
 import kr.co.pawpaw.mysql.user.domain.Role;
 import kr.co.pawpaw.mysql.user.domain.User;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.Getter;
 
 @Getter
 public class UserResponse {
+    @Schema(description = "유저 아이디", type = "STRING")
+    private UserId userId;
     @Schema(description = "유저 이메일", type = "STRING")
     private String email;
     @Schema(description = "유저 역할", type = "STRING")
@@ -22,6 +25,7 @@ public class UserResponse {
     private String imageUrl;
 
     private UserResponse(
+        final UserId userId,
         final String email,
         final Role role,
         final String nickname,
@@ -29,6 +33,7 @@ public class UserResponse {
         final PositionResponse position,
         final String imageUrl
     ) {
+        this.userId = userId;
         this.email = email;
         this.role = role;
         this.nickname = nickname;
@@ -42,6 +47,7 @@ public class UserResponse {
         final String imageUrl
     ) {
         return new UserResponse(
+            user.getUserId(),
             user.getEmail(),
             user.getRole(),
             user.getNickname(),
