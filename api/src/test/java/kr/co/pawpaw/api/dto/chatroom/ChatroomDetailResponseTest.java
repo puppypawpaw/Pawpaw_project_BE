@@ -19,7 +19,6 @@ class ChatroomDetailResponseTest {
             "name",
             "description",
             "coverUrl",
-            LocalDateTime.now(),
             List.of("hashTag1", "hashTag2"),
             "managerName",
             "managerImageUrl",
@@ -29,7 +28,7 @@ class ChatroomDetailResponseTest {
         );
 
         //when
-        ChatroomDetailResponse result = ChatroomDetailResponse.of(beforeProcessDto);
+        ChatroomDetailResponse result = ChatroomDetailResponse.of(beforeProcessDto, LocalDateTime.now());
 
         //then
         assertThat(result).usingRecursiveComparison()

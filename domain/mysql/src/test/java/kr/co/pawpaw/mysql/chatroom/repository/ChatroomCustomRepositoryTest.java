@@ -40,8 +40,6 @@ class ChatroomCustomRepositoryTest {
     @Autowired
     private FileRepository fileRepository;
     @Autowired
-    private ChatRepository chatRepository;
-    @Autowired
     private ChatroomParticipantRepository chatroomParticipantRepository;
     @Autowired
     private ChatroomScheduleRepository chatroomScheduleRepository;
@@ -108,19 +106,6 @@ class ChatroomCustomRepositoryTest {
         .fileUrl("managerImageFile-url")
         .uploader(user1)
         .build();
-    Chat chat1 = Chat.builder()
-        .chatroom(chatroom)
-        .data("chat-data-1")
-        .sender(user1)
-        .type(ChatType.MESSAGE)
-        .build();
-
-    Chat chat2 = Chat.builder()
-        .chatroom(chatroom)
-        .data("chat-data-2")
-        .sender(user2)
-        .type(ChatType.MESSAGE)
-        .build();
 
     ChatroomParticipant manager = ChatroomParticipant.builder()
         .role(ChatroomParticipantRole.MANAGER)
@@ -175,8 +160,6 @@ class ChatroomCustomRepositoryTest {
         chatroom = chatroomRepository.save(chatroom);
         chatroom2 = chatroomRepository.save(chatroom2);
         chatroom3 = chatroomRepository.save(chatroom3);
-        chat1 = chatRepository.save(chat1);
-        chat2 = chatRepository.save(chat2);
         manager = chatroomParticipantRepository.save(manager);
         participant = chatroomParticipantRepository.save(participant);
         manager2 = chatroomParticipantRepository.save(manager2);
@@ -206,7 +189,6 @@ class ChatroomCustomRepositoryTest {
             chatroom.getName(),
             chatroom.getDescription(),
             coverFile.getFileUrl(),
-            chat2.getCreatedDate().withNano((int)Math.round(chat2.getCreatedDate().getNano() / 1000.0) * 1000),
             chatroom.getHashTagList(),
             user1.getNickname(),
             managerImageFile.getFileUrl(),

@@ -22,4 +22,6 @@ public interface ChatRepository extends PagingAndSortingRepository<Chat, Chat.Ch
     );
 
     Optional<Chat> findByChatroomIdAndSortId(final Long chatroomId, final Long sortId);
+
+    Optional<Chat> findFirstByChatroomIdOrderBySortIdDesc(final Long chatroomId);
 }

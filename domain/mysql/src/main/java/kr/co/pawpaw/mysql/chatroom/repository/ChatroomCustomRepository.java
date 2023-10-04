@@ -3,7 +3,6 @@ package kr.co.pawpaw.mysql.chatroom.repository;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import kr.co.pawpaw.mysql.chatroom.domain.QChat;
 import kr.co.pawpaw.mysql.chatroom.domain.QChatroom;
 import kr.co.pawpaw.mysql.chatroom.domain.QChatroomParticipant;
 import kr.co.pawpaw.mysql.chatroom.domain.QChatroomSchedule;
@@ -35,7 +34,6 @@ public class ChatroomCustomRepository {
     private static final QUser qUserManager = QUser.user;
     private static final QFile qFileCover = new QFile("qFileCover");
     private static final QFile qFileManager = new QFile("qFileManager");
-    private static final QChat qChat = QChat.chat;
     private static final QChatroomSchedule qChatroomSchedule = QChatroomSchedule.chatroomSchedule;
 
     public List<ChatroomDetailData> findAllByUserIdWithDetailData(final UserId userId) {
@@ -45,7 +43,6 @@ public class ChatroomCustomRepository {
                     qChatroom.name,
                     qChatroom.description,
                     qFileCover.fileUrl,
-                    qChat.createdDate.max(),
                     qChatroom.hashTagList,
                     qUserManager.nickname,
                     qFileManager.fileUrl,
@@ -61,7 +58,6 @@ public class ChatroomCustomRepository {
             .innerJoin(qChatroomParticipantManager.user, qUserManager)
             .leftJoin(qUserManager.userImage, qFileManager)
             .leftJoin(qChatroomParticipant).on(qChatroom.eq(qChatroomParticipant.chatroom))
-            .leftJoin(qChat).on(qChatroom.eq(qChat.chatroom))
             .leftJoin(qChatroomSchedule).on(qChatroom.eq(qChatroomSchedule.chatroom)
                 .and(qChatroomSchedule.endDate.after(LocalDateTime.now())))
             .where(myQChatroomParticipant.user.userId.eq(Expressions.constant(userId)))

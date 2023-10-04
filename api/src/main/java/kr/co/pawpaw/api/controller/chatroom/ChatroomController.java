@@ -1,6 +1,7 @@
 package kr.co.pawpaw.api.controller.chatroom;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -9,6 +10,7 @@ import kr.co.pawpaw.api.aop.ChatroomRoleCheck;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.chatroom.ChatroomService;
+import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
 import kr.co.pawpaw.mysql.user.domain.UserId;
@@ -285,5 +287,29 @@ public class ChatroomController {
         chatroomService.inviteUser(chatroomId, request);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "GET",
+        summary = "채팅방 이전 채팅 조회",
+        description = "채팅방 이전 채팅 조회, last 필드가 false면 끝이 아님(스크롤 더 가능), true면 끝임"
+    )
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.PARTICIPANT)
+    @GetMapping("/{chatroomId}/message")
+    public ResponseEntity<Slice<ChatMessageDto>> getPreviousChatMessage(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long chatroomId,
+        @Parameter(description = "id 기준(targetId) 보다 작은 id를 가지는 채팅 메시지들을 조회, 비어있으면 전체 조회") @RequestParam(required = false) final Long targetId,
+        @Parameter(description = "조회할 메시지 수") @RequestParam(defaultValue = "20") final int size
+    ) {
+        return ResponseEntity.ok(chatroomService.findBeforeChatMessages(chatroomId, targetId, size));
     }
 }

@@ -40,4 +40,8 @@ public class ChatQuery {
 
         return new SliceImpl<>(content, chatSlice.getPageable(), chatSlice.hasNext());
     }
+
+    public Optional<Chat> findFirstByChatroomIdOrderBySortIdDesc(final Long chatroomId) {
+        return chatRepository.findFirstByChatroomIdOrderBySortIdDesc(chatroomId);
+    }
 }
