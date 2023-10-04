@@ -1,5 +1,6 @@
 package kr.co.pawpaw.ws.config;
 
+import kr.co.pawpaw.ws.handler.HandshakeInterceptor;
 import kr.co.pawpaw.ws.handler.StompHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final StompHandler stompHandler;
+    private final HandshakeInterceptor handshakeInterceptor;
 
     @Override
     public void configureMessageBroker(final MessageBrokerRegistry registry) {
@@ -25,6 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(final StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
             .setAllowedOriginPatterns("*")
+            .addInterceptors(handshakeInterceptor)
             .withSockJS();
     }
     @Override
