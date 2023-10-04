@@ -247,3 +247,4 @@ api/src/main/resources/application-secret.yml
 socket/src/main/resources/application-secret.yml
 /docker/rabbitmq
 /docker/rabbitmq.conf/
+/docker/dynamodb/shared-local-instance.db

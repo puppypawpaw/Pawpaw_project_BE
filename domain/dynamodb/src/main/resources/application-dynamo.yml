@@ -1,0 +1,14 @@
+amazon:
+  aws:
+    dynamo-endpoint: ${properties.dynamo.dynamo-endpoint}
+    signing-region: ${properties.dynamo.signing-region}
+    access-key: ${properties.dynamo.access-key}
+    secret-key: ${properties.dynamo.secret-key}
+spring:
+  data:
+    dynamodb:
+      entity2ddl:
+        auto: create-only
+        gsiProjectionType: ALL
+        readCapacity: 5
+        writeCapacity: 5

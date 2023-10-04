@@ -9,6 +9,7 @@ spring:
         - cookie
         - secret
         - server
+        - dynamo
       dev:
         - rdb
         - redis
@@ -16,6 +17,7 @@ spring:
         - cookie
         - secret
         - server
+        - dynamo
       local:
         - rdb
         - redis
@@ -23,3 +25,4 @@ spring:
         - cookie
         - secret
         - server
+        - dynamo
