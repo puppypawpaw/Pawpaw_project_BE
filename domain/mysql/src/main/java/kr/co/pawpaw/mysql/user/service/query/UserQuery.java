@@ -5,11 +5,13 @@ import kr.co.pawpaw.mysql.user.domain.OAuth2Provider;
 import kr.co.pawpaw.mysql.user.domain.Role;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.dto.ChatMessageUserDto;
 import kr.co.pawpaw.mysql.user.repository.UserCustomRepository;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,5 +68,13 @@ public class UserQuery {
 
     public User getReferenceById(final UserId userId) {
         return userRepository.getReferenceById(userId);
+    }
+
+    public ChatMessageUserDto getChatMessageUserDtoByUserId(final UserId userId) {
+        return userCustomRepository.getChatMessageUserDtoByUserId(userId);
+    }
+
+    public List<ChatMessageUserDto> getChatMessageUserDtoByUserIdIn(final Collection<UserId> userId) {
+        return userCustomRepository.getChatMessageUserDtoByUserIdIn(userId);
     }
 }
