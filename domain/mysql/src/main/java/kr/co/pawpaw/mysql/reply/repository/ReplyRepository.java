@@ -21,7 +21,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long>, CustomReply
      List<Reply> findRepliesWithChildren(@Param("parentReply") Reply parentReply);
 
     @Modifying
-    @Query("UPDATE Reply r SET r.isRemoved = '1' WHERE r.id = :replyId")
+    @Query("UPDATE Reply r SET r.isRemoved = true WHERE r.id = :replyId")
     void removeReplyById(@Param("replyId") Long replyId);
 
     Optional<Reply> findReplyById(Long id);
