@@ -2,8 +2,10 @@ package kr.co.pawpaw.api.dto.board;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.List;
 public class BoardDto {
     @Schema(description = "게시글 등록 DTO")
     @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class BoardRegisterDto {
         @Schema(name = "게시글 제목", example = "우리 댕댕이 귀엽죠?")
         private String title;
@@ -48,6 +51,7 @@ public class BoardDto {
     }
     @Schema(name = "게시글 수정 DTO")
     @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     public static class BoardUpdateDto {
         @Schema(name = "게시글 제목", example = "우리 냥이 귀엽죠?")
         private String title;

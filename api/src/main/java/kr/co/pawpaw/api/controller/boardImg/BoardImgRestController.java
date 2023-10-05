@@ -40,7 +40,7 @@ public class BoardImgRestController {
     )
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> upload(@Parameter(description = "게시글 ID", required = true, example = "1") @RequestParam Long boardId,
-                                       @RequestBody BoardImgDto.BoardImgUploadDto uploadDto,
+                                       @ModelAttribute BoardImgDto.BoardImgUploadDto uploadDto,
                                        @AuthenticatedUserId UserId userId) {
         imgService.upload(boardId, uploadDto, userId);
         return ResponseEntity.noContent().build();
@@ -58,7 +58,7 @@ public class BoardImgRestController {
     )
     @PatchMapping(value = "/update/{boardId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> update(@Parameter(description = "게시글 ID", required = true, example = "1") @PathVariable Long boardId,
-                                       @RequestBody BoardImgDto.BoardImgUploadDto uploadDto,
+                                       @ModelAttribute BoardImgDto.BoardImgUploadDto uploadDto,
                                        @AuthenticatedUserId UserId userId) {
         imgService.update(boardId, uploadDto, userId);
         return ResponseEntity.noContent().build();

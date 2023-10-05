@@ -3,10 +3,7 @@ package kr.co.pawpaw.mysql.board.domain;
 import kr.co.pawpaw.mysql.common.BaseTimeEntity;
 import kr.co.pawpaw.mysql.reply.domain.Reply;
 import kr.co.pawpaw.mysql.user.domain.User;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -35,6 +32,8 @@ public final class Board extends BaseTimeEntity {
 
     private boolean isRemoved = false;
 
+    private boolean isBookmarked = false;
+
     @Column(name = "liked_count")
     private int likedCount;
 
@@ -55,6 +54,7 @@ public final class Board extends BaseTimeEntity {
         this.user = user;
         this.writer = writer;
         this.isRemoved = false;
+        this.isBookmarked = false;
     }
     public void plusLikedCount(){
         this.likedCount = likedCount +1;
@@ -68,6 +68,12 @@ public final class Board extends BaseTimeEntity {
     }
     public void minusReplyCount(){
         this.replyCount = replyCount - 1;
+    }
+    public void addBookmark(){
+        this.isBookmarked = true;
+    }
+    public void deleteBookmark(){
+        this.isBookmarked = false;
     }
 
 
