@@ -9,6 +9,12 @@ import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
 import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
+import kr.co.pawpaw.dynamodb.domain.chat.Chat;
+import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
+import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
+import kr.co.pawpaw.dynamodb.service.chat.command.ChatCommand;
+import kr.co.pawpaw.dynamodb.service.chat.query.ChatQuery;
+import kr.co.pawpaw.dynamodb.util.chat.ChatUtil;
 import kr.co.pawpaw.mysql.chatroom.domain.*;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
 import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomCommand;
@@ -21,20 +27,32 @@ import kr.co.pawpaw.mysql.chatroom.service.query.TrendingChatroomQuery;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.dto.ChatMessageUserDto;
 import kr.co.pawpaw.mysql.user.service.query.UserQuery;
+import kr.co.pawpaw.redis.service.pub.RedisPublisher;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ChatroomService {
+    private final ChatQuery chatQuery;
+    private final ChatCommand chatCommand;
+    private final ChannelTopic chatTopic;
     private final ChatroomCommand chatroomCommand;
     private final ChatroomParticipantCommand chatroomParticipantCommand;
     private final ChatroomParticipantQuery chatroomParticipantQuery;
@@ -45,6 +63,7 @@ public class ChatroomService {
     private final UserQuery userQuery;
     private final FileService fileService;
     private final UserService userService;
+    private final RedisPublisher redisPublisher;
 
     @Transactional
     public void inviteUser(
@@ -104,6 +123,8 @@ public class ChatroomService {
         joinChatroomAsParticipant(chatroomId, user);
 
         createTrendingChatroom(chatroomId);
+
+        saveAndPublishChatMessage(ChatType.JOIN, ChatUtil.getJoinDataFromNickname(user.getNickname()), chatroomId);
     }
 
     @Transactional
@@ -122,6 +143,8 @@ public class ChatroomService {
         }
 
         chatroomParticipantCommand.delete(chatroomParticipant);
+
+        saveAndPublishChatMessage(ChatType.LEAVE, ChatUtil.getLeaveDataFromNickname(user.getNickname()), chatroomId);
     }
 
     @Transactional(readOnly = true)
@@ -155,10 +178,51 @@ public class ChatroomService {
             .collect(Collectors.toList());
     }
 
-    public List<ChatroomDetailResponse> getParticipatedChatroomList(final UserId userId) {
-        return chatroomQuery.getParticipatedChatroomDetailDataByUserId(userId)
+    public Slice<ChatMessageDto> findBeforeChatMessages(
+        final Long chatroomId,
+        final Long targetId,
+        final int size
+    ) {
+        Slice<Chat> chatSlice = chatQuery.findWithSliceByChatroomIdAndSortIdLessThan(
+            chatroomId,
+            targetId,
+            PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "sortId"))
+        );
+
+        Map<String, ChatMessageUserDto> chatMessageUserDtoMap = userQuery.getChatMessageUserDtoByUserIdIn(chatSlice.get()
+                .map(Chat::getSenderId)
+                .filter(Objects::nonNull)
+                .map(UserId::of)
+                .collect(Collectors.toList())
+            )
             .stream()
-            .map(ChatroomDetailResponse::of)
+            .collect(Collectors.toMap(dto -> dto.getUserId().getValue(), Function.identity()));
+
+        return chatSlice.map(chat -> {
+            ChatMessageUserDto dto = chatMessageUserDtoMap.get(chat.getSenderId());
+
+            if (Objects.nonNull(dto)) {
+                return ChatMessageDto.of(chat, dto.getNickname(), dto.getImageUrl());
+            } else {
+                return ChatMessageDto.of(chat, null, null);
+            }
+        });
+    }
+
+    public List<ChatroomDetailResponse> getParticipatedChatroomList(final UserId userId) {
+        List<ChatroomDetailData> beforeProcessDataList = chatroomQuery.getParticipatedChatroomDetailDataByUserId(userId);
+
+        Map<Long, LocalDateTime> chatroomLastChatTimeMap = beforeProcessDataList.stream()
+            .map(ChatroomDetailData::getId)
+            .distinct()
+            .map(chatQuery::findFirstByChatroomIdOrderBySortIdDesc)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toMap(Chat::getChatroomId, Chat::getCreatedDate));
+
+        return beforeProcessDataList
+            .stream()
+            .map(chatroomDetailData -> ChatroomDetailResponse.of(chatroomDetailData, chatroomLastChatTimeMap.get(chatroomDetailData.getId())))
             .collect(Collectors.toList());
     }
 
@@ -176,6 +240,24 @@ public class ChatroomService {
 
     public List<ChatroomCoverResponse> getChatroomDefaultCoverList() {
         return chatroomDefaultCoverQuery.findAllChatroomCover();
+    }
+
+    private void saveAndPublishChatMessage(
+        final ChatType chatType,
+        final String data,
+        final Long chatroomId
+    ) {
+        Chat chat = chatCommand.save(Chat.builder()
+                .chatroomId(chatroomId)
+                .chatType(chatType)
+                .data(data)
+            .build());
+
+        redisPublisher.publish(chatTopic, ChatMessageDto.of(
+            chat,
+            null,
+            null
+        ));
     }
 
     private void createTrendingChatroom(final Long chatroomId) {

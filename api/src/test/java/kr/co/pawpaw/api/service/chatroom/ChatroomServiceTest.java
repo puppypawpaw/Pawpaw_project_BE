@@ -8,6 +8,11 @@ import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
 import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
+import kr.co.pawpaw.dynamodb.domain.chat.Chat;
+import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
+import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
+import kr.co.pawpaw.dynamodb.service.chat.command.ChatCommand;
+import kr.co.pawpaw.dynamodb.service.chat.query.ChatQuery;
 import kr.co.pawpaw.mysql.chatroom.domain.*;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
 import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomCommand;
@@ -20,24 +25,27 @@ import kr.co.pawpaw.mysql.chatroom.service.query.TrendingChatroomQuery;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.dto.ChatMessageUserDto;
 import kr.co.pawpaw.mysql.user.service.query.UserQuery;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import kr.co.pawpaw.redis.service.pub.RedisPublisher;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -63,6 +71,8 @@ class ChatroomServiceTest {
     @Mock
     private ChatroomQuery chatroomQuery;
     @Mock
+    private ChatCommand chatCommand;
+    @Mock
     private UserQuery userQuery;
     @Mock
     private FileService fileService;
@@ -70,6 +80,12 @@ class ChatroomServiceTest {
     private UserService userService;
     @Mock
     private MultipartFile multipartFile;
+    @Mock
+    private ChannelTopic channelTopic;
+    @Mock
+    private ChatQuery chatQuery;
+    @Mock
+    private RedisPublisher redisPublisher;
     @InjectMocks
     private ChatroomService chatroomService;
 
@@ -103,6 +119,13 @@ class ChatroomServiceTest {
         .build();
 
     private static final Chatroom chatroom = Chatroom.builder()
+        .build();
+
+    Chat chat = Chat.builder()
+        .chatroomId(123L)
+        .chatType(ChatType.MESSAGE)
+        .data("안녕하세요")
+        .senderId("senderId")
         .build();
 
     @BeforeAll
@@ -277,166 +300,258 @@ class ChatroomServiceTest {
     @Nested
     @DisplayName("joinChatroom 메서드는")
     class JoinChatroom {
-        @Nested
-        @DisplayName("유저가")
-        class User {
-            @Test
-            @DisplayName("존재하지 않으면 예외가 발생한다.")
-            void NotFoundUserException() {
-                //given
-                when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
+        @Test
+        @DisplayName("유저가 존재하지 않으면 예외가 발생한다.")
+        void NotFoundUserException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
 
-                //when
-                assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(NotFoundUserException.class);
+            //when
+            assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(NotFoundUserException.class);
 
-                //then
-            }
+            //then
         }
-        @Nested
-        @DisplayName("채팅방에")
-        class Chatroom {
-            @Test
-            @DisplayName("이미 참여했으면 예외가 발생한다.")
-            void alreadyChatroomParticipantException() {
-                //given
-                when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-                when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(true);
-                //when
-                assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(AlreadyChatroomParticipantException.class);
+        @Test
+        @DisplayName("채팅방에 이미 참여했으면 예외가 발생한다.")
+        void alreadyChatroomParticipantException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(true);
+            //when
+            assertThatThrownBy(() -> chatroomService.joinChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(AlreadyChatroomParticipantException.class);
 
-                //then
-            }
-
-            @Test
-            @DisplayName("참여하지 않았으면 participant role로 참여자를 생성한다.")
-            void success() {
-                //given
-                when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-                when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(false);
-                when(trendingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(true);
-                //when
-                chatroomService.joinChatroom(user.getUserId(), chatroom.getId());
-
-                //then
-                ArgumentCaptor<ChatroomParticipant> chatroomParticipantArgumentCaptor = ArgumentCaptor.forClass(ChatroomParticipant.class);
-                verify(chatroomParticipantCommand).save(chatroomParticipantArgumentCaptor.capture());
-                assertThat(chatroomParticipantArgumentCaptor.getValue().isManager()).isFalse();
-            }
+            //then
         }
 
-        @Nested
-        @DisplayName("참여한 채팅방을")
-        class ParticipatedChatroom {
-            @Test
-            @DisplayName("뜨고있는 채팅방으로 설정한다.")
-            void setTrendingChatroom() throws NoSuchFieldException, IllegalAccessException {
-                //given
-                when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-                when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(false);
-                when(trendingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(false);
-                when(chatroomQuery.getReferenceById(chatroom.getId())).thenReturn(chatroom);
+        @Test
+        @DisplayName("채팅방에 참여하지 않았으면 participant role로 참여자를 생성한다.")
+        void success() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(false);
+            when(trendingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(true);
+            when(chatCommand.save(any(Chat.class))).thenReturn(chat);
 
-                //when
-                chatroomService.joinChatroom(user.getUserId(), chatroom.getId());
+            //when
+            chatroomService.joinChatroom(user.getUserId(), chatroom.getId());
 
-                //then
-                ArgumentCaptor<TrendingChatroom> trendingChatroomArgumentCaptor = ArgumentCaptor.forClass(TrendingChatroom.class);
-                verify(trendingChatroomCommand).save(trendingChatroomArgumentCaptor.capture());
-                assertThat(trendingChatroomArgumentCaptor.getValue().getChatroom().getId()).isEqualTo(chatroom.getId());
-            }
+            //then
+            ArgumentCaptor<ChatroomParticipant> chatroomParticipantArgumentCaptor = ArgumentCaptor.forClass(ChatroomParticipant.class);
+            verify(chatroomParticipantCommand).save(chatroomParticipantArgumentCaptor.capture());
+            assertThat(chatroomParticipantArgumentCaptor.getValue().isManager()).isFalse();
+        }
+
+        @Test
+        @DisplayName("참여한 채팅방을 뜨고있는 채팅방으로 설정한다.")
+        void setTrendingChatroom() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(false);
+            when(trendingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(false);
+            when(chatroomQuery.getReferenceById(chatroom.getId())).thenReturn(chatroom);
+            when(chatCommand.save(any(Chat.class))).thenReturn(chat);
+
+            //when
+            chatroomService.joinChatroom(user.getUserId(), chatroom.getId());
+
+            //then
+            ArgumentCaptor<TrendingChatroom> trendingChatroomArgumentCaptor = ArgumentCaptor.forClass(TrendingChatroom.class);
+            verify(trendingChatroomCommand).save(trendingChatroomArgumentCaptor.capture());
+            assertThat(trendingChatroomArgumentCaptor.getValue().getChatroom().getId()).isEqualTo(chatroom.getId());
+        }
+
+        @Test
+        @DisplayName("입장 채팅을 저장하고 redis에 publish한다.")
+        void saveChatAndPublishMessage() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(false);
+            when(trendingChatroomQuery.existsByChatroomId(chatroom.getId())).thenReturn(false);
+            when(chatroomQuery.getReferenceById(chatroom.getId())).thenReturn(chatroom);
+            when(chatCommand.save(any(Chat.class))).thenReturn(chat);
+
+            //when
+            chatroomService.joinChatroom(user.getUserId(), chatroom.getId());
+
+            //then
+            verify(chatCommand).save(any(Chat.class));
+            ArgumentCaptor<ChatMessageDto> argumentCaptor = ArgumentCaptor.forClass(ChatMessageDto.class);
+            verify(redisPublisher).publish(eq(channelTopic), argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(ChatMessageDto.of(chat, null, null));
         }
     }
 
-    @Test
-    @DisplayName("leaveChatroom 메서드는 존재하지 않는 유저 예외가 발생 가능하다.")
-    void leaveChatroomNotFoundUserException() {
-        //given
-        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
-        //when
-        assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(NotFoundUserException.class);
+    @Nested
+    @DisplayName("leaveChatroom 메서드는")
+    class LeaveChatroom {
+        @Test
+        @DisplayName("유저가 존재하지 않으면 예외가 발생한다.")
+        void notFoundUserException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
+            //when
+            assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(NotFoundUserException.class);
 
-        //then
-    }
+            //then
+        }
 
-    @Test
-    @DisplayName("leaveChatroom 메서드는 채팅방 참여자가 아니라는 예외가 발생할 수 있다.")
-    void leaveChatroomIsNotChatroomParticipantException() {
-        //given
-        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-        when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(Optional.empty());
+        @Test
+        @DisplayName("채팅방 참여자가 아니면 예외가 발생한다.")
+        void notChatroomParticipantException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(Optional.empty());
 
-        //when
-        assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(IsNotChatroomParticipantException.class);
+            //when
+            assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(IsNotChatroomParticipantException.class);
 
-        //then
-    }
+            //then
+        }
 
-    @Test
-    @DisplayName("leaveChatroom 메서드는 매니저는 호출 불가능하다.")
-    void leaveChatroomNotAllowedChatroomLeaveException() {
-        //given
-        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-        when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(Optional.of(ChatroomParticipant.builder()
+        @Test
+        @DisplayName("채팅방 매니저는 채팅방에서 나갈 수 없다.")
+        void managerNotAllowedChatroomLeaveException() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(Optional.of(ChatroomParticipant.builder()
                 .role(ChatroomParticipantRole.MANAGER)
-            .build()));
+                .build()));
 
-        //when
-        assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(NotAllowedChatroomLeaveException.class);
+            //when
+            assertThatThrownBy(() -> chatroomService.leaveChatroom(user.getUserId(), chatroom.getId())).isInstanceOf(NotAllowedChatroomLeaveException.class);
 
-        //then
+            //then
+        }
+
+        @Test
+        @DisplayName("chatroomParticipantCommand의 delete메서드를 호출한다.")
+        void callDeleteMethod() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            ChatroomParticipant chatroomParticipant = ChatroomParticipant.builder()
+                .role(ChatroomParticipantRole.PARTICIPANT)
+                .build();
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(Optional.of(chatroomParticipant));
+            when(chatCommand.save(any(Chat.class))).thenReturn(chat);
+
+            //when
+            chatroomService.leaveChatroom(user.getUserId(), chatroom.getId());
+
+            //then
+            verify(chatroomParticipantCommand).delete(chatroomParticipant);
+        }
+
+        @Test
+        @DisplayName("입장 채팅을 저장하고 redis에 publish한다.")
+        void saveChatAndPublishMessage() {
+            //given
+            when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
+            ChatroomParticipant chatroomParticipant = ChatroomParticipant.builder()
+                .role(ChatroomParticipantRole.PARTICIPANT)
+                .build();
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(Optional.of(chatroomParticipant));
+            when(chatCommand.save(any(Chat.class))).thenReturn(chat);
+
+            //when
+            chatroomService.leaveChatroom(user.getUserId(), chatroom.getId());
+
+            //then
+            verify(chatCommand).save(any(Chat.class));
+            ArgumentCaptor<ChatMessageDto> argumentCaptor = ArgumentCaptor.forClass(ChatMessageDto.class);
+            verify(redisPublisher).publish(eq(channelTopic), argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).usingRecursiveComparison().isEqualTo(ChatMessageDto.of(chat, null, null));
+        }
     }
 
-    @Test
-    @DisplayName("leaveChatroom 메서드는 chatroomParticipantCommand의 delete메서드를 호출한다.")
-    void leaveChatroom() {
-        //given
-        when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-        ChatroomParticipant chatroomParticipant = ChatroomParticipant.builder()
-            .role(ChatroomParticipantRole.PARTICIPANT)
-            .build();
-        when(chatroomParticipantQuery.findByUserIdAndChatroomId(user.getUserId(), chatroom.getId())).thenReturn(Optional.of(chatroomParticipant));
-
-        //when
-        chatroomService.leaveChatroom(user.getUserId(), chatroom.getId());
-
-        //then
-        verify(chatroomParticipantCommand).delete(chatroomParticipant);
-    }
-
-    @Test
-    @DisplayName("getParticipatedChatroomList 메서드는 chatroomQuery의 getParticipatedChatroomDetailDataByUserId 메서드를 호출한다.")
-    void getParticipatedChatroomList() {
-        //given
-        UserId userId = UserId.create();
-
-        List<ChatroomDetailData> chatroomDetailData = List.of(
-            new ChatroomDetailData(
-                1L,
-                "name",
-                "description",
-                "coverUrl",
-                LocalDateTime.now().minusDays(1),
-                List.of("hashTag1", "hashTag2"),
-                "managerName",
-                "managerImageUrl",
-                2L,
-                false,
-                false
-            )
+    @Nested
+    @DisplayName("findBeforeChatMessages 메서드는")
+    class FindBeforeChatMessages {
+        Long chatroomId = 1L;
+        Pageable pageable = PageRequest.of(0, 2);
+        List<Chat> chatList = List.of(Chat.builder()
+            .chatroomId(chatroomId)
+            .chatType(ChatType.MESSAGE)
+            .senderId("senderId1")
+            .data("data1")
+            .build(),
+            Chat.builder()
+                .chatroomId(chatroomId)
+                .chatType(ChatType.JOIN)
+                .data("hi 님이 입장하셨습니다.")
+                .build());
+        Slice<Chat> chatSlice = new SliceImpl<>(chatList, pageable, true);
+        List<ChatMessageUserDto> chatMessageUserDtos = List.of(
+            new ChatMessageUserDto(UserId.of(chatList.get(0).getSenderId()), "nickname", "imageUrl")
         );
+        @Test
+        @DisplayName("전송자 아이디가 존재하면 전송자의 닉네임과 이미지 URL을 포함하는 dto를 전송한다.")
+        void sendWithNicknameAndImageUrlIfSenderIdExists() {
+            //given
+            when(chatQuery.findWithSliceByChatroomIdAndSortIdLessThan(eq(chatroomId), eq(null), any(Pageable.class))).thenReturn(chatSlice);
+            when(userQuery.getChatMessageUserDtoByUserIdIn(any(List.class))).thenReturn(chatMessageUserDtos);
+            Slice<ChatMessageDto> resultExpected = chatSlice.map(chat -> ChatMessageDto.of(chat, Objects.isNull(chat.getSenderId()) ? null : "nickname", Objects.isNull(chat.getSenderId()) ? null : "imageUrl"));
 
-        List<ChatroomDetailResponse> resultExpected = chatroomDetailData.stream()
-            .map(ChatroomDetailResponse::of)
-            .collect(Collectors.toList());
+            //when
+            Slice<ChatMessageDto> result = chatroomService.findBeforeChatMessages(chatroomId, null, 2);
 
-        when(chatroomQuery.getParticipatedChatroomDetailDataByUserId(userId)).thenReturn(chatroomDetailData);
+            //then
+            assertThat(result).usingRecursiveComparison().isEqualTo(resultExpected);
+        }
+    }
 
-        //when
-        List<ChatroomDetailResponse> result = chatroomService.getParticipatedChatroomList(userId);
+    @Nested
+    @DisplayName("getParticipatedChatroomList 메서드는")
+    class GetParticipatedChatroomList {
+        Long chatroomId = 1L;
+        UserId userId = UserId.create();
+        Chat lastChat = Chat.builder()
+            .senderId("senderId")
+            .chatroomId(chatroomId)
+            .chatType(ChatType.MESSAGE)
+            .data("메시지입니다.")
+            .build();
 
-        //then
-        assertThat(result).usingRecursiveComparison().isEqualTo(resultExpected);
-        verify(chatroomQuery).getParticipatedChatroomDetailDataByUserId(userId);
+        @BeforeEach
+        void setup() throws NoSuchFieldException, IllegalAccessException {
+            Field createdDate = Chat.class.getDeclaredField("createdDate");
+            createdDate.setAccessible(true);
+            createdDate.set(lastChat, LocalDateTime.now().minusDays(1));
+        }
+
+
+        @Test
+        @DisplayName("chatroomQuery의 getParticipatedChatroomDetailDataByUserId 메서드를 호출한다.")
+        void callGetParticipatedChatroomDetailDataByUserId() {
+            //given
+            List<ChatroomDetailData> chatroomDetailData = List.of(
+                new ChatroomDetailData(
+                    chatroomId,
+                    "name",
+                    "description",
+                    "coverUrl",
+                    List.of("hashTag1", "hashTag2"),
+                    "managerName",
+                    "managerImageUrl",
+                    2L,
+                    false,
+                    false
+                )
+            );
+
+            List<ChatroomDetailResponse> resultExpected = chatroomDetailData.stream()
+                .map(data -> ChatroomDetailResponse.of(data, lastChat.getCreatedDate()))
+                .collect(Collectors.toList());
+
+            when(chatroomQuery.getParticipatedChatroomDetailDataByUserId(userId)).thenReturn(chatroomDetailData);
+            when(chatQuery.findFirstByChatroomIdOrderBySortIdDesc(chatroomId)).thenReturn(Optional.of(lastChat));
+
+            //when
+            List<ChatroomDetailResponse> result = chatroomService.getParticipatedChatroomList(userId);
+
+            //then
+            assertThat(result).usingRecursiveComparison().isEqualTo(resultExpected);
+            verify(chatroomQuery).getParticipatedChatroomDetailDataByUserId(userId);
+        }
     }
 
     @Test
