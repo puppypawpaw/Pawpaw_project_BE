@@ -1,5 +1,6 @@
 package kr.co.pawpaw.api.service.sms;
 
+import kr.co.pawpaw.api.config.property.SmsSendLimitProperties;
 import kr.co.pawpaw.api.config.property.VerificationProperties;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeRequest;
 import kr.co.pawpaw.api.dto.sms.CheckVerificationCodeResponse;
@@ -48,6 +49,8 @@ class SmsServiceTest {
     private VerifiedPhoneNumberCommand verifiedPhoneNumberCommand;
     @Mock
     private VerificationProperties verificationProperties;
+    @Mock
+    private SmsSendLimitProperties smsSendLimitProperties;
     @InjectMocks
     private SmsService smsService;
 
@@ -68,7 +71,7 @@ class SmsServiceTest {
     void sendVerificationCodeOutOfSmsLimitException() {
         //given
         when(smsLogQuery.getTodaySendCountByRecipientAndUsagePurpose(recipient.getTo(), smsUsagePurpose)).thenReturn(3L);
-
+        when(smsSendLimitProperties.getSignUp()).thenReturn(3);
         //when
         assertThatThrownBy(() -> smsService.sendVerificationCode(request, smsUsagePurpose)).isInstanceOf(OutOfSmsLimitException.class);
 
@@ -81,6 +84,7 @@ class SmsServiceTest {
     void sendVerificationCode() {
         //given
         when(smsLogQuery.getTodaySendCountByRecipientAndUsagePurpose(recipient.getTo(), smsUsagePurpose)).thenReturn(2L);
+        when(smsSendLimitProperties.getSignUp()).thenReturn(3);
         SendSmsResponse sendSmsResponse = new SendSmsResponse("requestId", "requestTime", "statusCode", "statusName");
         when(smsFeignService.sendSmsMessage(anyString(), eq(recipient))).thenReturn(sendSmsResponse);
         when(verificationProperties.getCodeLength()).thenReturn(6);

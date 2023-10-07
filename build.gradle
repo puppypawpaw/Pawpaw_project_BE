@@ -93,6 +93,7 @@ project(':api') {
         implementation project(path: ':domain:mysql', configuration: 'default')
         implementation project(path: ':domain:redis', configuration: 'default')
         implementation project(path: ':common', configuration: 'default')
+        implementation project(path: ':domain:dynamodb', configuration: 'default')
         implementation project(path: ':infrastructure:feign-client', configuration: 'default')
         implementation project(path: ':infrastructure:object-storage', configuration: 'default')
         implementation project(path: ':infrastructure:mail', configuration: 'default')
@@ -103,6 +104,7 @@ project(':socket') {
     dependencies {
         implementation project(path: ':domain:mysql', configuration: 'default')
         implementation project(path: ':domain:redis', configuration: 'default')
+        implementation project(path: ':domain:dynamodb', configuration: 'default')
         implementation project(path: ':common', configuration: 'default')
     }
 }

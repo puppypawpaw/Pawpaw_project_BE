@@ -1,0 +1,12 @@
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    implementation 'org.springframework.data:spring-data-releasetrain:Neumann-SR9'
+    implementation 'org.springframework.boot:spring-boot'
+    implementation 'io.github.boostchicken:spring-data-dynamodb:5.2.5'
+
+    //test
+    testImplementation 'org.testcontainers:testcontainers:1.18.3'
+}

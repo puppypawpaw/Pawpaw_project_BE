@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -35,13 +36,16 @@ public class ChatroomDetailResponse {
     @Schema(description = "채팅방 스케줄 여부")
     private Boolean hasSchedule;
 
-    public static ChatroomDetailResponse of(final ChatroomDetailData beforeProcessDto) {
+    public static ChatroomDetailResponse of(
+        final ChatroomDetailData beforeProcessDto,
+        final LocalDateTime lastChatTime
+    ) {
         return new ChatroomDetailResponse(
             beforeProcessDto.getId(),
             beforeProcessDto.getName(),
             beforeProcessDto.getDescription(),
             beforeProcessDto.getCoverUrl(),
-            TimeUtil.getTimeBeforeString(beforeProcessDto.getLastChatTime()),
+            TimeUtil.getTimeBeforeString(lastChatTime),
             beforeProcessDto.getHashTagList(),
             beforeProcessDto.getManagerName(),
             beforeProcessDto.getManagerImageUrl(),

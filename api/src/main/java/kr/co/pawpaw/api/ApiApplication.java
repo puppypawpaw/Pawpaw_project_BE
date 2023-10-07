@@ -12,23 +12,28 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@EnableRedisRepositories(basePackages = "kr.co.pawpaw.redis.*")
-@EnableJpaRepositories(basePackages = "kr.co.pawpaw.mysql.*")
-@EntityScan(basePackages = "kr.co.pawpaw.mysql.*")
+@EnableRedisRepositories(basePackages = "kr.co.pawpaw.redis")
+@EnableJpaRepositories(basePackages = "kr.co.pawpaw.mysql")
+@EntityScan(basePackages = "kr.co.pawpaw.mysql")
 @EnableScheduling
 @EnableJpaAuditing
-@EnableFeignClients(basePackages = "kr.co.pawpaw.feignClient.*")
-@ConfigurationPropertiesScan(basePackages = { "kr.co.pawpaw.api.*", "kr.co.pawpaw.redis.*" } )
+@EnableFeignClients(basePackages = "kr.co.pawpaw.feignClient")
+@ConfigurationPropertiesScan(basePackages = {
+    "kr.co.pawpaw.api",
+    "kr.co.pawpaw.redis",
+    "kr.co.pawpaw.dynamodb"
+})
 @OpenAPIDefinition(
     servers = @Server(url = "/", description = "defaultServer")
 )
 @SpringBootApplication(scanBasePackages = {
     "kr.co.pawpaw.api",
-    "kr.co.pawpaw.mysql.*",
-    "kr.co.pawpaw.redis.*",
-    "kr.co.pawpaw.feignClient.*",
-    "kr.co.pawpaw.objectStorage.*",
-    "kr.co.pawpaw.mail.*"
+    "kr.co.pawpaw.mysql",
+    "kr.co.pawpaw.redis",
+    "kr.co.pawpaw.feignClient",
+    "kr.co.pawpaw.objectStorage",
+    "kr.co.pawpaw.mail",
+    "kr.co.pawpaw.dynamodb"
 })
 public class ApiApplication {
     public static void main(String[] args) {

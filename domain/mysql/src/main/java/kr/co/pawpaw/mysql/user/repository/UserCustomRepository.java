@@ -6,10 +6,14 @@ import kr.co.pawpaw.mysql.chatroom.dto.ChatroomNonParticipantResponse;
 import kr.co.pawpaw.mysql.chatroom.dto.QChatroomNonParticipantResponse;
 import kr.co.pawpaw.mysql.storage.domain.QFile;
 import kr.co.pawpaw.mysql.user.domain.QUser;
+import kr.co.pawpaw.mysql.user.domain.UserId;
+import kr.co.pawpaw.mysql.user.dto.ChatMessageUserDto;
+import kr.co.pawpaw.mysql.user.dto.QChatMessageUserDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.querydsl.jpa.JPAExpressions.select;
@@ -41,6 +45,32 @@ public class UserCustomRepository {
                     .where(qChatroomParticipant.chatroom.id.eq(chatroomId)))
                 .and(qUser.nickname.contains(nicknameSearchKeyword))
             )
+            .fetch();
+    }
+
+    public ChatMessageUserDto getChatMessageUserDtoByUserId(final UserId userId) {
+        return queryFactory.select(
+            new QChatMessageUserDto(
+                qUser.userId,
+                qUser.nickname,
+                qFile.fileUrl
+            ))
+            .from(qUser)
+            .leftJoin(qUser.userImage, qFile)
+            .where(qUser.userId.eq(userId))
+            .fetchOne();
+    }
+
+    public List<ChatMessageUserDto> getChatMessageUserDtoByUserIdIn(final Collection<UserId> userIds) {
+        return queryFactory.select(
+                new QChatMessageUserDto(
+                    qUser.userId,
+                    qUser.nickname,
+                    qFile.fileUrl
+                ))
+            .from(qUser)
+            .leftJoin(qUser.userImage, qFile)
+            .where(qUser.userId.in(userIds))
             .fetch();
     }
 }
