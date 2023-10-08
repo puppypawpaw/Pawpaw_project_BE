@@ -1,5 +1,6 @@
 package kr.co.pawpaw.dynamodb.dto.chat;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.dynamodb.domain.chat.Chat;
 import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
 import kr.co.pawpaw.dynamodb.util.chat.ChatUtil;
@@ -13,13 +14,21 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageDto {
+    @Schema(description = "채팅 아이디", example = "1")
     private Long id;
+    @Schema(description = "채팅방 아이디", example = "1")
     private Long chatroomId;
+    @Schema(description = "채팅 유형", example = "MESSAGE | IMAGE | JOIN | LEAVE")
     private ChatType chatType;
+    @Schema(description = "채팅 데이터", example = "안녕하세요!")
     private String data;
+    @Schema(description = "채팅 전송자 유저 아이디", example = "1f739452-5d21-4dc6-b1e6-bd90309b2873")
     private String senderId;
+    @Schema(description = "채팅 전송자 닉네임", example = "수박이")
     private String sender;
+    @Schema(description = "채팅 전송자 이미지 URL", example = "https://example.com")
     private String senderImageUrl;
+    @Schema(description = "채팅 생성 시간", example = "2023-09-10 12:00:00")
     private String createdDate;
 
     public static ChatMessageDto of(

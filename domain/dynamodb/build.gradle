@@ -9,4 +9,7 @@ dependencies {
 
     //test
     testImplementation 'org.testcontainers:testcontainers:1.18.3'
+
+    //swagger
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
 }
