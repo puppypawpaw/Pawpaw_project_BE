@@ -12,6 +12,9 @@ dependencies {
 
     //security
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //api logging
+    implementation 'org.zalando:logbook-spring-boot-starter:2.16.0'
 }
 
 jar {
