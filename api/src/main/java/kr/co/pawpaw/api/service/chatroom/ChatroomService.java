@@ -4,10 +4,7 @@ import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.api.util.file.FileUtil;
-import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomParticipantException;
-import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
-import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
-import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverException;
+import kr.co.pawpaw.common.exception.chatroom.*;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.dynamodb.domain.chat.Chat;
 import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
@@ -64,6 +61,14 @@ public class ChatroomService {
     private final FileService fileService;
     private final UserService userService;
     private final RedisPublisher redisPublisher;
+
+    @Transactional(readOnly = true)
+    public ChatroomSimpleResponse getChatroomInfo(final Long chatroomId) {
+        Chatroom chatroom = chatroomQuery.findById(chatroomId)
+            .orElseThrow(NotFoundChatroomException::new);
+
+        return ChatroomSimpleResponse.of(chatroom);
+    }
 
     @Transactional
     public void sendChatImage(

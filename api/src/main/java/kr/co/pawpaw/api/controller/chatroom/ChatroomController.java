@@ -342,4 +342,31 @@ public class ChatroomController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 채팅방 입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "GET",
+        summary = "채팅방 정보 조회",
+        description = "채팅방 정보 조회"
+    )
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.PARTICIPANT)
+    @GetMapping(value = "/{chatroomId}")
+    public ResponseEntity<ChatroomSimpleResponse> getChatroomInfo(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long chatroomId
+    ) {
+        return ResponseEntity.ok(chatroomService.getChatroomInfo(chatroomId));
+    }
 }
