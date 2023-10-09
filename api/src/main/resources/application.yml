@@ -15,6 +15,7 @@ spring:
         - sms
         - mail
         - dynamo
+        - log
       dev:
         - rdb
         - redis
@@ -29,6 +30,7 @@ spring:
         - sms
         - mail
         - dynamo
+        - log
       local:
         - rdb
         - redis
@@ -43,3 +45,4 @@ spring:
         - sms
         - mail
         - dynamo
+        - log
