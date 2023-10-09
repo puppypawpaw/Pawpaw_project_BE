@@ -312,4 +312,34 @@ public class ChatroomController {
     ) {
         return ResponseEntity.ok(chatroomService.findBeforeChatMessages(chatroomId, targetId, size));
     }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 유저입니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "POST",
+        summary = "채팅방 이미지 채팅 업로드",
+        description = "채팅방 이미지 치탱 업로드, 이미지 업로드 시 채팅 메시지 자동 전송됨."
+    )
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.PARTICIPANT)
+    @PostMapping(value = "/{chatroomId}/message/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> sendChatImage(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long chatroomId,
+        @RequestParam final MultipartFile multipartFile
+    ) {
+        chatroomService.sendChatImage(userId, chatroomId, multipartFile);
+
+        return ResponseEntity.noContent().build();
+    }
 }

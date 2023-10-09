@@ -66,6 +66,37 @@ public class ChatroomService {
     private final RedisPublisher redisPublisher;
 
     @Transactional
+    public void sendChatImage(
+        final UserId userId,
+        final Long chatroomId,
+        final MultipartFile multipartFile
+    ) {
+        User user = userQuery.findByUserId(userId)
+            .orElseThrow(NotFoundUserException::new);
+
+        Chat imageChat = createImageChat(userId, chatroomId, multipartFile);
+
+        redisPublisher.publish(
+            chatTopic,
+            ChatMessageDto.of(
+                imageChat,
+                user.getNickname(),
+                user.getUserImage().getFileUrl()
+            ));
+    }
+
+    private Chat createImageChat(UserId userId, Long chatroomId, MultipartFile multipartFile) {
+        File imageChatFile = fileService.saveFileByMultipartFile(multipartFile, userId);
+
+        return chatCommand.save(Chat.builder()
+                .senderId(userId.getValue())
+                .chatroomId(chatroomId)
+                .chatType(ChatType.IMAGE)
+                .data(imageChatFile.getFileUrl())
+            .build());
+    }
+
+    @Transactional
     public void inviteUser(
         final Long chatroomId,
         final InviteChatroomUserRequest request
