@@ -141,9 +141,9 @@ public class ReplyService {
         Reply parentReply = replyQuery.findReplyByIdWithParentAndUser_UserId(replyId, userId).orElseThrow(ReplyNotFoundException::new);
 
         List<Reply> replies = replyQuery.findRepliesWithChildren(parentReply);
-        replies.forEach(Reply::remove);
-
-        replyQuery.removeReplyById(replyId);
+        replies.stream()
+                .map(Reply::getId)
+                .forEach(id -> replyQuery.removeReplyById(id));
         board.minusReplyCount();
     }
 
