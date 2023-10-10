@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Getter
 @Slf4j
-@RequestMapping("/reply")
+@RequestMapping("/api/reply")
 public class ReplyController {
 
     private final ReplyService replyService;
