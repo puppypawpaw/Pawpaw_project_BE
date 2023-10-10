@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Getter
 @Slf4j
-@RequestMapping("/board")
+@RequestMapping("/api/board")
 public class BoardRestController {
 
     private final BoardService boardService;
@@ -103,7 +103,7 @@ public class BoardRestController {
     public ResponseEntity<Slice<BoardListDto>> getList(
             @AuthenticatedUserId UserId userId,
             @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
-            @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "2") int pageSize) {
+            @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "4") int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return ResponseEntity.ok(boardService.getBoardListWithRepliesBy(userId, pageable));
     }
@@ -123,9 +123,30 @@ public class BoardRestController {
     public ResponseEntity<Slice<BoardListDto>> getSearchList(
             @AuthenticatedUserId UserId userId,
             @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
-            @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "2") int pageSize,
+            @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "4") int pageSize,
             @Parameter(description = "검색어") @RequestParam(value = "query") String query) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return ResponseEntity.ok(boardService.searchBoardsByQuery(userId, pageable, query));
     }
+
+    @Operation(
+            method = "GET",
+            summary = "마이 페이지에서 내가 작성한 글 조회",
+            description = "마이 피드를 가지고 온다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "My Feed 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BoardListDto.class))),
+            @ApiResponse(responseCode = "400", description = "My Feed 조회에 실패했습니다.", content = @Content)
+    })
+    @GetMapping("/myPage")
+    public ResponseEntity<Slice<BoardListDto>> getMyFeed(
+            @AuthenticatedUserId UserId userId,
+            @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+            @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "4") int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return ResponseEntity.ok(boardService.getBoardListWithRepliesByUser_UserId(userId, pageable));
+    }
+
 }
