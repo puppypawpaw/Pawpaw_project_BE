@@ -105,7 +105,7 @@ public class ChatroomController {
         ),
         @ApiResponse(
             responseCode= "409",
-            description = "이미 채팅방에 참여하였습니다.",
+            description = "이미 참여한 채팅방입니다.",
             content = @Content
         )
     })
@@ -268,7 +268,7 @@ public class ChatroomController {
         ),
         @ApiResponse(
             responseCode= "409",
-            description = "이미 채팅방에 참여하였습니다.",
+            description = "이미 참여한 채팅방입니다.",
             content = @Content
         )
     })

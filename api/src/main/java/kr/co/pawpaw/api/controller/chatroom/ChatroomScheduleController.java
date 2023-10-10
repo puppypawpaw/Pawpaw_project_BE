@@ -66,6 +66,11 @@ public class ChatroomScheduleController {
             responseCode = "404",
             description = "존재하지 않는 채팅방 스케줄입니다.",
             content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "409",
+            description = "이미 참여한 채팅방 스케줄입니다.",
+            content = @Content
         )
     })
     @Operation(

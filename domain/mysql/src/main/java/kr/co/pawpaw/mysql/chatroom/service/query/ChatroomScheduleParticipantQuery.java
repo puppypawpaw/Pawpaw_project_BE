@@ -19,4 +19,11 @@ public class ChatroomScheduleParticipantQuery {
     ) {
         return chatroomScheduleParticipantRepository.findByChatroomScheduleIdAndUserUserId(chatroomScheduleId, userId);
     }
+
+    public boolean existsByChatroomScheduleUserUserId(
+        final Long chatroomScheduleId,
+        final UserId userId
+    ) {
+        return chatroomScheduleParticipantRepository.existsByChatroomScheduleIdAndUserUserId(chatroomScheduleId, userId);
+    }
 }
