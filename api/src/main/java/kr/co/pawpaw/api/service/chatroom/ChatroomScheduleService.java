@@ -4,6 +4,7 @@ import kr.co.pawpaw.api.dto.chatroom.ChatroomScheduleResponse;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleRequest;
 import kr.co.pawpaw.api.dto.chatroom.CreateChatroomScheduleResponse;
 import kr.co.pawpaw.api.service.user.UserService;
+import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomScheduleParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotAChatroomScheduleParticipantException;
 import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomScheduleException;
 import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
@@ -59,6 +60,7 @@ public class ChatroomScheduleService {
         final Long chatroomScheduleId
     ) {
         checkChatroomSchedule(chatroomId, chatroomScheduleId);
+        checkAlreadyParticipant(chatroomScheduleId, userId);
         createChatroomScheduleParticipant(userId, chatroomScheduleId);
     }
 
@@ -97,6 +99,12 @@ public class ChatroomScheduleService {
         checkChatroomSchedule(chatroomId, chatroomScheduleId);
 
         chatroomScheduleCommand.deleteById(chatroomId);
+    }
+
+    private void checkAlreadyParticipant(final Long chatroomScheduleId, final UserId userId) {
+        if (chatroomScheduleParticipantQuery.existsByChatroomScheduleUserUserId(chatroomScheduleId, userId)) {
+            throw new AlreadyChatroomScheduleParticipantException();
+        }
     }
 
     private void changeNullImageUrlToUserDefaultImageUrl(

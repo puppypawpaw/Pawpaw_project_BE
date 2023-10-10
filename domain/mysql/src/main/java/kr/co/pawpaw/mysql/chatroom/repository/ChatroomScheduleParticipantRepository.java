@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface ChatroomScheduleParticipantRepository extends JpaRepository<ChatroomScheduleParticipant, Long> {
     Optional<ChatroomScheduleParticipant> findByChatroomScheduleIdAndUserUserId(final Long chatroomScheduleId, final UserId userId);
+
+    boolean existsByChatroomScheduleIdAndUserUserId(final Long chatroomScheduleId, final UserId userId);
 }
