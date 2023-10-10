@@ -3,10 +3,7 @@ package kr.co.pawpaw.api.service.chatroom;
 import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.service.user.UserService;
-import kr.co.pawpaw.common.exception.chatroom.AlreadyChatroomParticipantException;
-import kr.co.pawpaw.common.exception.chatroom.IsNotChatroomParticipantException;
-import kr.co.pawpaw.common.exception.chatroom.NotAllowedChatroomLeaveException;
-import kr.co.pawpaw.common.exception.chatroom.NotFoundChatroomDefaultCoverException;
+import kr.co.pawpaw.common.exception.chatroom.*;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.dynamodb.domain.chat.Chat;
 import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
@@ -44,10 +41,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -133,6 +127,50 @@ class ChatroomServiceTest {
         Field idField = Chatroom.class.getDeclaredField("id");
         idField.setAccessible(true);
         idField.set(chatroom, 12345L);
+    }
+
+    @Nested
+    @DisplayName("getChatroomInfo 메서드는")
+    class GetChatroomInfo {
+        Chatroom chatroom = Chatroom.builder()
+            .hashTagList(List.of("해시태그 1", "해시태그 2"))
+            .name("채팅방 이름")
+            .description("채팅방 설명")
+            .build();
+
+        @BeforeEach
+        void setup() throws NoSuchFieldException, IllegalAccessException {
+            Field chatroomIdField = Chatroom.class.getDeclaredField("id");
+            chatroomIdField.setAccessible(true);
+            chatroomIdField.set(chatroom, 123L);
+        }
+
+        @Test
+        @DisplayName("채팅방이 존재하지 않으면 예외가 발생한다.")
+        void NotFoundChatroomException() {
+            //given
+            when(chatroomQuery.findById(chatroom.getId())).thenReturn(Optional.empty());
+
+            //when
+            assertThatThrownBy(() -> chatroomService.getChatroomInfo(chatroom.getId()))
+                .isInstanceOf(NotFoundChatroomException.class);
+
+            //then
+        }
+
+        @Test
+        @DisplayName("Chatroom을 인자로하는 ChatroomSimpleResponse의 of 메서드의 결과와 반환값이 동일하다.")
+        void ofMethod() {
+            //given
+            when(chatroomQuery.findById(chatroom.getId())).thenReturn(Optional.of(chatroom));
+            ChatroomSimpleResponse expectedResult = ChatroomSimpleResponse.of(chatroom);
+
+            //when
+            ChatroomSimpleResponse result = chatroomService.getChatroomInfo(chatroom.getId());
+
+            //then
+            assertThat(result).usingRecursiveComparison().isEqualTo(expectedResult);
+        }
     }
 
     @Nested
