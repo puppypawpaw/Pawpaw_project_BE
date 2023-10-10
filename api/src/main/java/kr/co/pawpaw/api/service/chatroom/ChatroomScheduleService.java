@@ -97,7 +97,7 @@ public class ChatroomScheduleService {
         final Long chatroomScheduleId
     )  {
         checkChatroomSchedule(chatroomId, chatroomScheduleId);
-
+        chatroomScheduleParticipantCommand.deleteByChatroomScheduleId(chatroomScheduleId);
         chatroomScheduleCommand.deleteById(chatroomScheduleId);
     }
 

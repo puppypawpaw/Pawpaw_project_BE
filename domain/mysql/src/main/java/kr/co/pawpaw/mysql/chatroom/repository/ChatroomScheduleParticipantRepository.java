@@ -10,4 +10,5 @@ public interface ChatroomScheduleParticipantRepository extends JpaRepository<Cha
     Optional<ChatroomScheduleParticipant> findByChatroomScheduleIdAndUserUserId(final Long chatroomScheduleId, final UserId userId);
 
     boolean existsByChatroomScheduleIdAndUserUserId(final Long chatroomScheduleId, final UserId userId);
+    void deleteByChatroomScheduleId(final Long chatroomScheduleId);
 }

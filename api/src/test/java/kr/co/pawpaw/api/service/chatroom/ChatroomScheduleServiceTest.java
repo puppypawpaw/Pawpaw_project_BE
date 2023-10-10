@@ -278,8 +278,7 @@ class ChatroomScheduleServiceTest {
     class DeleteChatroomSchedule {
         Long chatroomId = 123L;
         Long chatroomScheduleId = 1234L;
-        ChatroomSchedule chatroomSchedule = ChatroomSchedule.builder()
-            .build();
+
         @Test
         @DisplayName("존재하는 채팅방 스케줄이 아니면 예외가 발생한다.")
         void notFoundChatroomScheduleException() {
@@ -294,6 +293,19 @@ class ChatroomScheduleServiceTest {
         }
 
         @Test
+        @DisplayName("chatroomScheduleParticipantCommand의 deleteByChatroomScheduleId 메서드를 호출한다.")
+        void deleteByChatroomScheduleId() {
+            //given
+            when(chatroomScheduleQuery.existByChatroomIdAndChatroomScheduleId(chatroomId, chatroomScheduleId)).thenReturn(true);
+
+            //when
+            chatroomScheduleService.deleteChatroomSchedule(chatroomId, chatroomScheduleId);
+
+            //then
+            verify(chatroomScheduleParticipantCommand).deleteByChatroomScheduleId(chatroomScheduleId);
+        }
+
+        @Test
         @DisplayName("chatroomScheduleCommand 의 deleteById 메서드를 호출한다.")
         void deleteById() {
             //given
@@ -303,7 +315,7 @@ class ChatroomScheduleServiceTest {
             chatroomScheduleService.deleteChatroomSchedule(chatroomId, chatroomScheduleId);
 
             //then
-            verify(chatroomScheduleCommand).deleteById(chatroomId);
+            verify(chatroomScheduleCommand).deleteById(chatroomScheduleId);
         }
     }
 }
