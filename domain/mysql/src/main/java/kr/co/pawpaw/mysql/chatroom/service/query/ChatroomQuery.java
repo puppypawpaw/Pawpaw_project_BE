@@ -3,6 +3,7 @@ package kr.co.pawpaw.mysql.chatroom.service.query;
 import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomDetailData;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomResponse;
+import kr.co.pawpaw.mysql.chatroom.dto.ChatroomSimpleResponse;
 import kr.co.pawpaw.mysql.chatroom.dto.TrendingChatroomResponse;
 import kr.co.pawpaw.mysql.chatroom.repository.ChatroomCustomRepository;
 import kr.co.pawpaw.mysql.chatroom.repository.ChatroomRepository;
@@ -44,5 +45,9 @@ public class ChatroomQuery {
         final int size
     ) {
         return trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(userId, beforeId, size);
+    }
+
+    public ChatroomSimpleResponse findByChatroomIdAsSimpleResponse(final Long chatroomId) {
+        return chatroomCustomRepository.findByChatroomIdAsSimpleResponse(chatroomId);
     }
 }

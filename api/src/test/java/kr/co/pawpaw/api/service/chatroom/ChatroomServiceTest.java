@@ -146,30 +146,15 @@ class ChatroomServiceTest {
         }
 
         @Test
-        @DisplayName("채팅방이 존재하지 않으면 예외가 발생한다.")
-        void NotFoundChatroomException() {
-            //given
-            when(chatroomQuery.findById(chatroom.getId())).thenReturn(Optional.empty());
-
-            //when
-            assertThatThrownBy(() -> chatroomService.getChatroomInfo(chatroom.getId()))
-                .isInstanceOf(NotFoundChatroomException.class);
-
-            //then
-        }
-
-        @Test
-        @DisplayName("Chatroom을 인자로하는 ChatroomSimpleResponse의 of 메서드의 결과와 반환값이 동일하다.")
+        @DisplayName("ChatroomQuery의 findByChatroomIdAsSimpleResponse 메서드를 호출한다.")
         void ofMethod() {
-            //given
-            when(chatroomQuery.findById(chatroom.getId())).thenReturn(Optional.of(chatroom));
-            ChatroomSimpleResponse expectedResult = ChatroomSimpleResponse.of(chatroom);
+            when(chatroomQuery.findByChatroomIdAsSimpleResponse(chatroom.getId())).thenReturn(null);
 
             //when
-            ChatroomSimpleResponse result = chatroomService.getChatroomInfo(chatroom.getId());
+            chatroomService.getChatroomInfo(chatroom.getId());
 
             //then
-            assertThat(result).usingRecursiveComparison().isEqualTo(expectedResult);
+            verify(chatroomQuery).findByChatroomIdAsSimpleResponse(chatroom.getId());
         }
     }
 

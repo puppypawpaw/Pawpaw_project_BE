@@ -6,10 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pawpaw.mysql.chatroom.domain.QChatroom;
 import kr.co.pawpaw.mysql.chatroom.domain.QChatroomParticipant;
 import kr.co.pawpaw.mysql.chatroom.domain.QChatroomSchedule;
-import kr.co.pawpaw.mysql.chatroom.dto.ChatroomDetailData;
-import kr.co.pawpaw.mysql.chatroom.dto.ChatroomResponse;
-import kr.co.pawpaw.mysql.chatroom.dto.QChatroomDetailData;
-import kr.co.pawpaw.mysql.chatroom.dto.QChatroomResponse;
+import kr.co.pawpaw.mysql.chatroom.dto.*;
 import kr.co.pawpaw.mysql.common.repository.OrderByNull;
 import kr.co.pawpaw.mysql.common.repository.OrderByRandom;
 import kr.co.pawpaw.mysql.storage.domain.QFile;
@@ -97,5 +94,20 @@ public class ChatroomCustomRepository {
             .orderBy(OrderByRandom.DEFAULT)
             .limit(10)
             .fetch();
+    }
+
+    public ChatroomSimpleResponse findByChatroomIdAsSimpleResponse(final Long chatroomId) {
+        return queryFactory.select(
+            new QChatroomSimpleResponse(
+                qChatroom.name,
+                qChatroom.description,
+                qChatroomParticipant.countDistinct(),
+                qFileCover.fileUrl
+            ))
+            .from(qChatroom)
+            .leftJoin(qChatroom.coverFile, qFileCover)
+            .leftJoin(qChatroomParticipant).on(qChatroom.eq(qChatroomParticipant.chatroom))
+            .where(qChatroom.id.eq(chatroomId))
+            .fetchOne();
     }
 }

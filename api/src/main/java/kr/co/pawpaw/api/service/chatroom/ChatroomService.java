@@ -64,10 +64,7 @@ public class ChatroomService {
 
     @Transactional(readOnly = true)
     public ChatroomSimpleResponse getChatroomInfo(final Long chatroomId) {
-        Chatroom chatroom = chatroomQuery.findById(chatroomId)
-            .orElseThrow(NotFoundChatroomException::new);
-
-        return ChatroomSimpleResponse.of(chatroom);
+        return chatroomQuery.findByChatroomIdAsSimpleResponse(chatroomId);
     }
 
     @Transactional
