@@ -98,7 +98,7 @@ public class ChatroomScheduleService {
     )  {
         checkChatroomSchedule(chatroomId, chatroomScheduleId);
 
-        chatroomScheduleCommand.deleteById(chatroomId);
+        chatroomScheduleCommand.deleteById(chatroomScheduleId);
     }
 
     private void checkAlreadyParticipant(final Long chatroomScheduleId, final UserId userId) {
