@@ -13,4 +13,7 @@ public class ChatroomCommand {
     public Chatroom save(final Chatroom chatroom) {
         return chatroomRepository.save(chatroom);
     }
+    public void deleteById(final Long chatroomId) {
+        chatroomRepository.deleteById(chatroomId);
+    }
 }

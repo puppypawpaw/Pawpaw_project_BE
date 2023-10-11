@@ -130,6 +130,44 @@ class ChatroomServiceTest {
     }
 
     @Nested
+    @DisplayName("deleteChatroom 메서드는")
+    class DeleteChatroom {
+        Long chatroomId = 123L;
+        ChatroomParticipant participant1 = ChatroomParticipant.builder().build();
+        ChatroomParticipant participant2 = ChatroomParticipant.builder().build();
+        List<ChatroomParticipant> twoParticipants = List.of(participant1, participant2);
+        List<ChatroomParticipant> oneParticipants = List.of(participant1);
+
+        @Test
+        @DisplayName("채팅방 참가자가 1명 초과면(방장 외에 존재하면) 예외가 발생한다.")
+        void chatroomParticipantExistException() {
+            //given
+            when(chatroomParticipantQuery.findAllByChatroomId(chatroomId)).thenReturn(twoParticipants);
+
+            //when
+            assertThatThrownBy(() -> chatroomService.deleteChatroom(chatroomId))
+                .isInstanceOf(ChatroomParticipantExistException.class);
+
+            //then
+
+        }
+
+        @Test
+        @DisplayName("잔여 채팅방 참가자를 삭제 후 채팅방을 삭제한다.")
+        void callDelete() {
+            //given
+            when(chatroomParticipantQuery.findAllByChatroomId(chatroomId)).thenReturn(oneParticipants);
+
+            //when
+            chatroomService.deleteChatroom(chatroomId);
+
+            //then
+            verify(chatroomParticipantCommand).delete(participant1);
+            verify(chatroomCommand).deleteById(chatroomId);
+        }
+    }
+
+    @Nested
     @DisplayName("updateChatroomManager 메서드는")
     class UpdateChatroomManager {
         Long chatroomId = 123L;

@@ -63,6 +63,18 @@ public class ChatroomService {
     private final RedisPublisher redisPublisher;
 
     @Transactional
+    public void deleteChatroom(final Long chatroomId) {
+        List<ChatroomParticipant> chatroomParticipantList = chatroomParticipantQuery.findAllByChatroomId(chatroomId);
+
+        if (chatroomParticipantList.size() > 1) {
+            throw new ChatroomParticipantExistException();
+        }
+
+        chatroomParticipantCommand.delete(chatroomParticipantList.get(0));
+        chatroomCommand.deleteById(chatroomId);
+    }
+
+    @Transactional
     public void updateChatroomManager(
         final UserId userId,
         final Long chatroomId,

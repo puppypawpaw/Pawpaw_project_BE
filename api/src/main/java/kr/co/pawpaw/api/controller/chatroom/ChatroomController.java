@@ -399,4 +399,38 @@ public class ChatroomController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "권한이 부족합니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 존재합니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "DELETE",
+        summary = "채팅방 삭제",
+        description = "채팅방 삭제"
+    )
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.MANAGER)
+    @DeleteMapping("/{chatroomId}")
+    public ResponseEntity<Void> deleteChatroom(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long chatroomId
+    ) {
+        chatroomService.deleteChatroom(chatroomId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
