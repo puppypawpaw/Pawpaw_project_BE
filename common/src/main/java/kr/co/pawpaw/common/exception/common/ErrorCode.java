@@ -52,6 +52,7 @@ public enum ErrorCode {
     ALREADY_CHATROOM_PARTICIPANT(409, "CR007", "이미 참여한 채팅방입니다."),
     NOT_FOUND_CHATROOM_DEFAULT_COVER(404, "CR008", "존재하지 않는 채팅방 기본 커버입니다."),
     ALREADY_CHATROOM_SCHEDULE_PARTICIPANT(409, "CR009", "이미 참여한 채팅방 스케줄입니다."),
+    ALREADY_CHATROOM_MANAGER(409, "CR010", "이미 채팅방 매니저입니다."),
     // 게시판 이미지
     BOARD_IMG_CANNOT_UPLOAD_EXCEPTION(400, "BOARD_IMG_CANNOT_UPLOAD_EXCEPTION", "이미지 업로드를 실패했습니다"),
     BOARD_IMG_CANNOT_VIEW_EXCEPTION(400, "BOARD_IMG_CANNOT_VIEW_EXCEPTION", "이미지 조회를 실패했습니다"),

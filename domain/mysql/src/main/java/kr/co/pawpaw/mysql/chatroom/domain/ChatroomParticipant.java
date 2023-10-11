@@ -40,4 +40,8 @@ public class ChatroomParticipant extends BaseTimeEntity {
     public boolean isManager() {
         return this.role.equals(ChatroomParticipantRole.MANAGER);
     }
+
+    public void updateRole(final ChatroomParticipantRole role) {
+        this.role = role;
+    }
 }

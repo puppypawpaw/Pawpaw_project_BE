@@ -369,4 +369,34 @@ public class ChatroomController {
     ) {
         return ResponseEntity.ok(chatroomService.getChatroomInfo(chatroomId));
     }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "권한이 부족합니다.",
+            content = @Content
+        ),
+    })
+    @Operation(
+        method = "PUT",
+        summary = "채팅방 방장 위임",
+        description = "채팅방 방장 위임"
+    )
+    @ChatroomRoleCheck(role = ChatroomParticipantRole.MANAGER)
+    @PutMapping(value = "/{chatroomId}/manager")
+    public ResponseEntity<Void> changeChatroomManager(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long chatroomId,
+        @RequestBody final UpdateChatroomManagerRequest request
+    ) {
+        chatroomService.updateChatroomManager(userId, chatroomId, request);
+
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -130,6 +130,73 @@ class ChatroomServiceTest {
     }
 
     @Nested
+    @DisplayName("updateChatroomManager 메서드는")
+    class UpdateChatroomManager {
+        Long chatroomId = 123L;
+        User user1 = User.builder().build();
+        User user2 = User.builder().build();
+
+        ChatroomParticipant currentManager = ChatroomParticipant.builder()
+            .role(ChatroomParticipantRole.MANAGER)
+            .build();
+
+        ChatroomParticipant nextManager = ChatroomParticipant.builder()
+            .role(ChatroomParticipantRole.PARTICIPANT)
+            .build();
+
+        UpdateChatroomManagerRequest request1 = UpdateChatroomManagerRequest.builder()
+            .nextManagerId(user2.getUserId())
+            .build();
+
+        UpdateChatroomManagerRequest request2 = UpdateChatroomManagerRequest.builder()
+            .nextManagerId(user1.getUserId())
+            .build();
+
+        @Test
+        @DisplayName("채팅방 참여자가 아니면 예외가 발생한다.")
+        void ifNotAChatroomParticipantThenThrowException() {
+            //given
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.empty());
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.empty());
+
+            //when
+            assertThatThrownBy(() -> chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1)).isInstanceOf(NotAChatroomParticipantException.class);
+            assertThatThrownBy(() -> chatroomService.updateChatroomManager(user2.getUserId(), chatroomId, request2)).isInstanceOf(NotAChatroomParticipantException.class);
+
+            //then
+        }
+
+        @Test
+        @DisplayName("기존 채팅방 매니저를 다음 매니저로 선택할 경우 예외가 발생한다.")
+        void alreadyChatroomManagerException() {
+            //given
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
+
+            //when
+            assertThatThrownBy(() -> chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request2))
+                .isInstanceOf(AlreadyChatroomManagerException.class);
+
+            //then
+
+        }
+
+        @Test
+        @DisplayName("현재 채팅방 매니저의 role을 참여자로 변경하고 다음 채팅방 매니저의 role을 매니저로 변경한다.")
+        void changeRoleOfCurrentAndNextManager() {
+            //given
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+
+            //when
+            chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1);
+
+            //then
+            assertThat(currentManager.getRole()).isEqualTo(ChatroomParticipantRole.PARTICIPANT);
+            assertThat(nextManager.getRole()).isEqualTo(ChatroomParticipantRole.MANAGER);
+        }
+    }
+
+    @Nested
     @DisplayName("getChatroomInfo 메서드는")
     class GetChatroomInfo {
         Chatroom chatroom = Chatroom.builder()
@@ -683,8 +750,10 @@ class ChatroomServiceTest {
     class GetChatroomParticipantResponseList {
         String defaultImageUrl = "기본 이미지 URL";
         Long chatroomId = 12345L;
+        UserId userId = UserId.create();
         List<ChatroomParticipantResponse> nullResponseList = List.of(
             new ChatroomParticipantResponse(
+                userId,
                 "nickname",
                 "briefIntroduction",
                 null,
@@ -693,6 +762,7 @@ class ChatroomServiceTest {
         );
         List<ChatroomParticipantResponse> nonNullResponseList = nullResponseList.stream()
             .map(response -> new ChatroomParticipantResponse(
+                response.getUserId(),
                 response.getNickname(),
                 response.getBriefIntroduction(),
                 defaultImageUrl,
