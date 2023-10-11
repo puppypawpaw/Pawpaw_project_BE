@@ -34,4 +34,8 @@ public class ChatroomParticipantQuery {
     public List<ChatroomParticipantResponse> getChatroomParticipantResponseList(final Long chatroomId) {
         return chatroomParticipantCustomRepository.getChatroomParticipantResponseList(chatroomId);
     }
+
+    public List<ChatroomParticipant> findAllByChatroomId(final Long chatroomId) {
+        return chatroomParticipantRepository.findAllByChatroomId(chatroomId);
+    }
 }

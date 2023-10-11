@@ -119,6 +119,7 @@ class ChatroomParticipantCustomRepositoryTest {
             List<ChatroomParticipantResponse> expectedResult = chatroomParticipantList
                 .stream()
                 .map(participant -> new ChatroomParticipantResponse(
+                    participant.getUser().getUserId(),
                     participant.getUser().getNickname(),
                     participant.getUser().getBriefIntroduction(),
                     Objects.nonNull(participant.getUser().getUserImage()) ?

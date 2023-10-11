@@ -62,6 +62,38 @@ public class ChatroomService {
     private final UserService userService;
     private final RedisPublisher redisPublisher;
 
+    @Transactional
+    public void deleteChatroom(final Long chatroomId) {
+        List<ChatroomParticipant> chatroomParticipantList = chatroomParticipantQuery.findAllByChatroomId(chatroomId);
+
+        if (chatroomParticipantList.size() > 1) {
+            throw new ChatroomParticipantExistException();
+        }
+
+        chatroomParticipantCommand.delete(chatroomParticipantList.get(0));
+        chatroomCommand.deleteById(chatroomId);
+    }
+
+    @Transactional
+    public void updateChatroomManager(
+        final UserId userId,
+        final Long chatroomId,
+        final UpdateChatroomManagerRequest request
+    ) {
+        ChatroomParticipant currentManager = chatroomParticipantQuery.findByUserIdAndChatroomId(userId, chatroomId)
+            .orElseThrow(NotAChatroomParticipantException::new);
+
+        ChatroomParticipant nextManager = chatroomParticipantQuery.findByUserIdAndChatroomId(request.getNextManagerId(), chatroomId)
+            .orElseThrow(NotAChatroomParticipantException::new);
+
+        if (nextManager.isManager()) {
+            throw new AlreadyChatroomManagerException();
+        }
+
+        currentManager.updateRole(ChatroomParticipantRole.PARTICIPANT);
+        nextManager.updateRole(ChatroomParticipantRole.MANAGER);
+    }
+
     @Transactional(readOnly = true)
     public ChatroomSimpleResponse getChatroomInfo(final Long chatroomId) {
         return chatroomQuery.findByChatroomIdAsSimpleResponse(chatroomId);

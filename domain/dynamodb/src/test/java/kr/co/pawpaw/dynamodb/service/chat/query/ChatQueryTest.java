@@ -34,18 +34,15 @@ class ChatQueryTest {
         Long sortId = 1234L;
         Long chatroomId = 123L;
         PageRequest pageable = PageRequest.of(0, 10);
-        List<Chat> chatList = List.of(
-            Chat.builder()
-                .chatroomId(1L)
-                .build(),
-            Chat.builder()
-                .chatroomId(2L)
-                .build()
-        );
+        Chat chat1 = Chat.builder()
+            .chatroomId(1L)
+            .build();
+        Chat chat2 = Chat.builder()
+            .chatroomId(2L)
+            .build();
+        List<Chat> chatList = List.of(chat1, chat2);
 
-        List<Chat> reverseChatList = chatList.stream()
-            .sorted(Comparator.comparing(Chat::getSortId).reversed())
-            .collect(Collectors.toList());
+        List<Chat> reverseChatList = List.of(chat2, chat1);
 
         Slice<Chat> chatSlice = new SliceImpl<>(chatList, pageable, true);
 
