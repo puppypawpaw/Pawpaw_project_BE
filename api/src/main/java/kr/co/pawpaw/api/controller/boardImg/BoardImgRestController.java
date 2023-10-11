@@ -23,7 +23,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/file")
+@RequestMapping("/api/file")
 public class BoardImgRestController {
 
     private final BoardImgService imgService;

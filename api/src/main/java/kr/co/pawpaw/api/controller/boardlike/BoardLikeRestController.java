@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/boardLike")
+@RequestMapping("/api/boardLike")
 public class BoardLikeRestController {
 
     private final BoardLikeService boardLikeService;

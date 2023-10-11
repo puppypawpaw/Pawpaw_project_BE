@@ -1,11 +1,11 @@
 package kr.co.pawpaw.api.service.board;
 
-import kr.co.pawpaw.api.service.boardImg.BoardImgService;
-import kr.co.pawpaw.api.service.reply.ReplyService;
 import kr.co.pawpaw.api.dto.board.BoardDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.RegisterResponseDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
+import kr.co.pawpaw.api.service.boardImg.BoardImgService;
+import kr.co.pawpaw.api.service.reply.ReplyService;
 import kr.co.pawpaw.common.exception.board.BoardException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardUpdateException;
@@ -110,6 +110,17 @@ public class BoardService {
         List<BoardListDto> boardListDtos = getBoardListDtos(userId, pageable, boardListWithReplies);
         return new SliceImpl<>(boardListDtos, pageable, boardListWithReplies.hasNext());
     }
+
+    @Transactional(readOnly = true)
+    public Slice<BoardListDto> getBoardListWithRepliesByUser_UserId(UserId userId, Pageable pageable) {
+        userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
+
+        Slice<Board> boardListWithReplies = boardQuery.getBoardListWithRepliesByUser_UserId(pageable, userId);
+
+        List<BoardListDto> boardListDtos = getBoardListDtos(userId, pageable, boardListWithReplies);
+        return new SliceImpl<>(boardListDtos, pageable, boardListWithReplies.hasNext());
+    }
+
     @Transactional(readOnly = true)
     public Slice<BoardListDto> searchBoardsByQuery(UserId userId, Pageable pageable, String query){
         userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
