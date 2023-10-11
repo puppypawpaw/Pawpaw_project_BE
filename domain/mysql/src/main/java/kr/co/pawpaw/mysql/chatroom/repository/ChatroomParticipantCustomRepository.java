@@ -24,6 +24,7 @@ public class ChatroomParticipantCustomRepository {
     public List<ChatroomParticipantResponse> getChatroomParticipantResponseList(final Long chatroomId) {
         return queryFactory.select(
             new QChatroomParticipantResponse(
+                qUser.userId,
                 qUser.nickname,
                 qUser.briefIntroduction,
                 qFile.fileUrl,
