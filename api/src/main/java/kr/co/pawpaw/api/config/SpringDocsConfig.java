@@ -7,8 +7,10 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile({"dev","local"})
 public class SpringDocsConfig {
     @Bean
     public OpenAPI openAPI() {
