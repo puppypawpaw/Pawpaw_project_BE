@@ -45,11 +45,10 @@ jobs:
           echo "$API_SECRET" > ./api/src/main/resources/application-secret.yml
           echo "$SOCKET_SECRET" > ./socket/src/main/resources/application-secret.yml
           ./gradlew clean jib -Penv=prod
-
-#      - name: Send Webhook to Jenkins
-#        uses: fjogeleit/http-request-action@v1
-#        with:
-#          url: ${{ secrets.PROD_JENKINS_WEBHOOK_URL }}
-#          method: 'GET'
-#          timeout: 60000
+      - name: Send Webhook to Jenkins
+        uses: fjogeleit/http-request-action@v1
+        with:
+         url: ${{ secrets.PROD_JENKINS_WEBHOOK_URL }}
+         method: 'GET'
+         timeout: 60000
 
