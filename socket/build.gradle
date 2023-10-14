@@ -24,16 +24,32 @@ tasks.named('jibDockerBuild') {
     dependsOn test
 }
 
-jib {
-    from {
-        image = 'openjdk:11-jre-slim-bullseye'
+if (hasProperty('env') && 'prod'.equals(env)) {
+    jib {
+        from {
+            image = 'openjdk:11-jre-slim-bullseye'
+        }
+        to {
+            image = '763295874162.dkr.ecr.ap-northeast-2.amazonaws.com/pawpaw-socket-prod'
+        }
+        container {
+            mainClass = "kr.co.pawpaw.ws.SocketApplication"
+            jvmFlags = ['-Duser.timezone=Asia/Seoul', '-Dspring.profiles.active=prod', '-XX:+UseContainerSupport']
+            volumes = ["/tmp"]
+        }
     }
-    to {
-        image = '520511553477.dkr.ecr.ap-northeast-2.amazonaws.com/pawpaw-socket-dev'
-    }
-    container {
-        mainClass = "kr.co.pawpaw.ws.SocketApplication"
-        jvmFlags = ['-Duser.timezone=Asia/Seoul', '-Dspring.profiles.active=dev', '-XX:+UseContainerSupport']
-        volumes = ["/tmp"]
+} else {
+    jib {
+        from {
+            image = 'openjdk:11-jre-slim-bullseye'
+        }
+        to {
+            image = '520511553477.dkr.ecr.ap-northeast-2.amazonaws.com/pawpaw-socket-dev'
+        }
+        container {
+            mainClass = "kr.co.pawpaw.ws.SocketApplication"
+            jvmFlags = ['-Duser.timezone=Asia/Seoul', '-Dspring.profiles.active=dev', '-XX:+UseContainerSupport']
+            volumes = ["/tmp"]
+        }
     }
 }
