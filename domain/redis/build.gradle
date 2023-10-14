@@ -1,0 +1,13 @@
+bootJar {
+	enabled = false
+}
+
+dependencies {
+	//redis
+	implementation "org.springframework.boot:spring-boot-starter-data-redis"
+	testImplementation "it.ozimov:embedded-redis:0.7.2"
+	testImplementation "org.springframework.boot:spring-boot-starter-data-redis"
+
+	//object-mapper
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.1'
+}

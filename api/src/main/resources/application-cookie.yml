@@ -1,0 +1,4 @@
+custom:
+  cookie:
+    domain: ${properties.cookie.cookieDomain}
+    sameSite: None

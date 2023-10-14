@@ -1,5 +1,4 @@
 HELP.md
-.gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -22,7 +21,6 @@ bin/
 *.iws
 *.iml
 *.ipr
-out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
@@ -88,8 +86,6 @@ cmake-build-*/
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
 
-# File-based project format
-*.iws
 
 # IntelliJ
 out/
@@ -231,22 +227,24 @@ gradle-app.setting
 
 # Eclipse Gradle plugin generated files
 # Eclipse Core
-.project
 # JDT-specific (Eclipse Java Development Tools)
-.classpath
 
 ### Gradle Patch ###
 # Java heap dump
 *.hprof
 
-#application.yml
-src/main/resources/application.yml
-*.yml
-
-#config
+# config
 src/main/java/com/fc/final7/global/config
 
-#QueryDSL
-src/main/generated/
+# QueryDSL
+domain/mysql/src/main/generated
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,intellij+all,gradle,java
+/docker/data/
+/.github/workflows/publish.yml
+README.md
+api/src/main/resources/application-secret.yml
+socket/src/main/resources/application-secret.yml
+/docker/rabbitmq
+/docker/rabbitmq.conf/
+/docker/dynamodb/shared-local-instance.db

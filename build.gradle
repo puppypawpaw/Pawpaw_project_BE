@@ -1,37 +1,110 @@
-plugins {
-    id 'java'
-    id 'org.springframework.boot' version '2.7.14'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
-}
-
-group = 'com.puppy'
-version = '0.0.1-SNAPSHOT'
-
-java {
-    sourceCompatibility = '11'
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+buildscript {
+    ext {
+        springBootVersion = '2.7.14'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "io.spring.gradle:dependency-management-plugin"
     }
 }
 
-repositories {
-    mavenCentral()
+allprojects {
+    group = 'kr.co.pawpaw'
+    version = '1.0'
 }
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    sourceCompatibility = '11'
+
+    dependencies {
+        //lombok
+        implementation 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+
+        //anotationProcessor
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+        //test
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    tasks.named('test') {
+        useJUnitPlatform()
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+project(':domain') {
+
+}
+
+project(':domain:redis') {
+
+}
+
+project(':domain:mysql') {
+
+}
+
+project(':domain:dynamodb') {
+
+}
+
+project(':common') {
+
+}
+
+project(':infrastructure') {
+
+}
+
+project(':infrastructure:object-storage') {
+
+}
+
+project(':infrastructure:feign-client') {
+
+}
+
+project(':infrastructure:mail') {
+
+}
+
+project(':api') {
+    dependencies {
+        implementation project(path: ':domain:mysql', configuration: 'default')
+        implementation project(path: ':domain:redis', configuration: 'default')
+        implementation project(path: ':common', configuration: 'default')
+        implementation project(path: ':domain:dynamodb', configuration: 'default')
+        implementation project(path: ':infrastructure:feign-client', configuration: 'default')
+        implementation project(path: ':infrastructure:object-storage', configuration: 'default')
+        implementation project(path: ':infrastructure:mail', configuration: 'default')
+    }
+}
+
+project(':socket') {
+    dependencies {
+        implementation project(path: ':domain:mysql', configuration: 'default')
+        implementation project(path: ':domain:redis', configuration: 'default')
+        implementation project(path: ':domain:dynamodb', configuration: 'default')
+        implementation project(path: ':common', configuration: 'default')
+    }
 }

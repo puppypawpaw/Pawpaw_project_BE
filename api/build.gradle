@@ -1,0 +1,56 @@
+plugins {
+    id "com.google.cloud.tools.jib" version "3.3.2"
+}
+
+dependencies {
+    //spring web
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-web'
+
+    //object storage
+    implementation 'com.amazonaws:aws-java-sdk-s3:1.12.470'
+
+    //security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //api logging
+    implementation 'org.zalando:logbook-spring-boot-starter:2.16.0'
+}
+
+jar {
+    enabled = false
+}
+
+tasks.named('jibDockerBuild') {
+    dependsOn test
+}
+
+if (hasProperty('env') && 'prod'.equals(env)) {
+    jib {
+        from {
+            image = 'openjdk:11-jre-slim-bullseye'
+        }
+        to {
+            image = '763295874162.dkr.ecr.ap-northeast-2.amazonaws.com/pawpaw-back-prod'
+        }
+        container {
+            mainClass = "kr.co.pawpaw.api.ApiApplication"
+            jvmFlags = ['-Duser.timezone=Asia/Seoul', '-Dspring.profiles.active=prod', '-XX:+UseContainerSupport']
+            volumes = ["/tmp"]
+        }
+    }
+} else {
+    jib {
+        from {
+            image = 'openjdk:11-jre-slim-bullseye'
+        }
+        to {
+            image = '520511553477.dkr.ecr.ap-northeast-2.amazonaws.com/pawpaw-back-dev'
+        }
+        container {
+            mainClass = "kr.co.pawpaw.api.ApiApplication"
+            jvmFlags = ['-Duser.timezone=Asia/Seoul', '-Dspring.profiles.active=dev', '-XX:+UseContainerSupport']
+            volumes = ["/tmp"]
+        }
+    }
+}

@@ -1,0 +1,8 @@
+bootJar {
+    enabled = false
+}
+
+dependencies {
+    implementation platform('org.springframework.cloud:spring-cloud-dependencies:2021.0.8')
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+}

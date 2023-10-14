@@ -1,0 +1,11 @@
+spring:
+  storage:
+    end-point: ${properties.storage.end-point}
+    access-key: ${properties.storage.access-key}
+    secret-key: ${properties.storage.secret-key}
+    bucket: ${properties.storage.bucket}
+    public-url: ${properties.storage.public-url}
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB

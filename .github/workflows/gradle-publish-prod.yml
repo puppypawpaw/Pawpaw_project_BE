@@ -1,0 +1,55 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
+# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
+
+name: Gradle Package
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      API_SECRET: ${{ secrets.API_SECRET }}
+      SOCKET_SECRET: ${{ secrets.SOCKET_SECRET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.PROD_AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
+          cache: 'gradle'
+
+      - name: Build with gradle
+        run: |
+          echo "$API_SECRET" > ./api/src/main/resources/application-secret.yml
+          echo "$SOCKET_SECRET" > ./socket/src/main/resources/application-secret.yml
+          ./gradlew clean jib -Penv=prod
+
+#      - name: Send Webhook to Jenkins
+#        uses: fjogeleit/http-request-action@v1
+#        with:
+#          url: ${{ secrets.PROD_JENKINS_WEBHOOK_URL }}
+#          method: 'GET'
+#          timeout: 60000
+
