@@ -1,7 +1,6 @@
 package kr.co.pawpaw.api.dto.follow;
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
-
 import lombok.Builder;
 import lombok.Getter;
 

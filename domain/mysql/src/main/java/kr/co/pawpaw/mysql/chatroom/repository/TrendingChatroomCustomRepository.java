@@ -34,42 +34,42 @@ public class TrendingChatroomCustomRepository {
     private static final QTrendingChatroom qTrendingChatroom = QTrendingChatroom.trendingChatroom;
 
     public Slice<TrendingChatroomResponse> findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(
-        final UserId userId,
-        final Long beforeId,
-        final int size
+            final UserId userId,
+            final Long beforeId,
+            final int size
     ) {
         BooleanExpression condition = qChatroom.id.notIn(
-            JPAExpressions.select(qChatroomParticipant.chatroom.id)
-                .from(qChatroomParticipant)
-                .where(qChatroomParticipant.user.userId.eq(userId)))
-            .and(qChatroom.searchable.isTrue());
+                        JPAExpressions.select(qChatroomParticipant.chatroom.id)
+                                .from(qChatroomParticipant)
+                                .where(qChatroomParticipant.user.userId.eq(userId)))
+                .and(qChatroom.searchable.isTrue());
 
         if (Objects.nonNull(beforeId)) {
             condition = condition.and(qTrendingChatroom.id.lt(beforeId));
         }
 
         List<TrendingChatroomResponse> chatroomResponseList = queryFactory.select(
-            new QTrendingChatroomResponse(
-                qChatroom.id,
-                qTrendingChatroom.id,
-                qChatroom.name,
-                qChatroom.description,
-                qChatroom.hashTagList,
-                qUserManager.nickname,
-                qFileManager.fileUrl,
-                qChatroomParticipant.count()
-            ))
-            .from(qTrendingChatroom)
-            .innerJoin(qTrendingChatroom.chatroom, qChatroom)
-            .innerJoin(qChatroom.manager, qChatroomParticipantManager)
-            .innerJoin(qChatroomParticipantManager.user, qUserManager)
-            .innerJoin(qUserManager.userImage, qFileManager)
-            .leftJoin(qChatroom.chatroomParticipants, qChatroomParticipant)
-            .where(condition)
-            .groupBy(qChatroom.id)
-            .orderBy(qTrendingChatroom.id.desc())
-            .limit(size+1)
-            .fetch();
+                        new QTrendingChatroomResponse(
+                                qChatroom.id,
+                                qTrendingChatroom.id,
+                                qChatroom.name,
+                                qChatroom.description,
+                                qChatroom.hashTagList,
+                                qUserManager.nickname,
+                                qFileManager.fileUrl,
+                                qChatroomParticipant.count()
+                        ))
+                .from(qTrendingChatroom)
+                .innerJoin(qTrendingChatroom.chatroom, qChatroom)
+                .innerJoin(qChatroom.manager, qChatroomParticipantManager)
+                .innerJoin(qChatroomParticipantManager.user, qUserManager)
+                .innerJoin(qUserManager.userImage, qFileManager)
+                .leftJoin(qChatroom.chatroomParticipants, qChatroomParticipant)
+                .where(condition)
+                .groupBy(qChatroom.id)
+                .orderBy(qTrendingChatroom.id.desc())
+                .limit(size+1)
+                .fetch();
 
         return new SliceImpl<>(chatroomResponseList.subList(0, Math.min(size, chatroomResponseList.size())), PageRequest.of(0, size), chatroomResponseList.size() > size);
     }
