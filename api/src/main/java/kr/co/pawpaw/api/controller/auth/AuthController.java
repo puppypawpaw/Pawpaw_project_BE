@@ -63,6 +63,11 @@ public class AuthController {
             responseCode = "409",
             description = "이미 가입된 이메일 입니다.",
             content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "413",
+            description = "파일 크기 제한을 초과하였습니다.",
+            content = @Content
         )
     })
     @Operation(
@@ -112,6 +117,11 @@ public class AuthController {
         @ApiResponse(
             responseCode = "400",
             description = "유효하지 않은 소셜 회원가입 임시 키입니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "413",
+            description = "파일 크기 제한을 초과하였습니다.",
             content = @Content
         )
     })

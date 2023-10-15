@@ -37,6 +37,11 @@ public class ChatroomController {
             responseCode = "404",
             description = "존재하지 않는 유저입니다.",
             content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "413",
+            description = "파일 크기 제한을 초과하였습니다.",
+            content = @Content
         )
     })
     @Operation(
@@ -323,6 +328,11 @@ public class ChatroomController {
         @ApiResponse(
             responseCode = "400",
             description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "413",
+            description = "파일 크기 제한을 초과하였습니다.",
             content = @Content
         )
     })

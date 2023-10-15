@@ -60,7 +60,9 @@ public enum ErrorCode {
     BOARD_IMG_CANNOT_REMOVE_EXCEPTION(400, "BOARD_IMG_CANNOT_REMOVE_EXCEPTION", "이미지 삭제를 실패했습니다"),
     // 반려동물
     INVALID_PET_TYPE(400, "PE001", "유효하지 않은 반려동물 종류입니다."),
-    NOT_FOUND_PET(404, "PE002", "존재하지 않는 반려동물 입니다.");
+    NOT_FOUND_PET(404, "PE002", "존재하지 않는 반려동물 입니다."),
+    // 파일 업로드
+    FILE_SIZE_LIMIT_EXCEPTION(413, "FU001", "파일 크기 제한을 초과하였습니다.");
 
     private final int status;
     private final String code;
