@@ -1,7 +1,8 @@
 package kr.co.pawpaw.dynamodb.service.chat.query;
 
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
-import kr.co.pawpaw.dynamodb.repository.ChatRepository;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
+import kr.co.pawpaw.dynamodb.chat.repository.ChatRepository;
+import kr.co.pawpaw.dynamodb.chat.service.query.ChatQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,9 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

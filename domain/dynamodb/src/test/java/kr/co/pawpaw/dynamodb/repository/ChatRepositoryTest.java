@@ -1,8 +1,9 @@
 package kr.co.pawpaw.dynamodb.repository;
 
+import kr.co.pawpaw.dynamodb.chat.repository.ChatRepository;
 import kr.co.pawpaw.dynamodb.common.AbstractDynamodbIntegrationTest;
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
-import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
+import kr.co.pawpaw.dynamodb.chat.domain.ChatType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

@@ -1,6 +1,6 @@
 package kr.co.pawpaw.ws.handler;
 
-import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
+import kr.co.pawpaw.dynamodb.chat.dto.ChatMessageDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

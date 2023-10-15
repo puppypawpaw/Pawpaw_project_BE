@@ -10,7 +10,7 @@ import kr.co.pawpaw.api.aop.ChatroomRoleCheck;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.chatroom.ChatroomService;
-import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
+import kr.co.pawpaw.dynamodb.chat.dto.ChatMessageDto;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
 import kr.co.pawpaw.mysql.user.domain.UserId;
