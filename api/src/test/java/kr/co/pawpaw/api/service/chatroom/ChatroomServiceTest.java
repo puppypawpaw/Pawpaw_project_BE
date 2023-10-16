@@ -219,11 +219,28 @@ class ChatroomServiceTest {
         }
 
         @Test
+        @DisplayName("존재하지 않는 채팅방이면 예외가 발생한다.")
+        void NotFoundChatroomException() {
+            //given
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+            when(chatroomQuery.findById(chatroomId)).thenReturn(Optional.empty());
+
+            //when
+            assertThatThrownBy(() -> chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1))
+                .isInstanceOf(NotFoundChatroomException.class);
+
+            //then
+
+        }
+
+        @Test
         @DisplayName("현재 채팅방 매니저의 role을 참여자로 변경하고 다음 채팅방 매니저의 role을 매니저로 변경한다.")
         void changeRoleOfCurrentAndNextManager() {
             //given
             when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
             when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+            when(chatroomQuery.findById(chatroomId)).thenReturn(Optional.of(chatroom));
 
             //when
             chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1);
@@ -231,6 +248,21 @@ class ChatroomServiceTest {
             //then
             assertThat(currentManager.getRole()).isEqualTo(ChatroomParticipantRole.PARTICIPANT);
             assertThat(nextManager.getRole()).isEqualTo(ChatroomParticipantRole.MANAGER);
+        }
+
+        @Test
+        @DisplayName("채팅방의 매니저를 새로운 매니저로 변경한다.")
+        void changeChatroomManagerToNextManager() {
+            //given
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+            when(chatroomQuery.findById(chatroomId)).thenReturn(Optional.of(chatroom));
+
+            //when
+            chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1);
+
+            //then
+            assertThat(chatroom.getManager()).usingRecursiveComparison().isEqualTo(nextManager);
         }
     }
 

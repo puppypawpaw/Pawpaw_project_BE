@@ -92,6 +92,11 @@ public class ChatroomService {
 
         currentManager.updateRole(ChatroomParticipantRole.PARTICIPANT);
         nextManager.updateRole(ChatroomParticipantRole.MANAGER);
+
+        Chatroom chatroom = chatroomQuery.findById(chatroomId)
+            .orElseThrow(NotFoundChatroomException::new);
+
+        chatroom.updateManager(nextManager);
     }
 
     @Transactional(readOnly = true)
