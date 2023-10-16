@@ -1,6 +1,6 @@
-package kr.co.pawpaw.dynamodb.repository;
+package kr.co.pawpaw.dynamodb.chat.repository;
 
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
 import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;

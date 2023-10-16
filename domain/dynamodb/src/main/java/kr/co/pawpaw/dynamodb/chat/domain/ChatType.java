@@ -1,4 +1,4 @@
-package kr.co.pawpaw.dynamodb.domain.chat;
+package kr.co.pawpaw.dynamodb.chat.domain;
 
 public enum ChatType {
     MESSAGE,

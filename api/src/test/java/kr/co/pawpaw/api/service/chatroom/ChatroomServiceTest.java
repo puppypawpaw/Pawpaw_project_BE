@@ -5,11 +5,11 @@ import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.chatroom.*;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
-import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
-import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
-import kr.co.pawpaw.dynamodb.service.chat.command.ChatCommand;
-import kr.co.pawpaw.dynamodb.service.chat.query.ChatQuery;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
+import kr.co.pawpaw.dynamodb.chat.domain.ChatType;
+import kr.co.pawpaw.dynamodb.chat.dto.ChatMessageDto;
+import kr.co.pawpaw.dynamodb.chat.service.command.ChatCommand;
+import kr.co.pawpaw.dynamodb.chat.service.query.ChatQuery;
 import kr.co.pawpaw.mysql.chatroom.domain.*;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
 import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomCommand;
@@ -219,11 +219,28 @@ class ChatroomServiceTest {
         }
 
         @Test
+        @DisplayName("존재하지 않는 채팅방이면 예외가 발생한다.")
+        void NotFoundChatroomException() {
+            //given
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+            when(chatroomQuery.findById(chatroomId)).thenReturn(Optional.empty());
+
+            //when
+            assertThatThrownBy(() -> chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1))
+                .isInstanceOf(NotFoundChatroomException.class);
+
+            //then
+
+        }
+
+        @Test
         @DisplayName("현재 채팅방 매니저의 role을 참여자로 변경하고 다음 채팅방 매니저의 role을 매니저로 변경한다.")
         void changeRoleOfCurrentAndNextManager() {
             //given
             when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
             when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+            when(chatroomQuery.findById(chatroomId)).thenReturn(Optional.of(chatroom));
 
             //when
             chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1);
@@ -231,6 +248,21 @@ class ChatroomServiceTest {
             //then
             assertThat(currentManager.getRole()).isEqualTo(ChatroomParticipantRole.PARTICIPANT);
             assertThat(nextManager.getRole()).isEqualTo(ChatroomParticipantRole.MANAGER);
+        }
+
+        @Test
+        @DisplayName("채팅방의 매니저를 새로운 매니저로 변경한다.")
+        void changeChatroomManagerToNextManager() {
+            //given
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+            when(chatroomQuery.findById(chatroomId)).thenReturn(Optional.of(chatroom));
+
+            //when
+            chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1);
+
+            //then
+            assertThat(chatroom.getManager()).usingRecursiveComparison().isEqualTo(nextManager);
         }
     }
 

@@ -1,8 +1,8 @@
-package kr.co.pawpaw.dynamodb.dto.chat;
+package kr.co.pawpaw.dynamodb.chat.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
-import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
+import kr.co.pawpaw.dynamodb.chat.domain.ChatType;
 import kr.co.pawpaw.dynamodb.util.chat.ChatUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
