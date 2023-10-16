@@ -1,8 +1,7 @@
-package kr.co.pawpaw.dynamodb.service.chat.query;
+package kr.co.pawpaw.dynamodb.chat.service.query;
 
 import kr.co.pawpaw.dynamodb.chat.domain.Chat;
 import kr.co.pawpaw.dynamodb.chat.repository.ChatRepository;
-import kr.co.pawpaw.dynamodb.chat.service.query.ChatQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
