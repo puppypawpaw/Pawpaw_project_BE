@@ -5,6 +5,7 @@ import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.RegisterResponseDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
 import kr.co.pawpaw.api.service.boardImg.BoardImgService;
+import kr.co.pawpaw.api.service.boardlike.BoardLikeService;
 import kr.co.pawpaw.api.service.reply.ReplyService;
 import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.board.BoardException;
@@ -43,6 +44,7 @@ public class BoardService {
     private final BoardCommand boardCommand;
     private final ReplyService replyService;
     private final UserService userService;
+    private final BoardLikeService boardLikeService;
 
     @Transactional
     public RegisterResponseDto register(UserId userId, BoardDto.BoardRegisterDto registerDto) {
@@ -152,8 +154,11 @@ public class BoardService {
     private BoardListDto convertBoardToDto(Board board) {
         List<String> fileLink = imgService.viewFileImg(board.getId());
         String imageUrl = userService.whoAmI(board.getUser().getUserId()).getImageUrl();
+        boolean existBoardLike = boardLikeService.checkLikeExist(board.getUser(), board);
+
 
         return BoardListDto.builder()
+                .userId(board.getUser().getUserId())
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
@@ -161,6 +166,7 @@ public class BoardService {
                 .replyCount(board.getReplyCount())
                 .userImageUrl(imageUrl)
                 .fileNames(fileLink)
+                .boardLiked(existBoardLike)
                 .writer(board.getWriter())
                 .createdDate(board.getCreatedDate())
                 .modifiedDate(board.getModifiedDate())
