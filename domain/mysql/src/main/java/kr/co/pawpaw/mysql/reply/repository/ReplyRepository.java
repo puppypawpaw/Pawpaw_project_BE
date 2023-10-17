@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ReplyRepository extends JpaRepository<Reply, Long>, CustomReplyRepository {
+public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     @Query("SELECT r FROM Reply r LEFT JOIN FETCH r.parent p WHERE r.id = :id AND (p IS NULL OR p.user.userId = :userId)")
     Optional<Reply> findReplyByIdWithParentAndUser_UserId(@Param("id") Long id, @Param("userId") UserId userId);

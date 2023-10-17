@@ -82,6 +82,8 @@ public class BoardDto {
         private int likedCount;
         @Schema(description = "게시글 댓글의 수")
         private int replyCount;
+        @Schema(description = "유저 프로필 url")
+        private String userImageUrl;
         @Schema(description = "게시글 생성일자")
         private LocalDateTime createdDate;
         @Schema(description = "게시글 수정일자")
@@ -89,14 +91,15 @@ public class BoardDto {
 
         @Builder
         public BoardListDto(Long id, String title, String content, String writer, int likedCount,
-                            int replyCount, LocalDateTime createdDate, LocalDateTime modifiedDate,
-                            List<ReplyListDto> replyListDto,  List<String> fileNames) {
+                            int replyCount,  String userImageUrl, LocalDateTime createdDate, LocalDateTime modifiedDate,
+                            List<ReplyListDto> replyListDto, List<String> fileNames) {
             this.id = id;
             this.title = title;
             this.content = content;
             this.writer = writer;
             this.likedCount = likedCount;
             this.replyCount = replyCount;
+            this.userImageUrl = userImageUrl;
             this.createdDate = createdDate;
             this.modifiedDate = modifiedDate;
             this.replyListDto = replyListDto;

@@ -6,6 +6,7 @@ import kr.co.pawpaw.api.dto.board.BoardDto.RegisterResponseDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
 import kr.co.pawpaw.api.service.boardImg.BoardImgService;
 import kr.co.pawpaw.api.service.reply.ReplyService;
+import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.board.BoardException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardUpdateException;
@@ -41,6 +42,7 @@ public class BoardService {
     private final BoardImgService imgService;
     private final BoardCommand boardCommand;
     private final ReplyService replyService;
+    private final UserService userService;
 
     @Transactional
     public RegisterResponseDto register(UserId userId, BoardDto.BoardRegisterDto registerDto) {
@@ -149,12 +151,15 @@ public class BoardService {
 
     private BoardListDto convertBoardToDto(Board board) {
         List<String> fileLink = imgService.viewFileImg(board.getId());
+        String imageUrl = userService.whoAmI(board.getUser().getUserId()).getImageUrl();
+
         return BoardListDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
                 .content(board.getContent())
                 .likedCount(board.getLikedCount())
                 .replyCount(board.getReplyCount())
+                .userImageUrl(imageUrl)
                 .fileNames(fileLink)
                 .writer(board.getWriter())
                 .createdDate(board.getCreatedDate())
