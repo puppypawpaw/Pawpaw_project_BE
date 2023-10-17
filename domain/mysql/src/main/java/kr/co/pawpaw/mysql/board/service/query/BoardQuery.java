@@ -1,6 +1,7 @@
 package kr.co.pawpaw.mysql.board.service.query;
 
 import kr.co.pawpaw.mysql.board.domain.Board;
+import kr.co.pawpaw.mysql.board.repository.BoardCustomRepository;
 import kr.co.pawpaw.mysql.board.repository.BoardRepository;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +17,18 @@ import java.util.Optional;
 public class BoardQuery {
 
     private final BoardRepository boardRepository;
+    private final BoardCustomRepository boardCustomRepository;
 
     public Optional<Board> findById(Long id){
       return boardRepository.findById(id);
     }
 
     public Slice<Board> getBoardListWithRepliesBy(Pageable pageable){
-        return boardRepository.getBoardListWithRepliesBy(pageable);
+        return boardCustomRepository.getBoardListWithRepliesBy(pageable);
     }
 
     public Slice<Board> getBoardListWithRepliesByUser_UserId(Pageable pageable, UserId userId){
-        return boardRepository.getBoardListWithRepliesByUser_UserId(pageable, userId);
+        return boardCustomRepository.getBoardListWithRepliesByUser_UserId(pageable, userId);
     }
     public Slice<Board> searchBoardsByQuery(@Param("query") String query, Pageable pageable){
         return boardRepository.searchBoardsByQuery(query, pageable);

@@ -1,6 +1,7 @@
 package kr.co.pawpaw.mysql.reply.service.query;
 
 import kr.co.pawpaw.mysql.reply.domain.Reply;
+import kr.co.pawpaw.mysql.reply.repository.ReplyCustomRepository;
 import kr.co.pawpaw.mysql.reply.repository.ReplyRepository;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class ReplyQuery {
 
     private final ReplyRepository replyRepository;
+    private final ReplyCustomRepository replyCustomRepository;
 
     public Optional<Reply> findReplyById(Long id){
         Optional<Reply> reply = replyRepository.findReplyById(id);
@@ -35,6 +37,6 @@ public class ReplyQuery {
     }
 
     public Slice<Reply> findReplyListByBoardId(Long boardId, Pageable pageable){
-        return replyRepository.findReplyListByBoardId(boardId, pageable);
+        return replyCustomRepository.findReplyListByBoardId(boardId, pageable);
     }
 }
