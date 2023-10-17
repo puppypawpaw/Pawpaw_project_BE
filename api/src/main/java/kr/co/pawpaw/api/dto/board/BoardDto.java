@@ -2,6 +2,7 @@ package kr.co.pawpaw.api.dto.board;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -66,6 +67,8 @@ public class BoardDto {
     @Schema(description = "게시글 리스트 DTO")
     @Getter
     public static class BoardListDto {
+        @Schema(description = "유저 id")
+        private UserId userId;
         @Schema(description = "게시글 id")
         private Long id;
         @Schema(description = "게시글 제목")
@@ -82,21 +85,28 @@ public class BoardDto {
         private int likedCount;
         @Schema(description = "게시글 댓글의 수")
         private int replyCount;
+        @Schema(description = "유저 프로필 url")
+        private String userImageUrl;
+        @Schema(description = "좋아요 여부")
+        private boolean boardLiked;
         @Schema(description = "게시글 생성일자")
         private LocalDateTime createdDate;
         @Schema(description = "게시글 수정일자")
         private LocalDateTime modifiedDate;
 
         @Builder
-        public BoardListDto(Long id, String title, String content, String writer, int likedCount,
-                            int replyCount, LocalDateTime createdDate, LocalDateTime modifiedDate,
-                            List<ReplyListDto> replyListDto,  List<String> fileNames) {
+        public BoardListDto(UserId userId, Long id, String title, String content, String writer, int likedCount,
+                            int replyCount, String userImageUrl, boolean boardLiked, LocalDateTime createdDate, LocalDateTime modifiedDate,
+                            List<ReplyListDto> replyListDto, List<String> fileNames) {
+            this.userId = userId;
             this.id = id;
             this.title = title;
             this.content = content;
             this.writer = writer;
             this.likedCount = likedCount;
             this.replyCount = replyCount;
+            this.userImageUrl = userImageUrl;
+            this.boardLiked = boardLiked;
             this.createdDate = createdDate;
             this.modifiedDate = modifiedDate;
             this.replyListDto = replyListDto;
