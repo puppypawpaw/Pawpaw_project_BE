@@ -1,7 +1,7 @@
 package kr.co.pawpaw.ws.dto.chat;
 
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
-import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
+import kr.co.pawpaw.dynamodb.chat.domain.ChatType;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.*;
 

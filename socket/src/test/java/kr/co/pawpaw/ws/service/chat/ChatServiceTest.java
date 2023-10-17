@@ -1,8 +1,8 @@
 package kr.co.pawpaw.ws.service.chat;
 
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
-import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
-import kr.co.pawpaw.dynamodb.service.chat.command.ChatCommand;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
+import kr.co.pawpaw.dynamodb.chat.dto.ChatMessageDto;
+import kr.co.pawpaw.dynamodb.chat.service.command.ChatCommand;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import kr.co.pawpaw.mysql.user.dto.ChatMessageUserDto;
 import kr.co.pawpaw.mysql.user.service.query.UserQuery;

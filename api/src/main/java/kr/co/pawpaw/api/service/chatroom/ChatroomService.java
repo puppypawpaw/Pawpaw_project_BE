@@ -6,11 +6,11 @@ import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.api.util.file.FileUtil;
 import kr.co.pawpaw.common.exception.chatroom.*;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
-import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
-import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
-import kr.co.pawpaw.dynamodb.service.chat.command.ChatCommand;
-import kr.co.pawpaw.dynamodb.service.chat.query.ChatQuery;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
+import kr.co.pawpaw.dynamodb.chat.domain.ChatType;
+import kr.co.pawpaw.dynamodb.chat.dto.ChatMessageDto;
+import kr.co.pawpaw.dynamodb.chat.service.command.ChatCommand;
+import kr.co.pawpaw.dynamodb.chat.service.query.ChatQuery;
 import kr.co.pawpaw.dynamodb.util.chat.ChatUtil;
 import kr.co.pawpaw.mysql.chatroom.domain.*;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
@@ -92,6 +92,11 @@ public class ChatroomService {
 
         currentManager.updateRole(ChatroomParticipantRole.PARTICIPANT);
         nextManager.updateRole(ChatroomParticipantRole.MANAGER);
+
+        Chatroom chatroom = chatroomQuery.findById(chatroomId)
+            .orElseThrow(NotFoundChatroomException::new);
+
+        chatroom.updateManager(nextManager);
     }
 
     @Transactional(readOnly = true)
