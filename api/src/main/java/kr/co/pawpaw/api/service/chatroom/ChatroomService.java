@@ -71,6 +71,7 @@ public class ChatroomService {
         }
 
         chatroomParticipantCommand.delete(chatroomParticipantList.get(0));
+        trendingChatroomCommand.deleteByChatroomId(chatroomId);
         chatroomCommand.deleteById(chatroomId);
     }
 

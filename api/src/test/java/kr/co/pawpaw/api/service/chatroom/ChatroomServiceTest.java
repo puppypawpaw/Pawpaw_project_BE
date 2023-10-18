@@ -153,8 +153,8 @@ class ChatroomServiceTest {
         }
 
         @Test
-        @DisplayName("잔여 채팅방 참가자를 삭제 후 채팅방을 삭제한다.")
-        void callDelete() {
+        @DisplayName("잔여 채팅방 참가자를 삭제, 뜨고있는 채팅방에서 채팅방을 삭제 후 채팅방을 삭제한다.")
+        void deleteTrendingChatroom() {
             //given
             when(chatroomParticipantQuery.findAllByChatroomId(chatroomId)).thenReturn(oneParticipants);
 
@@ -163,6 +163,7 @@ class ChatroomServiceTest {
 
             //then
             verify(chatroomParticipantCommand).delete(participant1);
+            verify(trendingChatroomCommand).deleteByChatroomId(chatroomId);
             verify(chatroomCommand).deleteById(chatroomId);
         }
     }
