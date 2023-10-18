@@ -14,4 +14,8 @@ public class TrendingChatroomCommand {
     public TrendingChatroom save(final TrendingChatroom trendingChatroom) {
         return trendingChatroomRepository.save(trendingChatroom);
     }
+
+    public void deleteByChatroomId(final Long chatroomId) {
+        trendingChatroomRepository.deleteByChatroomId(chatroomId);
+    }
 }
