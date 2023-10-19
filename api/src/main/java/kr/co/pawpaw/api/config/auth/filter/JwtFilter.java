@@ -73,8 +73,8 @@ public class JwtFilter extends OncePerRequestFilter {
 				cookieProperties.getDomain(),
 				cookieProperties.getSameSite());
 		} else {
-			CookieUtil.deleteCookie(request, response, TokenType.ACCESS.name());
-			CookieUtil.deleteCookie(request, response, TokenType.REFRESH.name());
+			CookieUtil.deleteCookie(request, response, TokenType.ACCESS.name(), cookieProperties.getDomain());
+			CookieUtil.deleteCookie(request, response, TokenType.REFRESH.name(), cookieProperties.getDomain());
 		}
 
 		filterChain.doFilter(request, response);
