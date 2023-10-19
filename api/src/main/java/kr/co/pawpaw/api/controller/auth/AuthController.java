@@ -147,7 +147,7 @@ public class AuthController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200"),
         @ApiResponse(
-            responseCode = "400",
+            responseCode = "401",
             description = "잘못된 계정정보입니다.",
             content = @Content
         ),

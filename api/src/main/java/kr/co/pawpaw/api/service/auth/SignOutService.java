@@ -1,5 +1,6 @@
 package kr.co.pawpaw.api.service.auth;
 
+import kr.co.pawpaw.api.config.property.CookieProperties;
 import kr.co.pawpaw.api.util.cookie.CookieUtil;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import kr.co.pawpaw.redis.auth.domain.TokenType;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 @RequiredArgsConstructor
 public class SignOutService {
     private final RefreshTokenCommand refreshTokenCommand;
+    private final CookieProperties cookieProperties;
 
     public void signOut(
         final UserId userId,
@@ -31,6 +33,6 @@ public class SignOutService {
         final HttpServletResponse response,
         final TokenType tokenType
     ) {
-        CookieUtil.deleteCookie(request, response, tokenType.name());
+        CookieUtil.deleteCookie(request, response, tokenType.name(), cookieProperties.getDomain());
     }
 }

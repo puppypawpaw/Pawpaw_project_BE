@@ -52,7 +52,8 @@ public class CookieUtil {
     public void deleteCookie(
         final HttpServletRequest request,
         final HttpServletResponse response,
-        final String name
+        final String name,
+        final String domain
     ) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
@@ -61,7 +62,7 @@ public class CookieUtil {
                     ResponseCookie deleteCookie = ResponseCookie.from(name, "")
                         .maxAge(0)
                         .path("/")
-                        .domain(cookie.getDomain())
+                        .domain(domain)
                         .httpOnly(true)
                         .secure(true)
                         .build();

@@ -1,6 +1,6 @@
 package kr.co.pawpaw.api.config.auth.service;
 
-import kr.co.pawpaw.common.exception.user.NotFoundUserException;
+import kr.co.pawpaw.common.exception.auth.AuthenticationException;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.service.query.UserQuery;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ public class CustomUserDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
         User user = userQuery.findByEmailAndProvider(email, null)
-            .orElseThrow(NotFoundUserException::new);
+            .orElseThrow(AuthenticationException::new);
 
         return builder()
             .username(user.getUserId().getValue())
