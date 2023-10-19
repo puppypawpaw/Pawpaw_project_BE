@@ -98,6 +98,8 @@ public class ChatroomService {
             .orElseThrow(NotFoundChatroomException::new);
 
         chatroom.updateManager(nextManager);
+
+        saveAndPublishChatMessage(ChatType.CHANGE_MANAGER, ChatUtil.getChangeManagerDataFromNickname(nextManager.getUser().getNickname()), chatroomId);
     }
 
     @Transactional(readOnly = true)
@@ -141,9 +143,12 @@ public class ChatroomService {
         final Long chatroomId,
         final InviteChatroomUserRequest request
     ) {
-        checkAlreadyChatroomParticipant(chatroomId, request.getUserId());
+        User user = userQuery.findByUserId(request.getUserId())
+            .orElseThrow(NotFoundUserException::new);
 
+        checkAlreadyChatroomParticipant(chatroomId, request.getUserId());
         createChatroomParticipantByChatroomIdAndInviteChatroomUserRequest(chatroomId, request);
+        saveAndPublishChatMessage(ChatType.INVITE, ChatUtil.getInviteDataFromNickname(user.getNickname()), chatroomId);
     }
 
     @Transactional

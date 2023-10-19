@@ -4,5 +4,7 @@ public enum ChatType {
     MESSAGE,
     IMAGE,
     JOIN,
-    LEAVE
+    LEAVE,
+    INVITE,
+    CHANGE_MANAGER
 }

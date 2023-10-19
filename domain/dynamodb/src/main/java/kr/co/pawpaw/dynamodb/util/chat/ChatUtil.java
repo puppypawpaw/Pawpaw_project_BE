@@ -35,4 +35,11 @@ public class ChatUtil {
         return String.format("%s님이 퇴장하셨습니다.", nickname);
     }
 
+    public String getInviteDataFromNickname(final String nickname) {
+        return String.format("%s님이 초대되었습니다.", nickname);
+    }
+
+    public String getChangeManagerDataFromNickname(final String nickname) {
+        return String.format("%s님으로 방장이 변경되었습니다.", nickname);
+    }
 }
