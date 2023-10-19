@@ -14,7 +14,7 @@ public enum PetType {
     LIZARD("도마뱀"),
     FROG("개구리");
 
-    private String koreanName;
+    private final String koreanName;
 
     PetType(final String koreanName) {
         this.koreanName = koreanName;
