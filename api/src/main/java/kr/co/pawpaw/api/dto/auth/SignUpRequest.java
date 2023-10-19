@@ -20,28 +20,21 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SignUpRequest {
-    @NotNull
-    @Schema(description = "유저의 약관 동의 여부, 1, 2, 3번이 필수, 4번이 필수아님", example = "[1,2,3]")
+    @NotNull @Schema(description = "유저의 약관 동의 여부, 1, 2, 3번이 필수, 4번이 필수아님", example = "[1,2,3]")
     private List<Long> termAgrees;
-    @NotBlank
-    @Schema(description = "유저의 닉네임", example = "수박이")
+    @NotBlank @Schema(description = "유저의 닉네임", example = "수박이")
     private String nickname;
-    @NotBlank
-    @Schema(description = "유저의 이메일", example = "zigzaag@pawpaw.com")
+    @NotBlank @Schema(description = "유저의 한줄 소개", example = "3살 너구리")
+    private String briefIntroduction;
+    @NotBlank @Schema(description = "유저의 이메일", example = "zigzaag@pawpaw.com")
     private String email;
-    @NotBlank
-    @Schema(description = "유저의 비밀번호", example = "abcd1234")
+    @NotBlank @Schema(description = "유저의 비밀번호", example = "abcd1234")
     private String password;
     @Schema(description = "유저의 핸드폰 번호", example = "01012345678")
     private String phoneNumber;
-    @NotNull
-    @Valid
-    @Schema(description = "유저의 초기 설정 위치")
+    @NotNull @Valid @Schema(description = "유저의 초기 설정 위치")
     private PositionRequest position;
-    @Valid
-    @NotNull
-    @Size(min=1)
-    @Schema(description = "반려동물 생성 요청, 1이상의 길이의 array필요")
+    @Valid @NotNull @Size(min=1) @Schema(description = "반려동물 생성 요청, 1이상의 길이의 array필요")
     private List<CreatePetRequest> petInfos;
 
     public User toUser(
@@ -52,6 +45,7 @@ public class SignUpRequest {
             .email(email)
             .password(passwordEncoded)
             .name(name)
+            .briefIntroduction(briefIntroduction)
             .nickname(nickname)
             .phoneNumber(phoneNumber)
             .position(position.toEntity())
