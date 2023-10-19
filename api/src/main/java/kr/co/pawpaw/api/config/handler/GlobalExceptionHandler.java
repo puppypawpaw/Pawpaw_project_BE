@@ -31,6 +31,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     protected ResponseEntity<ErrorResponse> handleAuthenticationException(final AuthenticationException e) {
+        if (e.getCause() instanceof BusinessException) {
+            return handleBusinessException((BusinessException) e.getCause());
+        }
         return new ResponseEntity<>(ErrorResponse.of(ErrorCode.HANDLE_AUTHENTICATION_ENTRYPOINT), HttpStatus.BAD_REQUEST);
     }
 

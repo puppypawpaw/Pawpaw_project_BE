@@ -4,7 +4,7 @@ public enum ErrorCode {
     // 기본
     HANDLE_AUTHENTICATION_ENTRYPOINT(401, "C001", "로그인 후 사용 가능합니다."),
     METHOD_NOT_ALLOWED(405, "C002", "지원하지 않는 Method 입니다"),
-    HANDLE_AUTHENTICATION_EXCEPTION(400, "C003", "잘못된 계정정보입니다."),
+    HANDLE_AUTHENTICATION_EXCEPTION(401, "C003", "잘못된 계정정보입니다."),
     // 제약사항
     CONSTRAINT_VALIDATION_EXCEPTION(400, "CV001", "잘못된 요청 파라미터 입니다."),
     // 회원가입
