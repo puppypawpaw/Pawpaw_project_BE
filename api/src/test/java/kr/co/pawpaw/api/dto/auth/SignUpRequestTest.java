@@ -34,13 +34,14 @@ class SignUpRequestTest {
     void validationTest() {
         //given
         SignUpRequest request1 = SignUpRequest.builder().build();
-        List<String> violationPropertyPaths1 = List.of("termAgrees", "nickname", "email", "password", "position", "petInfos");
+        List<String> violationPropertyPaths1 = List.of("termAgrees", "nickname", "email", "password", "position", "petInfos", "briefIntroduction");
         SignUpRequest request2 = SignUpRequest.builder()
             .termAgrees(List.of(1L, 2L, 3L))
             .email("email")
             .password("password")
             .nickname("nickname")
             .phoneNumber("phoneNumber")
+            .briefIntroduction("briefIntroduction")
             .petInfos(List.of())
             .position(positionRequest)
             .build();
@@ -51,6 +52,7 @@ class SignUpRequestTest {
             .password("password")
             .nickname("nickname")
             .phoneNumber("phoneNumber")
+            .briefIntroduction("briefIntroduction")
             .petInfos(List.of(
                 CreatePetRequest.builder()
                     .petName("petName")
@@ -65,6 +67,7 @@ class SignUpRequestTest {
             .password("password")
             .nickname("nickname")
             .phoneNumber("phoneNumber")
+            .briefIntroduction("briefIntroduction")
             .petInfos(List.of(
                 CreatePetRequest.builder().build()
             ))
