@@ -63,13 +63,19 @@ public class ReplyDto {
         private String content;
         @Schema(description = "작성자 명")
         private String nickname;
+        @Schema(description = "댓글 작성자 확인")
+        private boolean replyWriter;
+        @Schema(description = "유저 프로필 url")
+        private String userImageUrl;
         @ArraySchema(schema = @Schema(description = "자식 댓글 리스트", nullable = true))
         private List<ReplyListDto> children = new ArrayList<>();
 
-        public ReplyListDto(Long id, String content, String nickname) {
+        public ReplyListDto(Long id, String content, String nickname, boolean replyWriter, String userImageUrl) {
             this.id = id;
             this.content = content;
             this.nickname = nickname;
+            this.replyWriter = replyWriter;
+            this.userImageUrl = userImageUrl;
         }
         public void setChildToParentReply(List<ReplyListDto> children){
             this.children = children;

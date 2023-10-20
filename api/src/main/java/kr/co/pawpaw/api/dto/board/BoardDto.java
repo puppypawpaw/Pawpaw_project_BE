@@ -89,6 +89,8 @@ public class BoardDto {
         private String userImageUrl;
         @Schema(description = "좋아요 여부")
         private boolean boardLiked;
+        @Schema(description = "북마크 여부")
+        private boolean bookmarked;
         @Schema(description = "게시글 생성일자")
         private LocalDateTime createdDate;
         @Schema(description = "게시글 수정일자")
@@ -96,7 +98,7 @@ public class BoardDto {
 
         @Builder
         public BoardListDto(UserId userId, Long id, String title, String content, String writer, int likedCount,
-                            int replyCount, String userImageUrl, boolean boardLiked, LocalDateTime createdDate, LocalDateTime modifiedDate,
+                            int replyCount, String userImageUrl, boolean boardLiked, boolean bookmarked, LocalDateTime createdDate, LocalDateTime modifiedDate,
                             List<ReplyListDto> replyListDto, List<String> fileNames) {
             this.userId = userId;
             this.id = id;
@@ -107,6 +109,7 @@ public class BoardDto {
             this.replyCount = replyCount;
             this.userImageUrl = userImageUrl;
             this.boardLiked = boardLiked;
+            this.bookmarked = bookmarked;
             this.createdDate = createdDate;
             this.modifiedDate = modifiedDate;
             this.replyListDto = replyListDto;
