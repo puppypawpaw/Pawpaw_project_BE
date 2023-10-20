@@ -6,6 +6,7 @@ import kr.co.pawpaw.api.dto.board.BoardDto.RegisterResponseDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
 import kr.co.pawpaw.api.service.boardImg.BoardImgService;
 import kr.co.pawpaw.api.service.boardlike.BoardLikeService;
+import kr.co.pawpaw.api.service.bookmark.BookmarkService;
 import kr.co.pawpaw.api.service.reply.ReplyService;
 import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.board.BoardException;
@@ -45,6 +46,7 @@ public class BoardService {
     private final ReplyService replyService;
     private final UserService userService;
     private final BoardLikeService boardLikeService;
+    private final BookmarkService bookmarkService;
 
     @Transactional
     public RegisterResponseDto register(UserId userId, BoardDto.BoardRegisterDto registerDto) {
@@ -116,6 +118,17 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
+    public BoardListDto getBoardWithRepliesBy(long boardId, UserId userId, Pageable pageable) {
+        userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
+        Board board = boardQuery.getBoardWithRepliesBy(boardId);
+        BoardListDto boardListDto = convertBoardToDto(board);
+
+        Slice<ReplyListDto> replyListByBoardId = replyService.findReplyListByBoardId(userId, boardId, pageable);
+        boardListDto.setReplyListToBoard(replyListByBoardId.getContent());
+        return boardListDto;
+    }
+
+    @Transactional(readOnly = true)
     public Slice<BoardListDto> getBoardListWithRepliesByUser_UserId(UserId userId, Pageable pageable) {
         userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
 
@@ -126,7 +139,7 @@ public class BoardService {
     }
 
     @Transactional(readOnly = true)
-    public Slice<BoardListDto> searchBoardsByQuery(UserId userId, Pageable pageable, String query){
+    public Slice<BoardListDto> searchBoardsByQuery(UserId userId, Pageable pageable, String query) {
         userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
         if (!StringUtils.hasText(query) || query.isBlank())
             throw new BoardException.BoardSearchQueryException();
@@ -145,8 +158,8 @@ public class BoardService {
                 .collect(Collectors.toList());
 
         boardListDtos.forEach(boardDto -> {
-            List<ReplyListDto> replyList = replyService.findReplyListByBoardId(userId, boardDto.getId(), pageable).getContent();
-            boardDto.setReplyListToBoard(replyList);
+            Slice<ReplyListDto> replyList = replyService.findReplyListByBoardId(userId, boardDto.getId(), pageable);
+            boardDto.setReplyListToBoard(replyList.getContent());
         });
         return boardListDtos;
     }
@@ -155,6 +168,7 @@ public class BoardService {
         List<String> fileLink = imgService.viewFileImg(board.getId());
         String imageUrl = userService.whoAmI(board.getUser().getUserId()).getImageUrl();
         boolean existBoardLike = boardLikeService.checkLikeExist(board.getUser(), board);
+        boolean existBookmark = bookmarkService.existsByUserAndBoard(board.getUser(), board);
 
 
         return BoardListDto.builder()
@@ -167,6 +181,7 @@ public class BoardService {
                 .userImageUrl(imageUrl)
                 .fileNames(fileLink)
                 .boardLiked(existBoardLike)
+                .bookmarked(existBookmark)
                 .writer(board.getWriter())
                 .createdDate(board.getCreatedDate())
                 .modifiedDate(board.getModifiedDate())
