@@ -66,7 +66,7 @@ public class BookmarkService {
         }
         throw new BookmarkException.BookmarkDeleteFailException();
     }
-
+    @Transactional(readOnly = true)
     public Slice<BoardListDto> getBoardListWithRepliesByUser_UserId(Pageable pageable, UserId userId){
         userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
         Slice<Bookmark> boardListWithRepliesByUser_UserId = bookmarkQuery.getBoardListWithRepliesByUser_UserId(pageable, userId);
@@ -94,6 +94,7 @@ public class BookmarkService {
     private BoardListDto convertBoardToDto(Board board) {
         List<String> fileLink = imgService.viewFileImg(board.getId());
         boolean existBoardLike = boardLikeService.checkLikeExist(board.getUser(), board);
+        String imageUrl = board.getUser().getUserImage().getFileUrl();
 
         return BoardListDto.builder()
                 .userId(board.getUser().getUserId())
@@ -102,6 +103,7 @@ public class BookmarkService {
                 .likedCount(board.getLikedCount())
                 .replyCount(board.getReplyCount())
                 .fileNames(fileLink)
+                .userImageUrl(imageUrl)
                 .boardLiked(existBoardLike)
                 .writer(board.getWriter())
                 .createdDate(board.getCreatedDate())
