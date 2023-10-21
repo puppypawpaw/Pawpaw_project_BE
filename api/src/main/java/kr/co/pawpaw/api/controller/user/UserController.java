@@ -46,6 +46,11 @@ public class UserController {
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "413",
+            description = "파일 크기 제한을 초과하였습니다.",
+            content = @Content
+        )
     })
     @Operation(
         method = "PUT",

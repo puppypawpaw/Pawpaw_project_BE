@@ -6,11 +6,11 @@ import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.api.util.file.FileUtil;
 import kr.co.pawpaw.common.exception.chatroom.*;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
-import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
-import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
-import kr.co.pawpaw.dynamodb.service.chat.command.ChatCommand;
-import kr.co.pawpaw.dynamodb.service.chat.query.ChatQuery;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
+import kr.co.pawpaw.dynamodb.chat.domain.ChatType;
+import kr.co.pawpaw.dynamodb.chat.dto.ChatMessageDto;
+import kr.co.pawpaw.dynamodb.chat.service.command.ChatCommand;
+import kr.co.pawpaw.dynamodb.chat.service.query.ChatQuery;
 import kr.co.pawpaw.dynamodb.util.chat.ChatUtil;
 import kr.co.pawpaw.mysql.chatroom.domain.*;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
@@ -71,6 +71,7 @@ public class ChatroomService {
         }
 
         chatroomParticipantCommand.delete(chatroomParticipantList.get(0));
+        trendingChatroomCommand.deleteByChatroomId(chatroomId);
         chatroomCommand.deleteById(chatroomId);
     }
 
@@ -92,6 +93,13 @@ public class ChatroomService {
 
         currentManager.updateRole(ChatroomParticipantRole.PARTICIPANT);
         nextManager.updateRole(ChatroomParticipantRole.MANAGER);
+
+        Chatroom chatroom = chatroomQuery.findById(chatroomId)
+            .orElseThrow(NotFoundChatroomException::new);
+
+        chatroom.updateManager(nextManager);
+
+        saveAndPublishChatMessage(ChatType.CHANGE_MANAGER, ChatUtil.getChangeManagerDataFromNickname(nextManager.getUser().getNickname()), chatroomId);
     }
 
     @Transactional(readOnly = true)
@@ -135,9 +143,12 @@ public class ChatroomService {
         final Long chatroomId,
         final InviteChatroomUserRequest request
     ) {
-        checkAlreadyChatroomParticipant(chatroomId, request.getUserId());
+        User user = userQuery.findByUserId(request.getUserId())
+            .orElseThrow(NotFoundUserException::new);
 
+        checkAlreadyChatroomParticipant(chatroomId, request.getUserId());
         createChatroomParticipantByChatroomIdAndInviteChatroomUserRequest(chatroomId, request);
+        saveAndPublishChatMessage(ChatType.INVITE, ChatUtil.getInviteDataFromNickname(user.getNickname()), chatroomId);
     }
 
     @Transactional

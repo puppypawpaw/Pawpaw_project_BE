@@ -3,6 +3,7 @@ package kr.co.pawpaw.api.config.handler;
 import kr.co.pawpaw.common.exception.common.BusinessException;
 import kr.co.pawpaw.common.exception.common.ErrorCode;
 import kr.co.pawpaw.common.exception.common.ErrorResponse;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -30,11 +31,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     protected ResponseEntity<ErrorResponse> handleAuthenticationException(final AuthenticationException e) {
+        if (e.getCause() instanceof BusinessException) {
+            return handleBusinessException((BusinessException) e.getCause());
+        }
         return new ResponseEntity<>(ErrorResponse.of(ErrorCode.HANDLE_AUTHENTICATION_ENTRYPOINT), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleConstraintViolationException(final MethodArgumentNotValidException e) {
         return new ResponseEntity<>(ErrorResponse.of(ErrorCode.CONSTRAINT_VALIDATION_EXCEPTION), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FileSizeLimitExceededException.class)
+    protected ResponseEntity<ErrorResponse> handleFileSizeLimitExceededException(final FileSizeLimitExceededException e) {
+        return new ResponseEntity<>(ErrorResponse.of(ErrorCode.FILE_SIZE_LIMIT_EXCEPTION), HttpStatus.PAYLOAD_TOO_LARGE);
     }
 }

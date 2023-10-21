@@ -32,7 +32,7 @@ public class CookieAuthorizationRequestRepository implements AuthorizationReques
         final HttpServletResponse response
     ) {
         if (authorizationRequest == null) {
-            CookieUtil.deleteCookie(request, response, oAuth2Properties.getCookieName());
+            CookieUtil.deleteCookie(request, response, oAuth2Properties.getCookieName(), cookieProperties.getDomain());
             return;
         }
 
@@ -55,6 +55,6 @@ public class CookieAuthorizationRequestRepository implements AuthorizationReques
         final HttpServletRequest request,
         final HttpServletResponse response
     ) {
-        CookieUtil.deleteCookie(request, response, oAuth2Properties.getCookieName());
+        CookieUtil.deleteCookie(request, response, oAuth2Properties.getCookieName(), cookieProperties.getDomain());
     }
 }

@@ -10,7 +10,7 @@ import kr.co.pawpaw.api.aop.ChatroomRoleCheck;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.chatroom.ChatroomService;
-import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
+import kr.co.pawpaw.dynamodb.chat.dto.ChatMessageDto;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
 import kr.co.pawpaw.mysql.user.domain.UserId;
@@ -36,6 +36,11 @@ public class ChatroomController {
         @ApiResponse(
             responseCode = "404",
             description = "존재하지 않는 유저입니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "413",
+            description = "파일 크기 제한을 초과하였습니다.",
             content = @Content
         )
     })
@@ -323,6 +328,11 @@ public class ChatroomController {
         @ApiResponse(
             responseCode = "400",
             description = "채팅방 참여자가 아닙니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "413",
+            description = "파일 크기 제한을 초과하였습니다.",
             content = @Content
         )
     })

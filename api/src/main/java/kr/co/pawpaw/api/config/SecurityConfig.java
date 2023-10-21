@@ -11,6 +11,7 @@ import kr.co.pawpaw.api.config.property.ServerProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -102,6 +103,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    @Profile({"dev", "local"})
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().mvcMatchers(
             "/h2/**",

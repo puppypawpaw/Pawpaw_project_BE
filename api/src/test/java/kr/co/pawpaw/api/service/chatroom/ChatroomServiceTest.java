@@ -5,11 +5,12 @@ import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.chatroom.*;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
-import kr.co.pawpaw.dynamodb.domain.chat.ChatType;
-import kr.co.pawpaw.dynamodb.dto.chat.ChatMessageDto;
-import kr.co.pawpaw.dynamodb.service.chat.command.ChatCommand;
-import kr.co.pawpaw.dynamodb.service.chat.query.ChatQuery;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
+import kr.co.pawpaw.dynamodb.chat.domain.ChatType;
+import kr.co.pawpaw.dynamodb.chat.dto.ChatMessageDto;
+import kr.co.pawpaw.dynamodb.chat.service.command.ChatCommand;
+import kr.co.pawpaw.dynamodb.chat.service.query.ChatQuery;
+import kr.co.pawpaw.dynamodb.util.chat.ChatUtil;
 import kr.co.pawpaw.mysql.chatroom.domain.*;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
 import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomCommand;
@@ -126,7 +127,7 @@ class ChatroomServiceTest {
     static void setup() throws NoSuchFieldException, IllegalAccessException {
         Field idField = Chatroom.class.getDeclaredField("id");
         idField.setAccessible(true);
-        idField.set(chatroom, 12345L);
+        idField.set(chatroom, 123L);
     }
 
     @Nested
@@ -153,8 +154,8 @@ class ChatroomServiceTest {
         }
 
         @Test
-        @DisplayName("잔여 채팅방 참가자를 삭제 후 채팅방을 삭제한다.")
-        void callDelete() {
+        @DisplayName("잔여 채팅방 참가자를 삭제, 뜨고있는 채팅방에서 채팅방을 삭제 후 채팅방을 삭제한다.")
+        void deleteTrendingChatroom() {
             //given
             when(chatroomParticipantQuery.findAllByChatroomId(chatroomId)).thenReturn(oneParticipants);
 
@@ -163,6 +164,7 @@ class ChatroomServiceTest {
 
             //then
             verify(chatroomParticipantCommand).delete(participant1);
+            verify(trendingChatroomCommand).deleteByChatroomId(chatroomId);
             verify(chatroomCommand).deleteById(chatroomId);
         }
     }
@@ -171,15 +173,21 @@ class ChatroomServiceTest {
     @DisplayName("updateChatroomManager 메서드는")
     class UpdateChatroomManager {
         Long chatroomId = 123L;
-        User user1 = User.builder().build();
-        User user2 = User.builder().build();
+        User user1 = User.builder()
+            .nickname("user1-nickname")
+            .build();
+        User user2 = User.builder()
+            .nickname("user2-nickname")
+            .build();
 
         ChatroomParticipant currentManager = ChatroomParticipant.builder()
             .role(ChatroomParticipantRole.MANAGER)
+            .user(user1)
             .build();
 
         ChatroomParticipant nextManager = ChatroomParticipant.builder()
             .role(ChatroomParticipantRole.PARTICIPANT)
+            .user(user2)
             .build();
 
         UpdateChatroomManagerRequest request1 = UpdateChatroomManagerRequest.builder()
@@ -190,6 +198,12 @@ class ChatroomServiceTest {
             .nextManagerId(user1.getUserId())
             .build();
 
+        Chat chat = Chat.builder()
+            .chatroomId(chatroomId)
+            .chatType(ChatType.CHANGE_MANAGER)
+            .data(ChatUtil.getChangeManagerDataFromNickname(nextManager.getUser().getNickname()))
+            .build();
+
         @Test
         @DisplayName("채팅방 참여자가 아니면 예외가 발생한다.")
         void ifNotAChatroomParticipantThenThrowException() {
@@ -197,11 +211,9 @@ class ChatroomServiceTest {
             when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.empty());
             when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.empty());
 
-            //when
+            //then
             assertThatThrownBy(() -> chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1)).isInstanceOf(NotAChatroomParticipantException.class);
             assertThatThrownBy(() -> chatroomService.updateChatroomManager(user2.getUserId(), chatroomId, request2)).isInstanceOf(NotAChatroomParticipantException.class);
-
-            //then
         }
 
         @Test
@@ -210,12 +222,22 @@ class ChatroomServiceTest {
             //given
             when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
 
-            //when
+            //then
             assertThatThrownBy(() -> chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request2))
                 .isInstanceOf(AlreadyChatroomManagerException.class);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 채팅방이면 예외가 발생한다.")
+        void NotFoundChatroomException() {
+            //given
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+            when(chatroomQuery.findById(chatroomId)).thenReturn(Optional.empty());
 
             //then
-
+            assertThatThrownBy(() -> chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1))
+                .isInstanceOf(NotFoundChatroomException.class);
         }
 
         @Test
@@ -224,6 +246,8 @@ class ChatroomServiceTest {
             //given
             when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
             when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+            when(chatroomQuery.findById(chatroomId)).thenReturn(Optional.of(chatroom));
+            when(chatCommand.save(any(Chat.class))).thenReturn(chat);
 
             //when
             chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1);
@@ -231,6 +255,51 @@ class ChatroomServiceTest {
             //then
             assertThat(currentManager.getRole()).isEqualTo(ChatroomParticipantRole.PARTICIPANT);
             assertThat(nextManager.getRole()).isEqualTo(ChatroomParticipantRole.MANAGER);
+        }
+
+        @Test
+        @DisplayName("채팅방의 매니저를 새로운 매니저로 변경한다.")
+        void changeChatroomManagerToNextManager() {
+            //given
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+            when(chatroomQuery.findById(chatroomId)).thenReturn(Optional.of(chatroom));
+            when(chatCommand.save(any(Chat.class))).thenReturn(chat);
+
+            //when
+            chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1);
+
+            //then
+            assertThat(chatroom.getManager()).usingRecursiveComparison().isEqualTo(nextManager);
+        }
+
+        @Test
+        @DisplayName("방장 변경 유형의 채팅을 저장하고 채팅방에 메시지를 전송한다.")
+        void saveChatAndPublish() {
+            //given
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user1.getUserId(), chatroomId)).thenReturn(Optional.of(currentManager));
+            when(chatroomParticipantQuery.findByUserIdAndChatroomId(user2.getUserId(), chatroomId)).thenReturn(Optional.of(nextManager));
+            when(chatroomQuery.findById(chatroomId)).thenReturn(Optional.of(chatroom));
+            when(chatCommand.save(any(Chat.class))).thenReturn(chat);
+
+            //when
+            chatroomService.updateChatroomManager(user1.getUserId(), chatroomId, request1);
+
+            //then
+            ArgumentCaptor<Chat> chatArgumentCaptor = ArgumentCaptor.forClass(Chat.class);
+            verify(chatCommand).save(chatArgumentCaptor.capture());
+            assertThat(chatArgumentCaptor.getValue()).usingRecursiveComparison()
+                .ignoringFields("chatId.sortId")
+                .isEqualTo(Chat.builder()
+                    .chatroomId(chatroom.getId())
+                    .chatType(ChatType.CHANGE_MANAGER)
+                    .data(ChatUtil.getChangeManagerDataFromNickname(nextManager.getUser().getNickname()))
+                .build());
+
+            ArgumentCaptor<ChatMessageDto> chatMessageDtoArgumentCaptor = ArgumentCaptor.forClass(ChatMessageDto.class);
+            verify(redisPublisher).publish(eq(channelTopic), chatMessageDtoArgumentCaptor.capture());
+            assertThat(chatMessageDtoArgumentCaptor.getValue()).usingRecursiveComparison()
+                .isEqualTo(ChatMessageDto.of(chat, null, null));
         }
     }
 
@@ -286,11 +355,9 @@ class ChatroomServiceTest {
             //given
             when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.empty());
 
-            //when
+            //then
             assertThatThrownBy(() -> chatroomService.sendChatImage(user.getUserId(), chatroomId, multipartFile))
                 .isInstanceOf(NotFoundUserException.class);
-
-            //then
         }
 
         @Test
@@ -865,9 +932,6 @@ class ChatroomServiceTest {
     @Nested
     @DisplayName("inviteUser 메서드는")
     class InviteUser {
-        private InviteChatroomUserRequest request = InviteChatroomUserRequest.builder()
-            .userId(UserId.create())
-            .build();
         private Long chatroomId = 123L;
         private Chatroom chatroom = Chatroom.builder()
             .name("chatroom-name")
@@ -884,6 +948,9 @@ class ChatroomServiceTest {
             .briefIntroduction("user-briefIntroduction")
             .phoneNumber("user-phoneNumber")
             .build();
+        private InviteChatroomUserRequest request = InviteChatroomUserRequest.builder()
+            .userId(user.getUserId())
+            .build();
         private ChatroomParticipant chatroomParticipant = ChatroomParticipant.builder()
             .chatroom(chatroom)
             .user(user)
@@ -891,25 +958,37 @@ class ChatroomServiceTest {
             .build();
 
         @Test
+        @DisplayName("존재하지 않는 유저를 초대하면 예외가 발생한다.")
+        void NotFoundUserException() {
+            //given
+            when(userQuery.findByUserId(request.getUserId())).thenReturn(Optional.empty());
+
+            //then
+            assertThatThrownBy(() -> chatroomService.inviteUser(chatroomId, request))
+                .isInstanceOf(NotFoundUserException.class);
+        }
+
+        @Test
         @DisplayName("이미 참여한 유저를 초대하면 예외가 발생한다.")
         void AlreadyChatroomParticipantException() {
             //given
+            when(userQuery.findByUserId(request.getUserId())).thenReturn(Optional.of(user));
             when(chatroomParticipantQuery.existsByUserIdAndChatroomId(request.getUserId(), chatroomId)).thenReturn(true);
 
-            //when
+            //then
             assertThatThrownBy(() -> chatroomService.inviteUser(chatroomId, request))
                 .isInstanceOf(AlreadyChatroomParticipantException.class);
-
-            //then
         }
 
         @Test
         @DisplayName("ChatroomParticipantCommand의 save메서드를 호출한다.")
         void callSaveMethod() {
             //given
+            when(userQuery.findByUserId(request.getUserId())).thenReturn(Optional.of(user));
             when(chatroomParticipantQuery.existsByUserIdAndChatroomId(request.getUserId(), chatroomId)).thenReturn(false);
             when(chatroomQuery.getReferenceById(chatroomId)).thenReturn(chatroom);
             when(userQuery.getReferenceById(request.getUserId())).thenReturn(user);
+            when(chatCommand.save(any(Chat.class))).thenReturn(chat);
 
             //when
             chatroomService.inviteUser(chatroomId, request);
@@ -917,7 +996,36 @@ class ChatroomServiceTest {
             //then
             ArgumentCaptor<ChatroomParticipant> captor = ArgumentCaptor.forClass(ChatroomParticipant.class);
             verify(chatroomParticipantCommand).save(captor.capture());
-            assertThat(chatroomParticipant).usingRecursiveComparison().isEqualTo(captor.getValue());
+            assertThat(captor.getValue()).usingRecursiveComparison().isEqualTo(chatroomParticipant);
+        }
+
+        @Test
+        @DisplayName("chatCommand의 save 메서드를 통해 invite 유형의 chat을 저장하고 redisPublisher의 publish를 호출하여 채팅방에 메시지를 전송한다.")
+        void saveChatAndPublishInviteMessage() {
+            //given
+            when(userQuery.findByUserId(request.getUserId())).thenReturn(Optional.of(user));
+            when(chatroomParticipantQuery.existsByUserIdAndChatroomId(request.getUserId(), chatroomId)).thenReturn(false);
+            when(chatroomQuery.getReferenceById(chatroomId)).thenReturn(chatroom);
+            when(userQuery.getReferenceById(request.getUserId())).thenReturn(user);
+            when(chatCommand.save(any(Chat.class))).thenReturn(chat);
+
+            //when
+            chatroomService.inviteUser(chatroomId, request);
+
+            //then
+            ArgumentCaptor<Chat> argumentCaptor = ArgumentCaptor.forClass(Chat.class);
+            verify(chatCommand).save(argumentCaptor.capture());
+            assertThat(argumentCaptor.getValue()).usingRecursiveComparison()
+                .ignoringFields("chatId.sortId")
+                .isEqualTo(Chat.builder()
+                    .chatroomId(chatroomId)
+                    .chatType(ChatType.INVITE)
+                    .data(ChatUtil.getInviteDataFromNickname(user.getNickname()))
+                    .build());
+            ArgumentCaptor<ChatMessageDto> chatMessageDtoArgumentCaptor = ArgumentCaptor.forClass(ChatMessageDto.class);
+            verify(redisPublisher).publish(eq(channelTopic), chatMessageDtoArgumentCaptor.capture());
+            assertThat(chatMessageDtoArgumentCaptor.getValue()).usingRecursiveComparison()
+                .isEqualTo(ChatMessageDto.of(chat, null, null));
         }
     }
 }

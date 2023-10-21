@@ -1,7 +1,7 @@
-package kr.co.pawpaw.dynamodb.service.chat.command;
+package kr.co.pawpaw.dynamodb.chat.service.command;
 
-import kr.co.pawpaw.dynamodb.domain.chat.Chat;
-import kr.co.pawpaw.dynamodb.repository.ChatRepository;
+import kr.co.pawpaw.dynamodb.chat.domain.Chat;
+import kr.co.pawpaw.dynamodb.chat.repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

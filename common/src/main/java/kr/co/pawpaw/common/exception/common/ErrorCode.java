@@ -4,7 +4,7 @@ public enum ErrorCode {
     // 기본
     HANDLE_AUTHENTICATION_ENTRYPOINT(401, "C001", "로그인 후 사용 가능합니다."),
     METHOD_NOT_ALLOWED(405, "C002", "지원하지 않는 Method 입니다"),
-    HANDLE_AUTHENTICATION_EXCEPTION(400, "C003", "잘못된 계정정보입니다."),
+    HANDLE_AUTHENTICATION_EXCEPTION(401, "C003", "잘못된 계정정보입니다."),
     // 제약사항
     CONSTRAINT_VALIDATION_EXCEPTION(400, "CV001", "잘못된 요청 파라미터 입니다."),
     // 회원가입
@@ -53,14 +53,16 @@ public enum ErrorCode {
     NOT_FOUND_CHATROOM_DEFAULT_COVER(404, "CR008", "존재하지 않는 채팅방 기본 커버입니다."),
     ALREADY_CHATROOM_SCHEDULE_PARTICIPANT(409, "CR009", "이미 참여한 채팅방 스케줄입니다."),
     ALREADY_CHATROOM_MANAGER(409, "CR010", "이미 채팅방 매니저입니다."),
-    CHATROOM_PARTICIPANT_EXIST(404, "CR011", "채팅방 참여자가 존재합니다."),
+    CHATROOM_PARTICIPANT_EXIST(400, "CR011", "채팅방 참여자가 존재합니다."),
     // 게시판 이미지
     BOARD_IMG_CANNOT_UPLOAD_EXCEPTION(400, "BOARD_IMG_CANNOT_UPLOAD_EXCEPTION", "이미지 업로드를 실패했습니다"),
     BOARD_IMG_CANNOT_VIEW_EXCEPTION(400, "BOARD_IMG_CANNOT_VIEW_EXCEPTION", "이미지 조회를 실패했습니다"),
     BOARD_IMG_CANNOT_REMOVE_EXCEPTION(400, "BOARD_IMG_CANNOT_REMOVE_EXCEPTION", "이미지 삭제를 실패했습니다"),
     // 반려동물
     INVALID_PET_TYPE(400, "PE001", "유효하지 않은 반려동물 종류입니다."),
-    NOT_FOUND_PET(404, "PE002", "존재하지 않는 반려동물 입니다.");
+    NOT_FOUND_PET(404, "PE002", "존재하지 않는 반려동물 입니다."),
+    // 파일 업로드
+    FILE_SIZE_LIMIT_EXCEPTION(413, "FU001", "파일 크기 제한을 초과하였습니다.");
 
     private final int status;
     private final String code;

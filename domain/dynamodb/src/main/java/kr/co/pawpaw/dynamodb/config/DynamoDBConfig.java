@@ -19,7 +19,7 @@ import org.springframework.util.ObjectUtils;
 @Configuration
 @RequiredArgsConstructor
 @EnableDynamoDBRepositories(basePackages = {
-    "kr.co.pawpaw.dynamodb.repository"
+    "kr.co.pawpaw.dynamodb"
 }, includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = EnableScan.class))
 public class DynamoDBConfig {
     private final DynamoDbProperties dynamoDbProperties;

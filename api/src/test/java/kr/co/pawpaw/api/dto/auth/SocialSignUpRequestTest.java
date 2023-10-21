@@ -35,11 +35,12 @@ class SocialSignUpRequestTest {
         //given
         SocialSignUpRequest request1 = SocialSignUpRequest.builder()
             .build();
-        List<String> violationPropertyPaths1 = List.of("key", "termAgrees", "position", "petInfos", "noImage", "nickname");
+        List<String> violationPropertyPaths1 = List.of("key", "termAgrees", "position", "petInfos", "noImage", "nickname", "briefIntroduction");
         SocialSignUpRequest request2 = SocialSignUpRequest.builder()
             .key("key")
             .termAgrees(List.of(1L, 2L, 3L))
             .position(positionRequest)
+            .briefIntroduction("briefIntroduction")
             .noImage(false)
             .nickname("nick")
             .build();
@@ -48,6 +49,7 @@ class SocialSignUpRequestTest {
             .key("key")
             .termAgrees(List.of(1L, 2L, 3L))
             .position(positionRequest)
+            .briefIntroduction("briefIntroduction")
             .noImage(false)
             .nickname("nick")
             .petInfos(List.of(
@@ -59,6 +61,7 @@ class SocialSignUpRequestTest {
             .key("key")
             .termAgrees(List.of(1L, 2L, 3L))
             .position(positionRequest)
+            .briefIntroduction("briefIntroduction")
             .noImage(false)
             .nickname("nick")
             .petInfos(List.of(
