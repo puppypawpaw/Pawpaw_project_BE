@@ -72,8 +72,6 @@ class ChatroomServiceTest {
     @Mock
     private FileService fileService;
     @Mock
-    private UserService userService;
-    @Mock
     private MultipartFile multipartFile;
     @Mock
     private ChannelTopic channelTopic;
@@ -848,85 +846,6 @@ class ChatroomServiceTest {
 
         //then
         verify(chatroomQuery).getAccessibleTrendingChatroom(userId, beforeId, size);
-    }
-
-    @Nested
-    @DisplayName("getChatroomParticipantResponseList 메서드는")
-    class GetChatroomParticipantResponseList {
-        String defaultImageUrl = "기본 이미지 URL";
-        Long chatroomId = 12345L;
-        UserId userId = UserId.create();
-        List<ChatroomParticipantResponse> nullResponseList = List.of(
-            new ChatroomParticipantResponse(
-                userId,
-                "nickname",
-                "briefIntroduction",
-                null,
-                ChatroomParticipantRole.PARTICIPANT
-            )
-        );
-        List<ChatroomParticipantResponse> nonNullResponseList = nullResponseList.stream()
-            .map(response -> new ChatroomParticipantResponse(
-                response.getUserId(),
-                response.getNickname(),
-                response.getBriefIntroduction(),
-                defaultImageUrl,
-                response.getRole()
-            )).collect(Collectors.toList());
-
-        @Test
-        @DisplayName("ChatroomParticipantResponse의 ImageUrl이 null이면 기본 이미지 URL로 변경한다.")
-        void changeDefaultImageUrl() {
-            //given
-            when(userService.getUserDefaultImageUrl()).thenReturn(defaultImageUrl);
-            when(chatroomParticipantQuery.getChatroomParticipantResponseList(chatroomId)).thenReturn(nullResponseList);
-
-            //when
-            List<ChatroomParticipantResponse> result = chatroomService.getChatroomParticipantResponseList(chatroomId);
-
-            //then
-            assertThat(nonNullResponseList).usingRecursiveComparison().isEqualTo(result);
-        }
-    }
-
-    @Nested
-    @DisplayName("searchChatroomNonParticipants 메서드는")
-    class SearchChatroomNonParticipants {
-        String defaultImageUrl = "기본 이미지 URL";
-        Long chatroomId = 1234L;
-        String nicknameKeyword = "nickname";
-        List<ChatroomNonParticipantResponse> nullResponseList = List.of(
-            new ChatroomNonParticipantResponse(
-                UserId.create(),
-                "nickname",
-                "briefIntroduction",
-                null
-            )
-        );
-
-        List<ChatroomNonParticipantResponse> nonNullResponseList = nullResponseList
-            .stream()
-            .map(response -> new ChatroomNonParticipantResponse(
-                response.getUserId(),
-                response.getNickname(),
-                response.getBriefIntroduction(),
-                defaultImageUrl
-            )).collect(Collectors.toList());
-
-        @Test
-        @DisplayName("ChatroomNonParticipantResponse의 ImageUrl이 null이면 기본 이미지 URL로 변경한다.")
-        void changeDefaultImageUrl() {
-            //given
-            when(userService.getUserDefaultImageUrl()).thenReturn(defaultImageUrl);
-            when(userQuery.searchChatroomNonParticipant(chatroomId, nicknameKeyword)).thenReturn(nullResponseList);
-
-
-            //when
-            List<ChatroomNonParticipantResponse> result = chatroomService.searchChatroomNonParticipants(chatroomId, nicknameKeyword);
-
-            //then
-            assertThat(result).usingRecursiveComparison().isEqualTo(nonNullResponseList);
-        }
     }
 
     @Nested

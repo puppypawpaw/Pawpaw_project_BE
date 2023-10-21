@@ -149,10 +149,6 @@ class ChatroomScheduleServiceTest {
     @DisplayName("getNotEndChatroomScheduleList")
     class GetNotEndChatroomScheduleList {
         Long chatroomId = 123L;
-        File defaultUserImage = File.builder()
-            .fileName(UserUtil.getUserDefaultImageName())
-            .fileUrl("기본 url")
-            .build();
 
         List<ChatroomScheduleData> responseDataList = List.of(new ChatroomScheduleData(
             1L,
@@ -190,18 +186,13 @@ class ChatroomScheduleServiceTest {
         }
 
         @Test
-        @DisplayName("null인 채팅방 스케줄 참가자 이미지 url을 기본 이미지 url로 변경하고 LocalDateTime을 string으로 변환한다.")
+        @DisplayName("LocalDateTime을 string으로 변환한다.")
         void changeNullParticipantImageUrlToDefaultImageUrl() {
             //given
-            when(userService.getUserDefaultImageUrl()).thenReturn(defaultUserImage.getFileUrl());
             when(chatroomScheduleQuery.findNotEndChatroomScheduleByChatroomId(chatroomId)).thenReturn(responseDataList);
 
             List<ChatroomScheduleResponse> resultExpected = responseDataList.stream()
                 .map(data -> {
-                    data.getParticipants().forEach(
-                        participantResponse -> participantResponse.updateImageUrl(defaultUserImage.getFileUrl())
-                    );
-
                     try {
                         return constructor.newInstance(
                             data.getId(),

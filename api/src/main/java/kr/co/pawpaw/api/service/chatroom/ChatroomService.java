@@ -225,16 +225,7 @@ public class ChatroomService {
 
     @Transactional(readOnly = true)
     public List<ChatroomParticipantResponse> getChatroomParticipantResponseList(final Long chatroomId) {
-        String defaultImageUrl = userService.getUserDefaultImageUrl();
-
-        return chatroomParticipantQuery.getChatroomParticipantResponseList(chatroomId)
-            .stream()
-            .peek(response -> {
-                if (Objects.isNull(response.getImageUrl())) {
-                    response.updateImageUrl(defaultImageUrl);
-                }
-            })
-            .collect(Collectors.toList());
+        return chatroomParticipantQuery.getChatroomParticipantResponseList(chatroomId);
     }
 
     @Transactional(readOnly = true)
@@ -242,16 +233,7 @@ public class ChatroomService {
         final Long chatroomId,
         final String nicknameKeyword
     ) {
-        String defaultImageUrl = userService.getUserDefaultImageUrl();
-
-        return userQuery.searchChatroomNonParticipant(chatroomId, nicknameKeyword)
-            .stream()
-            .peek(response -> {
-                if (Objects.isNull(response.getImageUrl())) {
-                    response.updateImageUrl(defaultImageUrl);
-                }
-            })
-            .collect(Collectors.toList());
+        return userQuery.searchChatroomNonParticipant(chatroomId, nicknameKeyword);
     }
 
     public Slice<ChatMessageDto> findBeforeChatMessages(

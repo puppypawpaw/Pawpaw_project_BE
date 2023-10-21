@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,12 +78,8 @@ public class ChatroomScheduleService {
         final UserId userId,
         final Long chatroomId
     ) {
-        String userImageDefaultUrl = userService.getUserDefaultImageUrl();
-
         List<ChatroomScheduleData> scheduleDataList =
             chatroomScheduleQuery.findNotEndChatroomScheduleByChatroomId(chatroomId);
-
-        changeNullImageUrlToUserDefaultImageUrl(scheduleDataList, userImageDefaultUrl);
 
         return scheduleDataList.stream()
             .map(ChatroomScheduleResponse::of)
@@ -105,17 +100,6 @@ public class ChatroomScheduleService {
         if (chatroomScheduleParticipantQuery.existsByChatroomScheduleUserUserId(chatroomScheduleId, userId)) {
             throw new AlreadyChatroomScheduleParticipantException();
         }
-    }
-
-    private void changeNullImageUrlToUserDefaultImageUrl(
-        final List<ChatroomScheduleData> dataList,
-        final String userImageDefaultUrl
-    ) {
-        dataList.forEach(data -> data.getParticipants().forEach(participantResponse -> {
-            if (Objects.isNull(participantResponse.getImageUrl())) {
-                participantResponse.updateImageUrl(userImageDefaultUrl);
-            }
-        }));
     }
 
     private ChatroomSchedule createChatroomSchedule(
