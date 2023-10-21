@@ -44,7 +44,6 @@ public class ReplyService {
     private final BoardCommand boardCommand;
     private final ReplyCommand replyCommand;
     private final ReplyQuery replyQuery;
-    private final UserService userService;
 
     @Transactional
     public ReplyResponseDto register(ReplyRegisterDto registerDto, UserId userId) {
@@ -176,16 +175,16 @@ public class ReplyService {
 
     public ReplyListDto convertCommentToDto(Reply reply) {
         boolean checkReplyWriter = replyQuery.checkReplyWriter(reply.getUser(), reply.getBoard());
-        String userImageUrl = userService.whoAmI(reply.getUser().getUserId()).getImageUrl();
+        String userImageUrl = reply.getUser().getUserImage().getFileUrl();
+
         if (reply.isRemoved()) {
-            return new ReplyListDto(reply.getId(), "삭제된 댓글입니다.", null, true, userImageUrl);
+            return new ReplyListDto(reply.getId(), "삭제된 댓글입니다.", null, true, userImageUrl, new ArrayList<>());
         } else {
-            ReplyListDto dto = new ReplyListDto(reply.getId(), reply.getContent(), reply.getWriter(), checkReplyWriter, userImageUrl);
             List<ReplyListDto> childDtos = reply.getChild().stream()
                     .map(this::convertCommentToDto)
                     .collect(Collectors.toList());
-            dto.setChildToParentReply(childDtos);
-            return dto;
+
+            return new ReplyListDto(reply.getId(), reply.getContent(), reply.getWriter(), checkReplyWriter, userImageUrl, childDtos);
         }
     }
 }

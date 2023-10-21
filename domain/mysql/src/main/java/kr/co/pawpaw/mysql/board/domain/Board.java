@@ -22,9 +22,6 @@ public final class Board extends BaseTimeEntity {
     private long id;
 
     @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false)
     private String content;
 
     @Column(nullable = false)
@@ -48,8 +45,7 @@ public final class Board extends BaseTimeEntity {
     private List<Reply> reply = new ArrayList<>();
 
     @Builder
-    public Board(String title, String content, User user, String writer) {
-        this.title = title;
+    public Board(String content, User user, String writer) {
         this.content = content;
         this.user = user;
         this.writer = writer;
@@ -77,8 +73,7 @@ public final class Board extends BaseTimeEntity {
     }
 
 
-    public void updateTitleAndContent(String title, String content){
-        this.title = title;
+    public void updateContent(String content){
         this.content = content;
     }
     public void remove() {

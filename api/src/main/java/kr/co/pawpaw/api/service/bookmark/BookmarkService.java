@@ -3,6 +3,7 @@ package kr.co.pawpaw.api.service.bookmark;
 import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto;
 import kr.co.pawpaw.api.service.boardImg.BoardImgService;
+import kr.co.pawpaw.api.service.boardlike.BoardLikeService;
 import kr.co.pawpaw.api.service.reply.ReplyService;
 import kr.co.pawpaw.common.exception.board.BoardException;
 import kr.co.pawpaw.common.exception.board.BookmarkException;
@@ -37,6 +38,7 @@ public class BookmarkService {
     private final BookmarkCommand bookmarkCommand;
     private final ReplyService replyService;
     private final BoardImgService imgService;
+    private final BoardLikeService boardLikeService;
 
 
     @Transactional
@@ -91,13 +93,16 @@ public class BookmarkService {
 
     private BoardListDto convertBoardToDto(Board board) {
         List<String> fileLink = imgService.viewFileImg(board.getId());
+        boolean existBoardLike = boardLikeService.checkLikeExist(board.getUser(), board);
+
         return BoardListDto.builder()
+                .userId(board.getUser().getUserId())
                 .id(board.getId())
-                .title(board.getTitle())
                 .content(board.getContent())
                 .likedCount(board.getLikedCount())
                 .replyCount(board.getReplyCount())
                 .fileNames(fileLink)
+                .boardLiked(existBoardLike)
                 .writer(board.getWriter())
                 .createdDate(board.getCreatedDate())
                 .modifiedDate(board.getModifiedDate())
