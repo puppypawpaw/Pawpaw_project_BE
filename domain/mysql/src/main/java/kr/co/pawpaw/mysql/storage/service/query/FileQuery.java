@@ -15,6 +15,11 @@ public class FileQuery {
     public Optional<File> findByFileName(final String fileName) {
         return fileRepository.findById(fileName);
     }
+
+    public File getReferenceById(final String fileName) {
+        return fileRepository.getReferenceById(fileName);
+    }
+
     public boolean existsByFileName(final String fileName) {
         return fileRepository.existsById(fileName);
     }

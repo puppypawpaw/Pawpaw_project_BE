@@ -6,6 +6,7 @@ import kr.co.pawpaw.api.dto.auth.SignUpRequest;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpInfoResponse;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpRequest;
 import kr.co.pawpaw.api.util.file.FileUtil;
+import kr.co.pawpaw.api.util.user.UserUtil;
 import kr.co.pawpaw.common.exception.auth.DuplicateEmailException;
 import kr.co.pawpaw.common.exception.auth.DuplicatePhoneNumberException;
 import kr.co.pawpaw.common.exception.auth.InvalidOAuth2TempKeyException;
@@ -13,6 +14,7 @@ import kr.co.pawpaw.common.exception.auth.NotVerifiedPhoneNumberException;
 import kr.co.pawpaw.common.exception.term.NotAgreeAllRequiredTermException;
 import kr.co.pawpaw.mysql.pet.service.command.PetCommand;
 import kr.co.pawpaw.mysql.sms.domain.SmsUsagePurpose;
+import kr.co.pawpaw.mysql.storage.service.query.FileQuery;
 import kr.co.pawpaw.mysql.term.domain.UserTermAgree;
 import kr.co.pawpaw.mysql.term.service.command.TermCommand;
 import kr.co.pawpaw.mysql.term.service.query.TermQuery;
@@ -50,6 +52,7 @@ public class SignUpService {
     private final OAuth2TempAttributesQuery oAuth2TempAttributesQuery;
     private final OAuth2TempAttributesCommand oAuth2TempAttributesCommand;
     private final FileService fileService;
+    private final FileQuery fileQuery;
 
     @Transactional
     public void signUp(
@@ -57,14 +60,24 @@ public class SignUpService {
         final MultipartFile image
     ) {
         validateRequest(request);
-        User user = createUser(request);
+
+        String userName = getUserName(request);
+        User user = createUser(request, userName);
 
         if (image != null && FileUtil.getByteLength(image) > 0) {
             saveUserImageByMultipartFile(image, user);
+        } else {
+            saveDefaultUserImage(user);
         }
 
         petCommand.saveAll(request.toPet(user));
         saveUserTermAgreements(request.getTermAgrees(), user);
+    }
+
+    private String getUserName(final SignUpRequest request) {
+        return verifiedPhoneNumberQuery.findByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name())
+            .map(VerifiedPhoneNumber::getUserName)
+            .orElseThrow(NotVerifiedPhoneNumberException::new);
     }
 
     @Transactional
@@ -79,6 +92,8 @@ public class SignUpService {
 
         if (!request.getNoImage()) {
             saveUserImageByMultipartFileOrUrl(image, oAuth2TempAttributes.getProfileImageUrl(), user);
+        } else {
+            saveDefaultUserImage(user);
         }
 
         petCommand.saveAll(request.toPet(user));
@@ -129,6 +144,12 @@ public class SignUpService {
         user.updateImage(fileService.saveFileByMultipartFile(image, user.getUserId()));
     }
 
+    private void saveDefaultUserImage(
+        final User user
+    ) {
+        user.updateImage(fileQuery.getReferenceById(UserUtil.getUserDefaultImageName()));
+    }
+
     private void saveUserImageByUrl(
         final String url,
         final User user
@@ -166,15 +187,13 @@ public class SignUpService {
         termCommand.saveAllUserTermAgrees(userTermAgrees);
     }
 
-    private User createUser(final SignUpRequest request) {
-        VerifiedPhoneNumber vPhoneNo = verifiedPhoneNumberQuery.findByPhoneNumberAndUsagePurpose(
-            request.getPhoneNumber(),
-            SmsUsagePurpose.SIGN_UP.name()
-        ).orElseThrow(NotVerifiedPhoneNumberException::new);
-
+    private User createUser(
+        final SignUpRequest request,
+        final String userName
+    ) {
         return userCommand.save(request.toUser(
             passwordEncoder.encode(request.getPassword()),
-            vPhoneNo.getUserName()
+            userName
         ));
     }
 
