@@ -1,8 +1,10 @@
 package kr.co.pawpaw.mysql.reply.service.query;
 
+import kr.co.pawpaw.mysql.board.domain.Board;
 import kr.co.pawpaw.mysql.reply.domain.Reply;
 import kr.co.pawpaw.mysql.reply.repository.ReplyCustomRepository;
 import kr.co.pawpaw.mysql.reply.repository.ReplyRepository;
+import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -38,5 +40,8 @@ public class ReplyQuery {
 
     public Slice<Reply> findReplyListByBoardId(Long boardId, Pageable pageable){
         return replyCustomRepository.findReplyListByBoardId(boardId, pageable);
+    }
+    public boolean checkReplyWriter(User user, Board board){
+        return replyRepository.existsByUserAndBoard(user, board);
     }
 }

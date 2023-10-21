@@ -4,6 +4,7 @@ import kr.co.pawpaw.api.dto.reply.ReplyDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyRegisterDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyResponseDto;
+import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.reply.ReplyException;
 import kr.co.pawpaw.common.exception.reply.ReplyException.ReplyNotFoundException;
@@ -173,15 +174,17 @@ public class ReplyService {
     }
 
     public ReplyListDto convertCommentToDto(Reply reply) {
+        boolean checkReplyWriter = replyQuery.checkReplyWriter(reply.getUser(), reply.getBoard());
+        String userImageUrl = reply.getUser().getUserImage().getFileUrl();
+
         if (reply.isRemoved()) {
-            return new ReplyListDto(reply.getId(), "삭제된 댓글입니다.", null);
+            return new ReplyListDto(reply.getId(), "삭제된 댓글입니다.", null, true, userImageUrl, new ArrayList<>());
         } else {
-            ReplyListDto dto = new ReplyListDto(reply.getId(), reply.getContent(), reply.getWriter());
             List<ReplyListDto> childDtos = reply.getChild().stream()
                     .map(this::convertCommentToDto)
                     .collect(Collectors.toList());
-            dto.setChildToParentReply(childDtos);
-            return dto;
+
+            return new ReplyListDto(reply.getId(), reply.getContent(), reply.getWriter(), checkReplyWriter, userImageUrl, childDtos);
         }
     }
 }

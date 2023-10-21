@@ -110,6 +110,27 @@ public class BoardRestController {
 
     @Operation(
             method = "GET",
+            summary = "게시글 조회",
+            description = "게시글 하나를 가지고 온다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = BoardListDto.class))),
+            @ApiResponse(responseCode = "400", description = "게시글 조회에 실패했습니다.", content = @Content)
+    })
+    @GetMapping("/{boardId}")
+    public ResponseEntity<BoardListDto> getBoard(
+            @AuthenticatedUserId UserId userId,
+            @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+            @Parameter(description = "한 페이지에 보여줄 댓글 수") @RequestParam(value = "pageSize", defaultValue = "4") int pageSize,
+            @PathVariable long boardId) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return ResponseEntity.ok(boardService.getBoardWithRepliesBy(boardId, userId, pageable));
+    }
+
+    @Operation(
+            method = "GET",
             summary = "게시글 검색",
             description = "게시글을 검색한다."
     )
@@ -124,7 +145,7 @@ public class BoardRestController {
             @AuthenticatedUserId UserId userId,
             @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
             @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "4") int pageSize,
-            @Parameter(description = "검색어") @RequestParam(value = "query") String query) {
+            @Parameter(description = "검색어") @RequestParam(value = "query", required = false) String query) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return ResponseEntity.ok(boardService.searchBoardsByQuery(userId, pageable, query));
     }

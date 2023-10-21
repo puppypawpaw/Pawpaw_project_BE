@@ -3,6 +3,7 @@ package kr.co.pawpaw.mysql.bookmark.service.query;
 
 import kr.co.pawpaw.mysql.board.domain.Board;
 import kr.co.pawpaw.mysql.bookmark.domain.Bookmark;
+import kr.co.pawpaw.mysql.bookmark.repository.BookmarkCustomRepository;
 import kr.co.pawpaw.mysql.bookmark.repository.BookmarkRepository;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class BookmarkQuery {
 
     private final BookmarkRepository bookmarkRepository;
+    private final BookmarkCustomRepository bookmarkCustomRepository;
 
     public Optional<Bookmark> deleteBookmarkByUserAndBoard(User user, Board board){
         return bookmarkRepository.deleteBookmarkByUserAndBoard(user, board);
@@ -28,6 +30,6 @@ public class BookmarkQuery {
     }
 
     public Slice<Bookmark> getBoardListWithRepliesByUser_UserId(Pageable pageable, UserId userId){
-        return bookmarkRepository.getBoardListWithRepliesByUser_UserId(pageable, userId);
+        return bookmarkCustomRepository.getBoardListWithRepliesByUser_UserId(pageable, userId);
     }
 }
