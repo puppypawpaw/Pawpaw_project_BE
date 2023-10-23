@@ -26,7 +26,7 @@ public class BoardDto {
     }
     @Schema(description = "게시글 응답 DTO")
     @Getter
-    public static class RegisterResponseDto {
+    public static class BoardResponseDto {
         @Schema(description = "게시글 id", example = "14")
         private Long id;
         @Schema(description = "게시글 내용", example = "나이는 1살 입니다.")
@@ -37,13 +37,16 @@ public class BoardDto {
         private LocalDateTime createDate;
         @Schema(description = "게시글 수정일자", example = "2023-10-17 15:01:36.464359")
         private LocalDateTime modifiedDate;
+        @Schema(description = "게시글 첨부파일", example = "https://pub-2bd8949dbff24e3fbbc30ac222835ad6.r2.dev/8e942645-4276-40a5-b5de-942d0e16b2c7")
+        private List<String> fileUrls;
         @Builder
-        public RegisterResponseDto(Long id, String content, String writer, LocalDateTime createDate, LocalDateTime modifiedDate) {
+        public BoardResponseDto(Long id, String content, String writer, LocalDateTime createDate, LocalDateTime modifiedDate, List<String> fileUrls) {
             this.id = id;
             this.content = content;
             this.writer = writer;
             this.createDate = createDate;
             this.modifiedDate = modifiedDate;
+            this.fileUrls = fileUrls;
         }
 
     }
@@ -72,7 +75,7 @@ public class BoardDto {
         @Schema(description = "게시글의 댓글목록")
         private List<ReplyListDto> replyListDto;
         @Schema(description = "게시글의 첨부파일 링크", example = "https://pub-2bd8949dbff24e3fbbc30ac222835ad6.r2.dev/8d41ad2c-cfdd-47bb-aada-210bcffbb559")
-        private List<String> fileNames;
+        private List<String> fileUrls;
         @Schema(description = "게시글 좋아요 수", example = "10")
         private int likedCount;
         @Schema(description = "게시글 댓글의 수", example = "12")
@@ -91,7 +94,7 @@ public class BoardDto {
         @Builder
         public BoardListDto(UserId userId, Long id, String content, String writer, int likedCount,
                             int replyCount, String userImageUrl, boolean boardLiked, boolean bookmarked, LocalDateTime createdDate, LocalDateTime modifiedDate,
-                            List<ReplyListDto> replyListDto, List<String> fileNames) {
+                            List<ReplyListDto> replyListDto, List<String> fileUrls) {
             this.userId = userId;
             this.id = id;
             this.content = content;
@@ -104,11 +107,14 @@ public class BoardDto {
             this.createdDate = createdDate;
             this.modifiedDate = modifiedDate;
             this.replyListDto = replyListDto;
-            this.fileNames = fileNames;
+            this.fileUrls = fileUrls;
         }
 
         public void setReplyListToBoard(List<ReplyListDto> replyListDto){
             this.replyListDto = replyListDto;
+        }
+        public void setFileUrlsToBoard(List<String> fileUrls){
+            this.fileUrls = fileUrls;
         }
     }
 
