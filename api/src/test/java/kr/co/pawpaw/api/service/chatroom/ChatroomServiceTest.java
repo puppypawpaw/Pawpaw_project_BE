@@ -2,7 +2,6 @@ package kr.co.pawpaw.api.service.chatroom;
 
 import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.file.FileService;
-import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.chatroom.*;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.dynamodb.chat.domain.Chat;
@@ -12,8 +11,11 @@ import kr.co.pawpaw.dynamodb.chat.service.command.ChatCommand;
 import kr.co.pawpaw.dynamodb.chat.service.query.ChatQuery;
 import kr.co.pawpaw.dynamodb.util.chat.ChatUtil;
 import kr.co.pawpaw.mysql.chatroom.domain.*;
-import kr.co.pawpaw.mysql.chatroom.dto.*;
+import kr.co.pawpaw.mysql.chatroom.dto.ChatroomCoverResponse;
+import kr.co.pawpaw.mysql.chatroom.dto.ChatroomDetailData;
+import kr.co.pawpaw.mysql.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomCommand;
+import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomHashTagCommand;
 import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomParticipantCommand;
 import kr.co.pawpaw.mysql.chatroom.service.command.TrendingChatroomCommand;
 import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomDefaultCoverQuery;
@@ -79,6 +81,8 @@ class ChatroomServiceTest {
     private ChatQuery chatQuery;
     @Mock
     private RedisPublisher redisPublisher;
+    @Mock
+    private ChatroomHashTagCommand chatroomHashTagCommand;
     @InjectMocks
     private ChatroomService chatroomService;
 
@@ -305,7 +309,6 @@ class ChatroomServiceTest {
     @DisplayName("getChatroomInfo 메서드는")
     class GetChatroomInfo {
         Chatroom chatroom = Chatroom.builder()
-            .hashTagList(List.of("해시태그 1", "해시태그 2"))
             .name("채팅방 이름")
             .description("채팅방 설명")
             .build();
@@ -431,9 +434,9 @@ class ChatroomServiceTest {
         @DisplayName("생성된 chatroom의 mulitparFile이 null이면 fileService의 saveFileByMultipartFile메서드를 호출하지 않는다.")
         void nullNotCallSaveFileByMultipartFile() {
             //given
-            kr.co.pawpaw.mysql.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
+            Chatroom chatroom = request.toChatroom(file);
             when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-            when(chatroomCommand.save(any(kr.co.pawpaw.mysql.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+            when(chatroomCommand.save(any(Chatroom.class))).thenReturn(chatroom);
             //when
             chatroomService.createChatroom(user.getUserId(), request, null);
             //then
@@ -444,9 +447,9 @@ class ChatroomServiceTest {
         @DisplayName("생성된 chatroom의 mulitparFile의 길이가 0이면 fileService의 saveFileByMultipartFile메서드를 호출하지 않는다.")
         void zeroLenNotCallSaveFileByMultipartFile() throws IOException {
             //given
-            kr.co.pawpaw.mysql.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
+            Chatroom chatroom = request.toChatroom(file);
             when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-            when(chatroomCommand.save(any(kr.co.pawpaw.mysql.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+            when(chatroomCommand.save(any(Chatroom.class))).thenReturn(chatroom);
             when(multipartFile.getBytes()).thenReturn(new byte[0]);
 
             //when
@@ -460,13 +463,13 @@ class ChatroomServiceTest {
         @DisplayName("생성된 chatroom의 mulitparFile이 정상이면 생성된 chatroom의 Id를 필드로 가지는 CreateChatroomResponse를 반환한다.")
         void returnCreateChatroomResponse() throws IllegalAccessException, IOException, NoSuchFieldException {
             //given
-            kr.co.pawpaw.mysql.chatroom.domain.Chatroom chatroom = request.toChatroom(file);
+            Chatroom chatroom = request.toChatroom(file);
             Field idField = chatroom.getClass().getDeclaredField("id");
             idField.setAccessible(true);
             Long id = 1234L;
             idField.set(chatroom, id);
             when(userQuery.findByUserId(user.getUserId())).thenReturn(Optional.of(user));
-            when(chatroomCommand.save(any(kr.co.pawpaw.mysql.chatroom.domain.Chatroom.class))).thenReturn(chatroom);
+            when(chatroomCommand.save(any(Chatroom.class))).thenReturn(chatroom);
             when(multipartFile.getBytes()).thenReturn(new byte[file.getByteSize().intValue()]);
             when(fileService.saveFileByMultipartFile(multipartFile, user.getUserId())).thenReturn(file);
             //when
@@ -816,7 +819,7 @@ class ChatroomServiceTest {
             1L,
             "name",
             "description",
-            List.of("hashTag1"),
+            Set.of("hashTag1"),
             "managerName",
             "managerImageUrl",
             2L
@@ -855,7 +858,6 @@ class ChatroomServiceTest {
         private Chatroom chatroom = Chatroom.builder()
             .name("chatroom-name")
             .description("chatroom-description")
-            .hashTagList(List.of("hashtag-1", "hashtag-2"))
             .searchable(true)
             .locationLimit(false)
             .build();

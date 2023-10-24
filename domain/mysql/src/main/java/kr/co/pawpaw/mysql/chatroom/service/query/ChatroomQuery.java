@@ -23,6 +23,10 @@ public class ChatroomQuery {
     private final ChatroomCustomRepository chatroomCustomRepository;
     private final TrendingChatroomCustomRepository trendingChatroomCustomRepository;
 
+    public List<ChatroomResponse> findBySearchQuery(final String query) {
+        return chatroomCustomRepository.findBySearchQuery(query);
+    }
+
     public Optional<Chatroom> findById(final Long chatroomId) {
         return chatroomRepository.findById(chatroomId);
     }

@@ -1,6 +1,7 @@
 package kr.co.pawpaw.mysql.chatroom.repository;
 
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomDefaultCover;
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.repository.FileRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -8,14 +9,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
 @Nested
 @DisplayName("ChatroomDefaultCoverRepository의")
-class ChatroomDefaultCoverRepositoryTest {
+class ChatroomDefaultCoverRepositoryTest extends MySQLTestContainer {
     @Autowired
     private ChatroomDefaultCoverRepository chatroomDefaultCoverRepository;
     @Autowired

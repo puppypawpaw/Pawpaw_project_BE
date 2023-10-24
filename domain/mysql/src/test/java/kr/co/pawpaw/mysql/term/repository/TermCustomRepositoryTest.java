@@ -1,12 +1,13 @@
 package kr.co.pawpaw.mysql.term.repository;
 
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
 import kr.co.pawpaw.mysql.term.domain.Term;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
@@ -14,8 +15,9 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(value = { TermCustomRepository.class, QuerydslConfig.class })
-@DataJpaTest
-class TermCustomRepositoryTest {
+@Nested
+@DisplayName("TermCustomRepository는")
+class TermCustomRepositoryTest extends MySQLTestContainer {
     @Autowired
     private TermCustomRepository termCustomRepository;
     @Autowired
