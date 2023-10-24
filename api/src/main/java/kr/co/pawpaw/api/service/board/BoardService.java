@@ -54,16 +54,12 @@ public class BoardService {
 
             User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
 
-            List<File> fileList = new ArrayList<>();
+            List<String> fileUrls = new ArrayList<>();
             if (files != null) {
-                fileList = files.stream()
-                        .map(file -> fileService.saveFileByMultipartFile(file, userId))
+                fileUrls = files.stream()
+                        .map(file -> fileService.saveFileByMultipartFile(file, userId).getFileUrl())
                         .collect(Collectors.toList());
             }
-
-            List<String> fileUrls = fileList.stream()
-                    .map(File::getFileUrl)
-                    .collect(Collectors.toList());
 
             Board board = Board.builder()
                     .content(registerDto.getContent())
@@ -103,12 +99,8 @@ public class BoardService {
 
         // 이미지 파일 업데이트 (만약 파일이 업로드되었다면)
         if (files != null && !files.isEmpty()) {
-            List<File> fileList = files.stream()
-                    .map(file -> fileService.saveFileByMultipartFile(file, userId))
-                    .collect(Collectors.toList());
-
-            List<String> fileUrls = fileList.stream()
-                    .map(File::getFileUrl)
+            List<String> fileUrls = files.stream()
+                    .map(file -> fileService.saveFileByMultipartFile(file, userId).getFileUrl())
                     .collect(Collectors.toList());
 
             board.updateFileUrl(fileUrls);
