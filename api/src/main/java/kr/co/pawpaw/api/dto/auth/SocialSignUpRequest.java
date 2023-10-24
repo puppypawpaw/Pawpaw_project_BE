@@ -23,6 +23,9 @@ public class SocialSignUpRequest {
     @NotBlank @Schema(description = "redirect 시 제공했던 key 입력필요, key 유효기간 1일", example = "874a7470-a648-4b99-927c-9a2acc5f65a5")
     private String key;
 
+    @NotBlank @Schema(description = "유저의 한줄 소개", example = "3살 너구리")
+    private String briefIntroduction;
+
     @NotNull @Schema(description = "유저의 약관 동의 여부, 1, 2, 3번이 필수, 4번이 필수아님", example = "[1,2,3]")
     private List<Long> termAgrees;
 
@@ -51,6 +54,7 @@ public class SocialSignUpRequest {
             .email(email)
             .password("")
             .nickname(nickname)
+            .briefIntroduction(briefIntroduction)
             .position(position.toEntity())
             .provider(provider)
             .build();

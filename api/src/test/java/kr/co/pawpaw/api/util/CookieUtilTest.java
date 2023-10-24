@@ -101,7 +101,7 @@ class CookieUtilTest {
         when(request.getCookies()).thenReturn(cookies);
 
         //when
-        CookieUtil.deleteCookie(request, response, cookieName1);
+        CookieUtil.deleteCookie(request, response, cookieName1, null);
         //then
         ArgumentCaptor<String> cookieCaptor = ArgumentCaptor.forClass(String.class);
         verify(response).addHeader(eq("Set-Cookie"), cookieCaptor.capture());
