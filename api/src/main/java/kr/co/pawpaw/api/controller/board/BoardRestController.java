@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.dto.board.BoardDto;
 import kr.co.pawpaw.api.dto.board.BoardDto.BoardListDto;
+import kr.co.pawpaw.api.dto.board.BoardDto.BoardResponseDto;
 import kr.co.pawpaw.api.service.board.BoardService;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.Getter;
@@ -18,8 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.util.List;
 
 @Tag(name = "boards", description = "게시물 API")
 @RestController
@@ -39,21 +43,25 @@ public class BoardRestController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 등록 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = BoardDto.RegisterResponseDto.class))),
+                            schema = @Schema(implementation = BoardResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "게시글 등록에 실패했습니다", content = @Content)
     })
-    @PostMapping("/register")
-    public ResponseEntity<BoardDto.RegisterResponseDto> register(
+    @PostMapping(value = "/register", consumes = {
+            MediaType.APPLICATION_JSON_VALUE,
+            MediaType.MULTIPART_FORM_DATA_VALUE
+    })
+    public ResponseEntity<BoardResponseDto> register(
             @AuthenticatedUserId UserId userId,
-            @RequestBody BoardDto.BoardRegisterDto registerDto) {
-        BoardDto.RegisterResponseDto boardResponseDto = boardService.register(userId, registerDto);
+            @RequestPart BoardDto.BoardRegisterDto registerDto,
+            @RequestPart(required = false)  List<MultipartFile> files) {
+        BoardResponseDto boardResponseDto = boardService.register(userId, registerDto, files);
         return ResponseEntity.ok(boardResponseDto);
     }
 
     @Operation(
             method = "POST",
             summary = "게시글 수정",
-            description = "게시글을 수정한다."
+            description = "게시글을 수정한다. form-data 타입으로 content는 application/json으로 files는 contentType 지정 안해도 됨"
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 수정 성공",
@@ -62,12 +70,13 @@ public class BoardRestController {
             @ApiResponse(responseCode = "400", description = "게시글 수정에 실패했습니다", content = @Content)
     })
     @PatchMapping("/update/{boardId}")
-    public ResponseEntity<BoardDto.BoardUpdateDto> updateBoard(
+    public ResponseEntity<BoardResponseDto> updateBoard(
             @AuthenticatedUserId UserId userId,
             @Parameter(description = "게시글 ID", required = true) @PathVariable Long boardId,
-            @RequestBody BoardDto.BoardUpdateDto updateDto) {
-        BoardDto.BoardUpdateDto boardUpdateDto = boardService.update(userId, boardId, updateDto);
-        return ResponseEntity.ok(boardUpdateDto);
+            @RequestPart BoardDto.BoardUpdateDto updateDto,
+            @RequestPart(required = false) List<MultipartFile> files) {
+        BoardResponseDto boardResponseDto = boardService.update(userId, boardId, updateDto, files);
+        return ResponseEntity.ok(boardResponseDto);
     }
 
     @Operation(

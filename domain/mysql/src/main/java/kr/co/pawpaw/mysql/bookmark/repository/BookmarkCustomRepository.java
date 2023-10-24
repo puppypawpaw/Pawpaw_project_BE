@@ -23,14 +23,14 @@ public class BookmarkCustomRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public Slice<Bookmark> getBoardListWithRepliesByUser_UserId(Pageable pageable, UserId userId) {
+    public Slice<Bookmark> getBoardListWithRepliesByUser_UserIdAndBookmarked(Pageable pageable, UserId userId) {
         List<Bookmark> boards = queryFactory.selectFrom(bookmark)
                 .leftJoin(bookmark.board, board).fetchJoin()
                 .leftJoin(bookmark.user, user).fetchJoin()
                 .orderBy(
                         board.createdDate.desc()
                 )
-                .where(board.user.userId.eq(userId))
+                .where(user.userId.eq(userId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();

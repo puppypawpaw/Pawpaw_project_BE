@@ -46,7 +46,7 @@ public class BookmarkService {
         User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
         Board board = boardQuery.findById(boardId).orElseThrow(BoardException.BoardNotFoundException::new);
 
-        if (!existsByUserAndBoard(user, board)) {
+        if (!existsByUser_UserIdAndBoard(userId, board)) {
             bookmarkCommand.save(new Bookmark(board, user));
             board.addBookmark();
             return true;
@@ -59,7 +59,7 @@ public class BookmarkService {
         User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
         Board board = boardQuery.findById(boardId).orElseThrow(BoardException.BoardNotFoundException::new);
 
-        if (existsByUserAndBoard(user, board)) {
+        if (existsByUser_UserIdAndBoard(userId, board)) {
             bookmarkQuery.deleteBookmarkByUserAndBoard(user, board);
             board.deleteBookmark();
             return true;
@@ -69,31 +69,34 @@ public class BookmarkService {
     @Transactional(readOnly = true)
     public Slice<BoardListDto> getBoardListWithRepliesByUser_UserId(Pageable pageable, UserId userId){
         userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
-        Slice<Bookmark> boardListWithRepliesByUser_UserId = bookmarkQuery.getBoardListWithRepliesByUser_UserId(pageable, userId);
+        Slice<Bookmark> boardListWithRepliesByUser_UserId = bookmarkQuery.getBoardListWithRepliesByUser_UserIdAndBookmarked(pageable, userId);
 
         List<BoardListDto> boardListDtos = getBoardListDtos(userId, pageable, boardListWithRepliesByUser_UserId);
         return new SliceImpl<>(boardListDtos, pageable, boardListWithRepliesByUser_UserId.hasNext());
     }
 
-    public boolean existsByUserAndBoard(User user, Board board) {
-        return bookmarkQuery.existsByUserAndBoard(user, board);
+    public boolean existsByUser_UserIdAndBoard(UserId userId, Board board) {
+        return bookmarkQuery.existsByUser_UserIdAndBoard(userId, board);
     }
 
     private List<BoardListDto> getBoardListDtos(UserId userId, Pageable pageable, Slice<Bookmark> bookmarks) {
         List<BoardListDto> boardListDtos = bookmarks.stream()
-                .map(bookmark -> convertBoardToDto(bookmark.getBoard()))
+                .map(bookmark -> convertBoardToDto(userId, bookmark.getBoard()))
                 .collect(Collectors.toList());
 
         boardListDtos.forEach(boardDto -> {
             List<ReplyDto.ReplyListDto> replyList = replyService.findReplyListByBoardId(userId, boardDto.getId(), pageable).getContent();
             boardDto.setReplyListToBoard(replyList);
+
+            Board board = boardQuery.findBoardWithFileUrlsById(boardDto.getId());
+            boardDto.setFileUrlsToBoard(board.getFileUrls());
         });
         return boardListDtos;
     }
 
-    private BoardListDto convertBoardToDto(Board board) {
-        List<String> fileLink = imgService.viewFileImg(board.getId());
+    private BoardListDto convertBoardToDto(UserId userId, Board board) {
         boolean existBoardLike = boardLikeService.checkLikeExist(board.getUser(), board);
+        boolean existBookmark = existsByUser_UserIdAndBoard(userId, board);
         String imageUrl = board.getUser().getUserImage().getFileUrl();
 
         return BoardListDto.builder()
@@ -102,9 +105,9 @@ public class BookmarkService {
                 .content(board.getContent())
                 .likedCount(board.getLikedCount())
                 .replyCount(board.getReplyCount())
-                .fileNames(fileLink)
                 .userImageUrl(imageUrl)
                 .boardLiked(existBoardLike)
+                .bookmarked(existBookmark)
                 .writer(board.getWriter())
                 .createdDate(board.getCreatedDate())
                 .modifiedDate(board.getModifiedDate())

@@ -25,11 +25,11 @@ public class BookmarkQuery {
         return bookmarkRepository.deleteBookmarkByUserAndBoard(user, board);
     }
 
-    public boolean existsByUserAndBoard(User user, Board board){
-        return bookmarkRepository.existsByUserAndBoard(user, board);
+    public boolean existsByUser_UserIdAndBoard(UserId userId, Board board){
+        return bookmarkRepository.existsByUser_UserIdAndBoard(userId, board);
     }
 
-    public Slice<Bookmark> getBoardListWithRepliesByUser_UserId(Pageable pageable, UserId userId){
-        return bookmarkCustomRepository.getBoardListWithRepliesByUser_UserId(pageable, userId);
+    public Slice<Bookmark> getBoardListWithRepliesByUser_UserIdAndBookmarked(Pageable pageable, UserId userId){
+        return bookmarkCustomRepository.getBoardListWithRepliesByUser_UserIdAndBookmarked(pageable, userId);
     }
 }

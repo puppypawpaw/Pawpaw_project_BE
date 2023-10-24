@@ -9,8 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -36,5 +34,8 @@ public class BoardQuery {
     }
     public Slice<Board> searchBoardsByQuery(@Param("query") String query, Pageable pageable){
         return boardRepository.searchBoardsByQuery(query, pageable);
+    }
+    public Board findBoardWithFileUrlsById(@Param("id") Long id){
+        return boardRepository.findBoardWithFileUrlsById(id);
     }
 }
