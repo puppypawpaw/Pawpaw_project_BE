@@ -4,6 +4,7 @@ import kr.co.pawpaw.api.dto.reply.ReplyDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyListDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyRegisterDto;
 import kr.co.pawpaw.api.dto.reply.ReplyDto.ReplyResponseDto;
+import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.reply.ReplyException;
 import kr.co.pawpaw.common.exception.reply.ReplyException.ReplyNotFoundException;
@@ -79,6 +80,8 @@ public class ReplyService {
                 .boardId(registerDto.getBoardId())
                 .parentId(registerDto.getParentId())
                 .replyId(savedReply.getId())
+                .createdDate(reply.getCreatedDate())
+                .modifiedDate(reply.getModifiedDate())
                 .build();
     }
     private ReplyResponseDto registerReplyWhenNotExistParentReply(ReplyRegisterDto registerDto, User user, Board board) {
@@ -98,6 +101,8 @@ public class ReplyService {
                 .boardId(registerDto.getBoardId())
                 .parentId(null)
                 .replyId(savedReply.getId())
+                .createdDate(reply.getCreatedDate())
+                .modifiedDate(reply.getModifiedDate())
                 .build();
     }
 
@@ -119,6 +124,8 @@ public class ReplyService {
                 .content(updateDto.getContent())
                 .boardId(reply.getBoard().getId())
                 .replyId(reply.getId())
+                .createdDate(reply.getCreatedDate())
+                .modifiedDate(reply.getModifiedDate())
                 .build();
     }
 
@@ -162,26 +169,51 @@ public class ReplyService {
         List<ReplyListDto> result = new ArrayList<>();
         Map<Long, ReplyListDto> map = new HashMap<>();
 
-        replyList.stream().forEach(c -> {
-            ReplyListDto dto = convertCommentToDto(c);
-            map.put(dto.getId(), dto);
-            if (c.getParent() != null) {
-                map.get(c.getParent().getId()).getChildren().add(dto);
-            } else result.add(dto);
-        });
+        for (Reply reply : replyList) {
+            ReplyListDto dto = map.computeIfAbsent(reply.getId(), id -> convertCommentToDto(reply));
+
+            if (reply.getParent() != null) {
+                ReplyListDto parentDto = map.computeIfAbsent(reply.getParent().getId(), id -> convertCommentToDto(reply.getParent()));
+                parentDto.getChildren().add(dto);
+            } else {
+                result.add(dto);
+            }
+        }
         return result;
     }
 
     public ReplyListDto convertCommentToDto(Reply reply) {
+        boolean checkReplyWriter = replyQuery.checkReplyWriter(reply.getUser(), reply.getBoard());
+        String userImageUrl = reply.getUser().getUserImage().getFileUrl();
+
         if (reply.isRemoved()) {
-            return new ReplyListDto(reply.getId(), "삭제된 댓글입니다.", null);
+            return ReplyListDto.builder()
+                    .id(reply.getId())
+                    .replyWriterId(reply.getUser().getUserId())
+                    .content("삭제된 댓글입니다.")
+                    .nickname(null)
+                    .replyWriter(true)
+                    .userImageUrl(userImageUrl)
+                    .childToParentReply(new ArrayList<>())
+                    .createdDate(reply.getCreatedDate())
+                    .modifiedDate(reply.getModifiedDate())
+                    .build();
         } else {
-            ReplyListDto dto = new ReplyListDto(reply.getId(), reply.getContent(), reply.getWriter());
             List<ReplyListDto> childDtos = reply.getChild().stream()
                     .map(this::convertCommentToDto)
                     .collect(Collectors.toList());
-            dto.setChildToParentReply(childDtos);
-            return dto;
+
+            return ReplyListDto.builder()
+                    .id(reply.getId())
+                    .replyWriterId(reply.getUser().getUserId())
+                    .content(reply.getContent())
+                    .nickname(reply.getWriter())
+                    .replyWriter(checkReplyWriter)
+                    .userImageUrl(userImageUrl)
+                    .childToParentReply(childDtos)
+                    .createdDate(reply.getCreatedDate())
+                    .modifiedDate(reply.getModifiedDate())
+                    .build();
         }
     }
 }

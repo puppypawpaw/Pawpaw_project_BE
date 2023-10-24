@@ -1,6 +1,8 @@
 package kr.co.pawpaw.mysql.reply.repository;
 
+import kr.co.pawpaw.mysql.board.domain.Board;
 import kr.co.pawpaw.mysql.reply.domain.Reply;
+import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,4 +28,5 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     Optional<Reply> findReplyById(Long id);
 
+    boolean existsByUserAndBoard(User user, Board board);
 }

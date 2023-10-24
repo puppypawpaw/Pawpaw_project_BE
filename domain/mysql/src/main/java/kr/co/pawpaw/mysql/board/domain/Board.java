@@ -3,7 +3,10 @@ package kr.co.pawpaw.mysql.board.domain;
 import kr.co.pawpaw.mysql.common.BaseTimeEntity;
 import kr.co.pawpaw.mysql.reply.domain.Reply;
 import kr.co.pawpaw.mysql.user.domain.User;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -20,9 +23,6 @@ public final class Board extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "board_id")
     private long id;
-
-    @Column(nullable = false)
-    private String title;
 
     @Column(nullable = false)
     private String content;
@@ -47,14 +47,19 @@ public final class Board extends BaseTimeEntity {
     @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Reply> reply = new ArrayList<>();
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "board_file_urls", joinColumns = @JoinColumn(name = "board_id"))
+    @Column(name = "file_url")
+    private List<String> fileUrls;
+
     @Builder
-    public Board(String title, String content, User user, String writer) {
-        this.title = title;
+    public Board(String content, User user, String writer, List<String> fileUrls) {
         this.content = content;
         this.user = user;
         this.writer = writer;
         this.isRemoved = false;
         this.isBookmarked = false;
+        this.fileUrls = fileUrls;
     }
     public void plusLikedCount(){
         this.likedCount = likedCount +1;
@@ -77,9 +82,14 @@ public final class Board extends BaseTimeEntity {
     }
 
 
-    public void updateTitleAndContent(String title, String content){
-        this.title = title;
+    public void updateContent(String content){
         this.content = content;
+    }
+    public void updateFileUrl(List<String> fileUrls) {
+        this.fileUrls.clear();
+        if (fileUrls != null) {
+            this.fileUrls.addAll(fileUrls);
+        }
     }
     public void remove() {
         this.isRemoved = true;
