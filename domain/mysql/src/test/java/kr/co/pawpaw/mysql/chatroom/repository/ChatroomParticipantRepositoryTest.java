@@ -3,24 +3,26 @@ package kr.co.pawpaw.mysql.chatroom.repository;
 import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipant;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.position.Position;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-class ChatroomParticipantRepositoryTest {
+@Nested
+@DisplayName("ChatroomParticipantRepository 는")
+class ChatroomParticipantRepositoryTest extends MySQLTestContainer {
     @Autowired
     private ChatroomParticipantRepository chatroomParticipantRepository;
     @Autowired
@@ -52,7 +54,6 @@ class ChatroomParticipantRepositoryTest {
 
         chatroom = chatroomRepository.save(Chatroom.builder()
             .description("description")
-            .hashTagList(List.of("hashTag1", "hashTag2"))
             .locationLimit(false)
             .searchable(false)
             .name("name")
@@ -70,9 +71,7 @@ class ChatroomParticipantRepositoryTest {
     @Test
     @DisplayName("저장 및 findByUserUserIdAndChatroomId 메서드 테스트")
     void findByUserUserIdAndChatroomId() {
-        //given
         //when
-
         Optional<ChatroomParticipant> result = chatroomParticipantRepository.findByUserUserIdAndChatroomId(user.getUserId(), chatroom.getId());
 
         //then

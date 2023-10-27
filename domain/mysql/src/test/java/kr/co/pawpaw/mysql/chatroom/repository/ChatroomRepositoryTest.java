@@ -1,17 +1,19 @@
 package kr.co.pawpaw.mysql.chatroom.repository;
 
 import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-class ChatroomRepositoryTest {
+@Nested
+@DisplayName("ChatroomRepository는")
+class ChatroomRepositoryTest extends MySQLTestContainer {
     @Autowired
     private ChatroomRepository chatroomRepository;
 

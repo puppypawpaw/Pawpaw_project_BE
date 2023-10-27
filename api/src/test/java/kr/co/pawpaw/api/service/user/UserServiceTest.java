@@ -5,7 +5,6 @@ import kr.co.pawpaw.api.dto.user.UpdateUserPositionRequest;
 import kr.co.pawpaw.api.dto.user.UpdateUserProfileRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.api.service.file.FileService;
-import kr.co.pawpaw.api.util.user.UserUtil;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.mysql.position.Position;
 import kr.co.pawpaw.mysql.storage.domain.File;
@@ -177,41 +176,6 @@ class UserServiceTest {
 
             //then
             assertThat(request).usingRecursiveComparison().isEqualTo(user);
-        }
-    }
-
-    @Nested
-    @DisplayName("getUserDefaultImageUrl 메서드는")
-    class GetUserDefaultImageUrl {
-        File userDefaultImage = File.builder()
-            .fileName("기본 이미지")
-            .fileUrl("파일 URL")
-            .build();
-
-        @Test
-        @DisplayName("fileRepository에 userDefaultImage파일이 없으면 null을 반환한다.")
-        void returnNull() {
-            //given
-            when(fileQuery.findByFileName(UserUtil.getUserDefaultImageName())).thenReturn(Optional.empty());
-
-            //when
-            String result = userService.getUserDefaultImageUrl();
-
-            //then
-            assertThat(result).isNull();
-        }
-
-        @Test
-        @DisplayName("fileRepository에 userDefaultImage파일이 존재하면 file의 url을 반환한다.")
-        void returnUrl() {
-            //given
-            when(fileQuery.findByFileName(UserUtil.getUserDefaultImageName())).thenReturn(Optional.of(userDefaultImage));
-
-            //when
-            String result = userService.getUserDefaultImageUrl();
-
-            //then
-            assertThat(result).isEqualTo(userDefaultImage.getFileUrl());
         }
     }
 

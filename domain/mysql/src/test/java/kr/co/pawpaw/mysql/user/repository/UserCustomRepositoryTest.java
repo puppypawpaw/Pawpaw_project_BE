@@ -6,6 +6,7 @@ import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomNonParticipantResponse;
 import kr.co.pawpaw.mysql.chatroom.repository.ChatroomParticipantRepository;
 import kr.co.pawpaw.mysql.chatroom.repository.ChatroomRepository;
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
 import kr.co.pawpaw.mysql.position.Position;
 import kr.co.pawpaw.mysql.storage.domain.File;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
@@ -26,9 +26,9 @@ import java.util.Objects;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(value = { QuerydslConfig.class, UserCustomRepository.class })
-@DataJpaTest
+@Nested
 @DisplayName("UserCustomRepository의")
-class UserCustomRepositoryTest {
+class UserCustomRepositoryTest extends MySQLTestContainer {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -124,7 +124,6 @@ class UserCustomRepositoryTest {
                 Chatroom.builder()
                     .name("chatroom1-name")
                     .description("chatroom1-description")
-                    .hashTagList(List.of("chatroom1-hashtag1", "chatroom1-hashtag2"))
                     .locationLimit(false)
                     .searchable(true)
                     .build()
@@ -145,8 +144,6 @@ class UserCustomRepositoryTest {
         @CsvSource(value = {"0,4", "1,3", "2,2", "3,1", "4,0"})
         @DisplayName("채팅방 참여자가 아닌 유저들을 닉네임으로 검색한다.")
         void searchNotParticipantsByNickName(int userListIndex, int expectedSize) {
-            //given
-
             //when
             List<ChatroomNonParticipantResponse> result = userCustomRepository.searchChatroomNonParticipant(chatroom.getId(), userList.get(userListIndex).getNickname());
 
@@ -158,13 +155,14 @@ class UserCustomRepositoryTest {
         @CsvSource(value = {"0,false", "1,true"})
         @DisplayName("ChatroomNonParticipantResponse 의 imageUrl 필드는 유저의 이미지가 있으면 이미지 url을 없으면 null을 반환한다.")
         void noImageReturnNullImageUrl(int userListIndex, boolean imageUrlIsNull) {
-            //given
-
             //when
-            ChatroomNonParticipantResponse target = userCustomRepository.searchChatroomNonParticipant(chatroom.getId(), userList.get(userListIndex).getNickname()).get(0);
+            List<ChatroomNonParticipantResponse> list = userCustomRepository.searchChatroomNonParticipant(chatroom.getId(), userList.get(userListIndex).getNickname());
 
             //then
-            assertThat(Objects.isNull(target.getImageUrl())).isEqualTo(imageUrlIsNull);
+            assertThat(
+                list.stream().filter(response -> response.getUserId().equals(userList.get(userListIndex).getUserId())
+                    && Objects.nonNull(response.getImageUrl())).findAny().isEmpty())
+                .isEqualTo(imageUrlIsNull);
         }
     }
 }

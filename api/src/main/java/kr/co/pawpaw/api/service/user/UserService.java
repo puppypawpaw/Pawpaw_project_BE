@@ -68,8 +68,7 @@ public class UserService {
         user.updateProfile(updateUserProfileRequest.getNickname(), updateUserProfileRequest.getBriefIntroduction());
     }
 
-    @Transactional(readOnly = true)
-    public String getUserDefaultImageUrl() {
+    private String getUserDefaultImageUrl() {
         return fileQuery.findByFileName(UserUtil.getUserDefaultImageName())
             .map(File::getFileUrl)
             .orElse(null);

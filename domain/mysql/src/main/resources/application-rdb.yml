@@ -7,6 +7,7 @@ spring:
     hikari:
       max-lifetime: 600000
   jpa:
+    database-platform: kr.co.pawpaw.mysql.common.repository.CustomDialect
     open-in-view: false
     show-sql: true
     hibernate:

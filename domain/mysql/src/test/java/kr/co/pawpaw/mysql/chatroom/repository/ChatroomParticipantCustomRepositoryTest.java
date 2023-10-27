@@ -4,6 +4,7 @@ import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipant;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomParticipantResponse;
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
 import kr.co.pawpaw.mysql.position.Position;
 import kr.co.pawpaw.mysql.storage.domain.File;
@@ -25,9 +26,9 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(value = { QuerydslConfig.class, ChatroomParticipantCustomRepository.class })
-@DataJpaTest
+@Nested
 @DisplayName("ChatroomParticipantCustomRepository 클래스의")
-class ChatroomParticipantCustomRepositoryTest {
+class ChatroomParticipantCustomRepositoryTest extends MySQLTestContainer {
     @Autowired
     private ChatroomParticipantCustomRepository chatroomParticipantCustomRepository;
     @Autowired
@@ -90,7 +91,6 @@ class ChatroomParticipantCustomRepositoryTest {
                 Chatroom.builder()
                     .name("chatroom1-name")
                     .description("chatroom1-description")
-                    .hashTagList(List.of("chatroom1-hashtag1", "chatroom1-hashtag2"))
                     .locationLimit(false)
                     .searchable(true)
                     .build()

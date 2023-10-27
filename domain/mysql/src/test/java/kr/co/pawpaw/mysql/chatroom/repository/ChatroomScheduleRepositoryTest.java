@@ -2,20 +2,22 @@ package kr.co.pawpaw.mysql.chatroom.repository;
 
 import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomSchedule;
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-class ChatroomScheduleRepositoryTest {
+@Nested
+@DisplayName("ChatroomScheduleRepository 는")
+class ChatroomScheduleRepositoryTest extends MySQLTestContainer {
     @Autowired
     private ChatroomScheduleRepository chatroomScheduleRepository;
     @Autowired

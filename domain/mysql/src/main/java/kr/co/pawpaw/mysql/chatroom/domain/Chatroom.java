@@ -22,18 +22,14 @@ public class Chatroom extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "VARCHAR(2048) NOT NULL, FULLTEXT INDEX name_fulltext (name) WITH PARSER ngram")
     private String name;
-    @Column(nullable = false)
+    @Column(columnDefinition = "VARCHAR(2048) NOT NULL, FULLTEXT INDEX description_fulltext (description) WITH PARSER ngram")
     private String description;
     @Column(nullable = false)
     private Boolean searchable;
     @Column(nullable = false)
     private Boolean locationLimit;
-
-    @Type(type = "io.hypersistence.utils.hibernate.type.json.JsonType")
-    @Column(columnDefinition = "TEXT")
-    private final List<String> hashTagList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     private File coverFile;
@@ -46,16 +42,12 @@ public class Chatroom extends BaseTimeEntity {
 
     @Builder
     public Chatroom(
-        final Collection<String> hashTagList,
         final String name,
         final String description,
         final Boolean searchable,
         final Boolean locationLimit,
         final File coverFile
     ) {
-        if (Objects.nonNull(hashTagList)) {
-            this.hashTagList.addAll(hashTagList);
-        }
         this.name = name;
         this.description = description;
         this.searchable = searchable;

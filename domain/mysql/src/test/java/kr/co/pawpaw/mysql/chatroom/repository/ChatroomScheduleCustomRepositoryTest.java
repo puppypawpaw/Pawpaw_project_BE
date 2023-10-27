@@ -5,6 +5,7 @@ import kr.co.pawpaw.mysql.chatroom.domain.ChatroomSchedule;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomScheduleParticipant;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomScheduleData;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomScheduleParticipantResponse;
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.repository.FileRepository;
@@ -12,9 +13,9 @@ import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
@@ -24,8 +25,9 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(value = { QuerydslConfig.class, ChatroomScheduleCustomRepository.class })
-@DataJpaTest
-class ChatroomScheduleCustomRepositoryTest {
+@Nested
+@DisplayName("ChatroomScheduleCustomRepository는")
+class ChatroomScheduleCustomRepositoryTest extends MySQLTestContainer {
     @Autowired
     private ChatroomScheduleCustomRepository chatroomScheduleCustomRepository;
     @Autowired

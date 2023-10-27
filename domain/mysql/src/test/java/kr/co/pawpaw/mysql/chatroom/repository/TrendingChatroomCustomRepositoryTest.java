@@ -1,10 +1,8 @@
 package kr.co.pawpaw.mysql.chatroom.repository;
 
-import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
-import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipant;
-import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
-import kr.co.pawpaw.mysql.chatroom.domain.TrendingChatroom;
+import kr.co.pawpaw.mysql.chatroom.domain.*;
 import kr.co.pawpaw.mysql.chatroom.dto.TrendingChatroomResponse;
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.repository.FileRepository;
@@ -12,9 +10,9 @@ import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Slice;
 
@@ -23,9 +21,10 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Nested
+@DisplayName("TrendingChatroomCustomRepository의")
 @Import(value = { TrendingChatroomCustomRepository.class, QuerydslConfig.class })
-@DataJpaTest
-class TrendingChatroomCustomRepositoryTest {
+class TrendingChatroomCustomRepositoryTest extends MySQLTestContainer {
     @Autowired
     private TrendingChatroomCustomRepository trendingChatroomCustomRepository;
     @Autowired
@@ -38,6 +37,8 @@ class TrendingChatroomCustomRepositoryTest {
     private FileRepository fileRepository;
     @Autowired
     private TrendingChatroomRepository trendingChatroomRepository;
+    @Autowired
+    private ChatroomHashTagRepository chatroomHashTagRepository;
 
     User user1 = User.builder()
         .name("user1-name")
@@ -83,7 +84,6 @@ class TrendingChatroomCustomRepositoryTest {
         .searchable(true)
         .name("chatroom1-name")
         .description("chatroom1-description")
-        .hashTagList(List.of("hashTag1", "hashTag2"))
         .build();
 
     Chatroom chatroom2 = Chatroom.builder()
@@ -91,7 +91,6 @@ class TrendingChatroomCustomRepositoryTest {
         .searchable(true)
         .name("chatroom2-name")
         .description("chatroom2-description")
-        .hashTagList(List.of("hashTag1", "hashTag2"))
         .build();
 
     Chatroom chatroom3 = Chatroom.builder()
@@ -99,7 +98,6 @@ class TrendingChatroomCustomRepositoryTest {
         .searchable(false)
         .name("chatroom3-name")
         .description("chatroom3-description")
-        .hashTagList(List.of("hashTag1", "hashTag2"))
         .build();
 
     ChatroomParticipant chatroom1Manager = ChatroomParticipant.builder()
@@ -132,6 +130,12 @@ class TrendingChatroomCustomRepositoryTest {
         .chatroom(chatroom3)
         .build();
 
+    ChatroomHashTag chatroom1HashTag;
+
+    ChatroomHashTag chatroom2HashTag;
+
+    ChatroomHashTag chatroom3HashTag;
+
 
     @BeforeEach
     void setup() {
@@ -163,98 +167,106 @@ class TrendingChatroomCustomRepositoryTest {
 
         chatroom1 = chatroomRepository.save(chatroom1);
         chatroom2 = chatroomRepository.save(chatroom2);
+        chatroom3 = chatroomRepository.save(chatroom2);
+
+        chatroom1HashTag = chatroomHashTagRepository.save(ChatroomHashTag.builder()
+            .chatroom(chatroom1)
+            .hashTag("chatroom1-hashTag")
+            .build());
+        chatroom2HashTag = chatroomHashTagRepository.save(ChatroomHashTag.builder()
+            .chatroom(chatroom2)
+            .hashTag("chatroom2-hashTag")
+            .build());
+        chatroom3HashTag = chatroomHashTagRepository.save(ChatroomHashTag.builder()
+            .chatroom(chatroom3)
+            .hashTag("chatroom3-hashTag")
+            .build());
 
         trendingChatroom1 = trendingChatroomRepository.save(trendingChatroom1);
         trendingChatroom2 = trendingChatroomRepository.save(trendingChatroom2);
     }
 
-    @Test
-    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 beforeId 가 null이면 제외 없이 결과를 반환한다.")
-    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeBeforeIdIsNull() {
-        //given
+    @Nested
+    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는")
+    class FindAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize {
+        @Test
+        @DisplayName("beforeId가 null이면 제외 없이 결과를 반환한다.")
+        void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeBeforeIdIsNull() {
+            //when
+            Slice<TrendingChatroomResponse> result1 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user1.getUserId(), null, 12);
+            Slice<TrendingChatroomResponse> result2 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 12);
 
-        //when
-        Slice<TrendingChatroomResponse> result1 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user1.getUserId(), null, 12);
-        Slice<TrendingChatroomResponse> result2 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 12);
+            //then
+            assertThat(result1.getContent().size()).isEqualTo(1);
+            assertThat(result2.getContent().size()).isEqualTo(2);
+        }
 
-        //then
-        assertThat(result1.getContent().size()).isEqualTo(1);
-        assertThat(result2.getContent().size()).isEqualTo(2);
-    }
+        @Test
+        @DisplayName("참여하지 않은 채팅방만 검색한다.")
+        void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeNotParticipated() {
+            //when
+            Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user2.getUserId(), null, 12);
 
-    @Test
-    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 참여하지 않은 채팅방만 검색한다.")
-    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeNotParticipated() {
-        //given
+            //then
+            assertThat(result.getContent().size()).isEqualTo(0);
+        }
 
-        //when
-        Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user2.getUserId(), null, 12);
+        @Test
+        @DisplayName("hasNext로 다음 레코드가 남아있는지 확인 가능한 slice를 반환한다.")
+        void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeHasNext() {
+            //when
+            Slice<TrendingChatroomResponse> result1 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 1);
+            Slice<TrendingChatroomResponse> result2 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 2);
 
-        //then
-        assertThat(result.getContent().size()).isEqualTo(0);
-    }
+            //then
+            assertThat(result1.getContent().size()).isEqualTo(1);
+            assertThat(result1.hasNext()).isTrue();
+            assertThat(result2.getContent().size()).isEqualTo(2);
+            assertThat(result2.hasNext()).isFalse();
+        }
 
-    @Test
-    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 hashNext로 다음 entity가 존재하는지 파악 가능하다.")
-    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeHasNext() {
-        //given
+        @Test
+        @DisplayName("beforeId 보다 작은 id를 가진 것만 검색한다.")
+        void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeBeforeBeforeId() {
+            //when
+            Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), trendingChatroom2.getId(), 2);
 
-        //when
-        Slice<TrendingChatroomResponse> result1 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 1);
-        Slice<TrendingChatroomResponse> result2 = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 2);
+            //then
+            assertThat(result.getContent().size()).isEqualTo(1);
+            assertThat(result.hasNext()).isFalse();
+        }
 
-        //then
-        assertThat(result1.getContent().size()).isEqualTo(1);
-        assertThat(result1.hasNext()).isTrue();
-        assertThat(result2.getContent().size()).isEqualTo(2);
-        assertThat(result2.hasNext()).isFalse();
-    }
+        @Test
+        @DisplayName("searchable이 true인 것만 검색한다.")
+        void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeSearchableTest() {
+            //when
+            Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 2);
 
-    @Test
-    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 beforeId 미만의 id를 가진 뜨고있는 채팅방만 검색한다.")
-    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeBeforeBeforeId() {
-        //given
+            //then
+            assertThat(result.getContent().size()).isEqualTo(2);
+            assertThat(result.hasNext()).isFalse();
+        }
 
-        //when
-        Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), trendingChatroom2.getId(), 2);
+        @Test
+        @DisplayName("결과값이 예상한 결과와 동일하다")
+        void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeFieldTest() {
+            //given
+            TrendingChatroomResponse resultExpected = new TrendingChatroomResponse(
+                chatroom1.getId(),
+                trendingChatroom1.getId(),
+                chatroom1.getName(),
+                chatroom1.getDescription(),
+                List.of(chatroom1HashTag.getHashTag()),
+                user1.getNickname(),
+                user1ImageFile.getFileUrl(),
+                2L
+            );
 
-        //then
-        assertThat(result.getContent().size()).isEqualTo(1);
-        assertThat(result.hasNext()).isFalse();
-    }
+            //when
+            Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), trendingChatroom2.getId(), 2);
 
-    @Test
-    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 searchable이 true인 chatroom만 검색한다.")
-    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeSearchableTest() {
-        //given
-
-        //when
-        Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), null, 2);
-
-        //then
-        assertThat(result.getContent().size()).isEqualTo(2);
-        assertThat(result.hasNext()).isFalse();
-    }
-
-    @Test
-    @DisplayName("findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize 메서드는 필드 값 테스트")
-    void findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSizeFieldTest() {
-        //given
-        TrendingChatroomResponse resultExpected = new TrendingChatroomResponse(
-            chatroom1.getId(),
-            trendingChatroom1.getId(),
-            chatroom1.getName(),
-            chatroom1.getDescription(),
-            chatroom1.getHashTagList(),
-            user1.getNickname(),
-            user1ImageFile.getFileUrl(),
-            2L
-        );
-
-        //when
-        Slice<TrendingChatroomResponse> result = trendingChatroomCustomRepository.findAccessibleTrendingChatroomByUserIdAndBeforeIdAndSize(user3.getUserId(), trendingChatroom2.getId(), 2);
-
-        //then
-        assertThat(result.getContent().get(0)).usingRecursiveComparison().isEqualTo(resultExpected);
+            //then
+            assertThat(result.getContent().get(0)).usingRecursiveComparison().isEqualTo(resultExpected);
+        }
     }
 }
