@@ -1,21 +1,23 @@
 package kr.co.pawpaw.mysql.user.repository;
 
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.user.domain.OAuth2Provider;
 import kr.co.pawpaw.mysql.user.domain.Role;
 import kr.co.pawpaw.mysql.user.domain.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-class UserRepositoryTest {
+@DisplayName("UserRepository는")
+@Nested
+class UserRepositoryTest extends MySQLTestContainer {
     @Autowired
     private UserRepository userRepository;
 

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -15,7 +14,6 @@ class CreateChatroomResponseTest {
     void of() throws NoSuchFieldException, IllegalAccessException {
         //given
         Chatroom chatroom = Chatroom.builder()
-            .hashTagList(List.of("hashtag-1"))
             .build();
         Long id = 123L;
         Field idField = Chatroom.class.getDeclaredField("id");

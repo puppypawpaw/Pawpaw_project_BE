@@ -2,7 +2,6 @@ package kr.co.pawpaw.api.service.chatroom;
 
 import kr.co.pawpaw.api.dto.chatroom.*;
 import kr.co.pawpaw.api.service.file.FileService;
-import kr.co.pawpaw.api.service.user.UserService;
 import kr.co.pawpaw.api.util.file.FileUtil;
 import kr.co.pawpaw.common.exception.chatroom.*;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
@@ -17,6 +16,7 @@ import kr.co.pawpaw.mysql.chatroom.dto.*;
 import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomCommand;
 import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomParticipantCommand;
 import kr.co.pawpaw.mysql.chatroom.service.command.TrendingChatroomCommand;
+import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomHashTagCommand;
 import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomDefaultCoverQuery;
 import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomQuery;
@@ -59,8 +59,13 @@ public class ChatroomService {
     private final ChatroomQuery chatroomQuery;
     private final UserQuery userQuery;
     private final FileService fileService;
-    private final UserService userService;
     private final RedisPublisher redisPublisher;
+    private final ChatroomHashTagCommand chatroomHashTagCommand;
+
+    @Transactional(readOnly = true)
+    public List<ChatroomResponse> searchChatroom(final String query) {
+        return chatroomQuery.findBySearchQuery(query);
+    }
 
     @Transactional
     public void deleteChatroom(final Long chatroomId) {
@@ -162,6 +167,7 @@ public class ChatroomService {
 
         File coverFile = createChatroomCoverIfExists(userId, chatroomCoverMultipartFile);
         Chatroom chatroom = createChatroomByRequestAndCoverFile(request, coverFile);
+        createChatroomHashTags(request, chatroom);
 
         joinChatroomAsManager(chatroom, user);
 
@@ -180,6 +186,7 @@ public class ChatroomService {
             .orElseThrow(NotFoundChatroomDefaultCoverException::new);
 
         Chatroom chatroom = createChatroomByRequestAndCoverFile(request, chatroomDefaultCover.getCoverFile());
+        createChatroomHashTags(request, chatroom);
 
         joinChatroomAsManager(chatroom, user);
 
@@ -225,16 +232,7 @@ public class ChatroomService {
 
     @Transactional(readOnly = true)
     public List<ChatroomParticipantResponse> getChatroomParticipantResponseList(final Long chatroomId) {
-        String defaultImageUrl = userService.getUserDefaultImageUrl();
-
-        return chatroomParticipantQuery.getChatroomParticipantResponseList(chatroomId)
-            .stream()
-            .peek(response -> {
-                if (Objects.isNull(response.getImageUrl())) {
-                    response.updateImageUrl(defaultImageUrl);
-                }
-            })
-            .collect(Collectors.toList());
+        return chatroomParticipantQuery.getChatroomParticipantResponseList(chatroomId);
     }
 
     @Transactional(readOnly = true)
@@ -242,16 +240,7 @@ public class ChatroomService {
         final Long chatroomId,
         final String nicknameKeyword
     ) {
-        String defaultImageUrl = userService.getUserDefaultImageUrl();
-
-        return userQuery.searchChatroomNonParticipant(chatroomId, nicknameKeyword)
-            .stream()
-            .peek(response -> {
-                if (Objects.isNull(response.getImageUrl())) {
-                    response.updateImageUrl(defaultImageUrl);
-                }
-            })
-            .collect(Collectors.toList());
+        return userQuery.searchChatroomNonParticipant(chatroomId, nicknameKeyword);
     }
 
     public Slice<ChatMessageDto> findBeforeChatMessages(
@@ -396,6 +385,20 @@ public class ChatroomService {
         final File coverFile
     ) {
         return chatroomCommand.save(request.toChatroom(coverFile));
+    }
+
+    private void createChatroomHashTags(
+        final CreateChatroomRequest request,
+        final Chatroom chatroom
+    ) {
+        chatroomHashTagCommand.saveAll(request.toChatroomHashTagList(chatroom));
+    }
+
+    private void createChatroomHashTags(
+        final CreateChatroomWithDefaultCoverRequest request,
+        final Chatroom chatroom
+    ) {
+        chatroomHashTagCommand.saveAll(request.toChatroomHashTagList(chatroom));
     }
 
     private Chatroom createChatroomByRequestAndCoverFile(

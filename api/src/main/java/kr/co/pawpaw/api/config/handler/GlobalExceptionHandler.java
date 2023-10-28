@@ -12,6 +12,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -35,6 +37,11 @@ public class GlobalExceptionHandler {
             return handleBusinessException((BusinessException) e.getCause());
         }
         return new ResponseEntity<>(ErrorResponse.of(ErrorCode.HANDLE_AUTHENTICATION_ENTRYPOINT), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected  ResponseEntity<ErrorResponse> handleConstraintDeclarationException(final ConstraintViolationException e) {
+        return new ResponseEntity<>(ErrorResponse.of(ErrorCode.CONSTRAINT_VALIDATION_EXCEPTION), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

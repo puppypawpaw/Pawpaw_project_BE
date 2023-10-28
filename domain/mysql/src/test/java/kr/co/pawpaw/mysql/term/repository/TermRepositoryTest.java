@@ -1,18 +1,20 @@
 package kr.co.pawpaw.mysql.term.repository;
 
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.term.domain.Term;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-class TermRepositoryTest {
+@Nested
+@DisplayName("TermRepository는")
+class TermRepositoryTest extends MySQLTestContainer {
     @Autowired
     private TermRepository termRepository;
 

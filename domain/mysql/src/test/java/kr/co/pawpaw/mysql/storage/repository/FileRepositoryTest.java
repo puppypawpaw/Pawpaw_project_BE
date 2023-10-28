@@ -1,20 +1,23 @@
 package kr.co.pawpaw.mysql.storage.repository;
 
+import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
-class FileRepositoryTest {
+
+@Nested
+@DisplayName("FileRepository는")
+class FileRepositoryTest extends MySQLTestContainer {
     @Autowired
     private FileRepository fileRepository;
     @Autowired

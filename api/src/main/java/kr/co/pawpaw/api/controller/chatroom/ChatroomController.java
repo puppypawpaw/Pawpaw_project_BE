@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Tag(name = "chatroom")
@@ -30,6 +31,27 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatroomController {
     private final ChatroomService chatroomService;
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청 파리미터입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "GET",
+        summary = "채팅방 검색 API",
+        description = "채팅방 검색 API, 검색어로 이름, 설명, 태그를 검색. 검색어는 2글자 이상만 가능"
+    )
+    @GetMapping("/search")
+    public ResponseEntity<List<ChatroomResponse>> searchChatroom(
+        @RequestParam @Size(min=1) final String query,
+        @AuthenticatedUserId final UserId userId
+    ) {
+        return ResponseEntity.ok(chatroomService.searchChatroom(query));
+    }
 
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200"),

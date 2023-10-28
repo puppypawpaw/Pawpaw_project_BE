@@ -4,7 +4,7 @@ import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
-import java.util.List;
+import java.util.Collection;
 
 @Getter
 public class ChatroomResponse {
@@ -15,7 +15,7 @@ public class ChatroomResponse {
     @Schema(description = "채팅방 소개", example = "반려동물을 키우는 사람이라면 누구나 들어와서 자랑해주세요~")
     private String description;
     @Schema(description = "채팅방 해시태그 목록", example = "['강아지', '고양이', '20대 이상']")
-    private List<String> hashTagList;
+    private Collection<String> hashTagList;
     @Schema(description = "채팅방 매니저 이름", example = "지상최강감자")
     private String managerName;
     @Schema(description = "채팅방 매니저 이미지 url", example = "https://example.com")
@@ -28,7 +28,7 @@ public class ChatroomResponse {
         final Long id,
         final String name,
         final String description,
-        final List<String> hashTagList,
+        final Collection<String> hashTagList,
         final String managerName,
         final String managerImageUrl,
         final Long participantNumber

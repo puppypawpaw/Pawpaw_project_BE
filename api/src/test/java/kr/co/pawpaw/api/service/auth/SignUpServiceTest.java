@@ -7,6 +7,7 @@ import kr.co.pawpaw.api.dto.auth.SocialSignUpInfoResponse;
 import kr.co.pawpaw.api.dto.auth.SocialSignUpRequest;
 import kr.co.pawpaw.api.dto.pet.CreatePetRequest;
 import kr.co.pawpaw.api.dto.position.PositionRequest;
+import kr.co.pawpaw.api.util.user.UserUtil;
 import kr.co.pawpaw.common.exception.auth.DuplicateEmailException;
 import kr.co.pawpaw.common.exception.auth.DuplicatePhoneNumberException;
 import kr.co.pawpaw.common.exception.auth.InvalidOAuth2TempKeyException;
@@ -15,8 +16,10 @@ import kr.co.pawpaw.common.exception.term.NotAgreeAllRequiredTermException;
 import kr.co.pawpaw.mysql.pet.domain.Pet;
 import kr.co.pawpaw.mysql.pet.domain.PetType;
 import kr.co.pawpaw.mysql.pet.service.command.PetCommand;
+import kr.co.pawpaw.mysql.position.Position;
 import kr.co.pawpaw.mysql.sms.domain.SmsUsagePurpose;
 import kr.co.pawpaw.mysql.storage.domain.File;
+import kr.co.pawpaw.mysql.storage.service.query.FileQuery;
 import kr.co.pawpaw.mysql.term.domain.Term;
 import kr.co.pawpaw.mysql.term.domain.UserTermAgree;
 import kr.co.pawpaw.mysql.term.service.command.TermCommand;
@@ -32,6 +35,7 @@ import kr.co.pawpaw.redis.auth.service.command.OAuth2TempAttributesCommand;
 import kr.co.pawpaw.redis.auth.service.query.OAuth2TempAttributesQuery;
 import kr.co.pawpaw.redis.auth.service.query.VerifiedPhoneNumberQuery;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -72,130 +76,27 @@ class SignUpServiceTest {
     private OAuth2TempAttributesQuery oAuth2TempAttributesQuery;
     @Mock
     private OAuth2TempAttributesCommand oAuth2TempAttributesCommand;
+    @Mock
+    private FileQuery fileQuery;
 
     @InjectMocks
     private SignUpService signUpService;
 
-    @Test
-    @DisplayName("일반 회원가입 메서드 유저 중복 테스트")
-    void 일반_회원가입_메서드_유저_중복_테스트() {
-        //given
-        String alreadyExistEmail = "aee";
-        SignUpRequest request = SignUpRequest.builder()
-            .email(alreadyExistEmail)
-            .phoneNumber("01012345678")
-            .build();
-
-        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(true);
-        //when
-        assertThatThrownBy(() -> signUpService.signUp(request, multipartFile)).isInstanceOf(DuplicateEmailException.class);
-
-        //then
-        verify(userQuery, times(1)).existsByEmailAndProvider(request.getEmail(), null);
-    }
-
-    @Test
-    @DisplayName("일반 회원가입 메서드 필수 약관 동의 테스트")
-    void 일반_회원가입_메서드_필수_약관_동의_테스트() {
-        //given
-        List<Long> termAgrees = List.of(1L, 2L, 4L);
-        Set<Long> termAgreesSet = new HashSet<>(termAgrees);
-        SignUpRequest request = SignUpRequest.builder()
-            .email("email")
-            .termAgrees(termAgrees)
-            .phoneNumber("01012345678")
-            .build();
-
-        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
-        when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(false);
-        //when
-        assertThatThrownBy(() -> signUpService.signUp(request, multipartFile)).isInstanceOf(NotAgreeAllRequiredTermException.class);
-
-        //then
-        verify(userQuery, times(1)).existsByEmailAndProvider(request.getEmail(), null);
-        verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesSet);
-    }
-
-    @Test
-    @DisplayName("일반 회원가입 메서드 핸드폰 번호 유효성 테스트")
-    void 일반_회원가입_메서드_핸드폰_번호_유효성_테스트() {
-        //given
+    @Nested
+    @DisplayName("일반 회원가입 메서드는")
+    class SignUp {
         List<Long> termAgrees = List.of(1L, 2L, 3L);
-        Set<Long> termAgreesSet = new HashSet<>(termAgrees);
-        String password = "password";
-        String email = "email";
-        SignUpRequest request1 = SignUpRequest.builder()
-            .email(email)
-            .termAgrees(termAgrees)
-            .password(password)
-            .phoneNumber("01012345678")
-            .build();
-        SignUpRequest request2 = SignUpRequest.builder()
-            .email(email)
-            .termAgrees(termAgrees)
-            .password(password)
-            .phoneNumber("01087654321")
-            .build();
-
-
-        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
-        when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(true);
-        when(userQuery.existsByPhoneNumber(eq(request1.getPhoneNumber()))).thenReturn(true);
-        when(userQuery.existsByPhoneNumber(eq(request2.getPhoneNumber()))).thenReturn(false);
-        when(verifiedPhoneNumberQuery.existsByPhoneNumberAndUsagePurpose(eq(request2.getPhoneNumber()), eq(SmsUsagePurpose.SIGN_UP.name()))).thenReturn(false);
-        //when
-        assertThatThrownBy(() -> signUpService.signUp(request1, multipartFile)).isInstanceOf(DuplicatePhoneNumberException.class);
-        assertThatThrownBy(() -> signUpService.signUp(request2, multipartFile)).isInstanceOf(NotVerifiedPhoneNumberException.class);
-
-        //then
-        verify(userQuery, times(2)).existsByEmailAndProvider(email, null);
-        verify(termQuery, times(2)).isAllRequiredTermIds(termAgreesSet);
-        verify(userQuery, times(1)).existsByPhoneNumber(request1.getPhoneNumber());
-        verify(userQuery, times(1)).existsByPhoneNumber(request2.getPhoneNumber());
-        verify(verifiedPhoneNumberQuery, times(1)).existsByPhoneNumberAndUsagePurpose(request2.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name());
-    }
-
-    @Test
-    @DisplayName("일반 회원가입 메서드 이미지 없이 작동 테스트")
-    void 일반_회원가입_메서드_이미지_없이_작동_테스트() {
-        //given
-        List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
-        List<Term> termAgrees = List.of(
-            Term.builder()
-                .title("term1")
-                .content("term1-content")
-                .order(1L)
-                .required(true)
-                .build(),
-            Term.builder()
-                .title("term2")
-                .content("term2-content")
-                .order(2L)
-                .required(true)
-                .build(),
-            Term.builder()
-                .title("term3")
-                .content("term3-content")
-                .order(3L)
-                .required(true)
-                .build()
-        );
-        Set<Long> termAgreesOrderSet = new HashSet<>(termAgreeOrders);
-        String password = "password";
-        String email = "email";
-        String nickname = "nickname";
-        PositionRequest position = PositionRequest.builder()
-            .latitude(36.8)
-            .longitude(36.8)
-            .name("36.8")
-            .build();
         SignUpRequest request = SignUpRequest.builder()
-            .email(email)
-            .termAgrees(termAgreeOrders)
-            .password(password)
-            .nickname(nickname)
-            .position(position)
-            .phoneNumber("01087654321")
+            .email("abc@test.com")
+            .password("password")
+            .nickname("nickname")
+            .position(PositionRequest.builder()
+                .name("position")
+                .latitude(13.4)
+                .longitude(13.5)
+                .build())
+            .phoneNumber("01012345678")
+            .termAgrees(termAgrees)
             .petInfos(List.of(
                 CreatePetRequest.builder()
                     .petName("루이")
@@ -203,263 +104,128 @@ class SignUpServiceTest {
                     .build()
             ))
             .build();
-
         String passwordEncoded = "passwordEncoded";
-        String name = "userName";
-
-        User savedUser = request.toUser(passwordEncoded, name);
-
-        File file = File.builder()
-            .fileName(UUID.randomUUID().toString())
-            .contentType("image/png")
-            .byteSize(1234L)
-            .uploader(savedUser)
-            .build();
-
         VerifiedPhoneNumber vPhoneNo = VerifiedPhoneNumber.builder()
             .phoneNumber(request.getPhoneNumber())
             .usagePurpose(SmsUsagePurpose.SIGN_UP.name())
-            .userName(name)
+            .userName("username")
             .build();
 
-        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
-        when(termQuery.isAllRequiredTermIds(eq(termAgreesOrderSet))).thenReturn(true);
-        when(userQuery.existsByPhoneNumber(eq(request.getPhoneNumber()))).thenReturn(false);
-        when(verifiedPhoneNumberQuery.existsByPhoneNumberAndUsagePurpose(eq(request.getPhoneNumber()), eq(SmsUsagePurpose.SIGN_UP.name()))).thenReturn(true);
-        when(verifiedPhoneNumberQuery.findByPhoneNumberAndUsagePurpose(eq(request.getPhoneNumber()), eq(SmsUsagePurpose.SIGN_UP.name()))).thenReturn(Optional.of(vPhoneNo));
-        when(passwordEncoder.encode(request.getPassword())).thenReturn(passwordEncoded);
-        when(userCommand.save(any(User.class))).thenReturn(savedUser);
-        when(termQuery.findAllByOrderIsIn(eq(termAgreeOrders))).thenReturn(termAgrees);
-
-        //when
-        signUpService.signUp(request, null);
-
-        //then
-        verify(userQuery, times(1)).existsByEmailAndProvider(email, null);
-        verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesOrderSet);
-        verify(userQuery, times(1)).existsByPhoneNumber(request.getPhoneNumber());
-        verify(verifiedPhoneNumberQuery, times(1)).existsByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name());
-        verify(verifiedPhoneNumberQuery, times(1)).findByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name());
-
-        verify(passwordEncoder, times(1)).encode(request.getPassword());
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userCommand, times(1)).save(userCaptor.capture());
-        User capturedUser = userCaptor.getValue();
-        assertThat(capturedUser).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(savedUser);
-
-        verify(fileService, times(0)).saveFileByMultipartFile(any(), any());
-
-        ArgumentCaptor<List<Pet>> petListCaptor = ArgumentCaptor.forClass(List.class);
-        verify(petCommand, times(1)).saveAll(petListCaptor.capture());
-        List<Pet> capturedPetList = petListCaptor.getValue();
-        assertThat(capturedPetList.size()).isEqualTo(1);
-        assertThat(capturedPetList.get(0).getName()).isEqualTo(request.getPetInfos().get(0).getPetName());
-        assertThat(capturedPetList.get(0).getPetType()).isEqualTo(request.getPetInfos().get(0).getPetType());
-        assertThat(capturedPetList.get(0).getParent()).isEqualTo(savedUser);
-
-        ArgumentCaptor<Collection<UserTermAgree>> userTermAgreeListCaptor = ArgumentCaptor.forClass(Collection.class);
-        verify(termCommand, times(1)).saveAllUserTermAgrees(userTermAgreeListCaptor.capture());
-        Collection<UserTermAgree> capturedUserTermAgreeList = userTermAgreeListCaptor.getValue();
-        assertThat(capturedUserTermAgreeList.size()).isEqualTo(3);
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(0))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(1))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(2))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getUser).collect(Collectors.toSet()).contains(savedUser)).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getUser).collect(Collectors.toSet()).size()).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("일반 회원가입 메서드 작동 테스트")
-    void 일반_회원가입_메서드_작동_테스트() throws IOException {
-        //given
-        List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
-        List<Term> termAgrees = List.of(
-            Term.builder()
-                .title("term1")
-                .content("term1-content")
-                .order(1L)
-                .required(true)
-                .build(),
-            Term.builder()
-                .title("term2")
-                .content("term2-content")
-                .order(2L)
-                .required(true)
-                .build(),
-            Term.builder()
-                .title("term3")
-                .content("term3-content")
-                .order(3L)
-                .required(true)
-                .build()
-        );
-        Set<Long> termAgreesOrderSet = new HashSet<>(termAgreeOrders);
-        String password = "password";
-        String email = "email";
-        String nickname = "nickname";
-        PositionRequest position = PositionRequest.builder()
-            .latitude(36.8)
-            .longitude(36.8)
-            .name("36.8")
-            .build();
-        SignUpRequest request = SignUpRequest.builder()
-            .email(email)
-            .termAgrees(termAgreeOrders)
-            .password(password)
-            .nickname(nickname)
-            .position(position)
-            .phoneNumber("01087654321")
-            .petInfos(List.of(
-                CreatePetRequest.builder()
-                    .petName("루이")
-                    .petType(PetType.DOG)
-                    .build()
-            ))
-            .build();
-
-        String passwordEncoded = "passwordEncoded";
-        String name = "userName";
-
-        User savedUser = request.toUser(passwordEncoded, name);
+        User savedUser = request.toUser(passwordEncoded, vPhoneNo.getUserName());
+        List<Term> agreeTermList = termAgrees.stream()
+            .map(termOrder -> Term.builder()
+                .title(String.format("약관 %s", termOrder))
+                .content(String.format("약관 %s 내용", termOrder))
+                .order(termOrder)
+                .required(termOrder < 4)
+                .build())
+            .collect(Collectors.toList());
 
         File file = File.builder()
-            .fileName(UUID.randomUUID().toString())
-            .contentType("image/png")
-            .byteSize(1234L)
-            .uploader(savedUser)
+            .fileName("기본 이미지")
             .build();
 
-        VerifiedPhoneNumber vPhoneNo = VerifiedPhoneNumber.builder()
-            .phoneNumber(request.getPhoneNumber())
-            .usagePurpose(SmsUsagePurpose.SIGN_UP.name())
-            .userName(name)
+        File newFile = File.builder()
+            .fileName("새로운 이미지")
             .build();
 
-        when(userQuery.existsByEmailAndProvider(any(String.class), any())).thenReturn(false);
-        when(termQuery.isAllRequiredTermIds(eq(termAgreesOrderSet))).thenReturn(true);
-        when(userQuery.existsByPhoneNumber(eq(request.getPhoneNumber()))).thenReturn(false);
-        when(verifiedPhoneNumberQuery.existsByPhoneNumberAndUsagePurpose(eq(request.getPhoneNumber()), eq(SmsUsagePurpose.SIGN_UP.name()))).thenReturn(true);
-        when(verifiedPhoneNumberQuery.findByPhoneNumberAndUsagePurpose(eq(request.getPhoneNumber()), eq(SmsUsagePurpose.SIGN_UP.name()))).thenReturn(Optional.of(vPhoneNo));
-        when(passwordEncoder.encode(request.getPassword())).thenReturn(passwordEncoded);
-        when(userCommand.save(any(User.class))).thenReturn(savedUser);
-        when(termQuery.findAllByOrderIsIn(eq(termAgreeOrders))).thenReturn(termAgrees);
-        when(multipartFile.getBytes()).thenReturn(new byte[123]);
-        when(fileService.saveFileByMultipartFile(eq(multipartFile), eq(savedUser.getUserId()))).thenReturn(file);
+        @Test
+        @DisplayName("이미 가입한 이메일이면 예외를 발생한다.")
+        void duplicateEmailException() {
+            //given
+            when(userQuery.existsByEmailAndProvider(request.getEmail(), null)).thenReturn(true);
 
-        //when
-        signUpService.signUp(request, multipartFile);
+            //then
+            assertThatThrownBy(() -> signUpService.signUp(request, multipartFile)).isInstanceOf(DuplicateEmailException.class);
+        }
 
-        //then
-        verify(userQuery, times(1)).existsByEmailAndProvider(email, null);
-        verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesOrderSet);
-        verify(userQuery, times(1)).existsByPhoneNumber(request.getPhoneNumber());
-        verify(verifiedPhoneNumberQuery, times(1)).existsByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name());
-        verify(verifiedPhoneNumberQuery, times(1)).findByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name());
+        @Test
+        @DisplayName("필수 약관을 하나라도 동의안하면 예외가 발생한다.")
+        void notAgreeAllRequiredTermException() {
+            //given
+            when(userQuery.existsByEmailAndProvider(request.getEmail(), null)).thenReturn(false);
+            when(termQuery.isAllRequiredTermIds(new HashSet<>(termAgrees))).thenReturn(false);
 
-        verify(passwordEncoder, times(1)).encode(request.getPassword());
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userCommand, times(1)).save(userCaptor.capture());
-        User capturedUser = userCaptor.getValue();
-        capturedUser.updateImage(file);
-        assertThat(capturedUser).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(savedUser);
+            //then
+            assertThatThrownBy(() -> signUpService.signUp(request, multipartFile)).isInstanceOf(NotAgreeAllRequiredTermException.class);
+        }
 
-        verify(fileService).saveFileByMultipartFile(multipartFile, savedUser.getUserId());
+        @Test
+        @DisplayName("이미 가입한 핸드폰 번호이면 예외가 발생한다.")
+        void duplicatePhoneNumberException() {
+            //given
+            when(userQuery.existsByEmailAndProvider(request.getEmail(), null)).thenReturn(false);
+            when(termQuery.isAllRequiredTermIds(new HashSet<>(termAgrees))).thenReturn(true);
+            when(userQuery.existsByPhoneNumber(request.getPhoneNumber())).thenReturn(true);
 
-        ArgumentCaptor<List<Pet>> petListCaptor = ArgumentCaptor.forClass(List.class);
-        verify(petCommand, times(1)).saveAll(petListCaptor.capture());
-        List<Pet> capturedPetList = petListCaptor.getValue();
-        assertThat(capturedPetList.size()).isEqualTo(1);
-        assertThat(capturedPetList.get(0).getName()).isEqualTo(request.getPetInfos().get(0).getPetName());
-        assertThat(capturedPetList.get(0).getPetType()).isEqualTo(request.getPetInfos().get(0).getPetType());
-        assertThat(capturedPetList.get(0).getParent()).isEqualTo(savedUser);
+            //when
+            assertThatThrownBy(() -> signUpService.signUp(request, multipartFile)).isInstanceOf(DuplicatePhoneNumberException.class);
+        }
 
-        ArgumentCaptor<Collection<UserTermAgree>> userTermAgreeListCaptor = ArgumentCaptor.forClass(Collection.class);
-        verify(termCommand, times(1)).saveAllUserTermAgrees(userTermAgreeListCaptor.capture());
-        Collection<UserTermAgree> capturedUserTermAgreeList = userTermAgreeListCaptor.getValue();
-        assertThat(capturedUserTermAgreeList.size()).isEqualTo(3);
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(0))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(1))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(2))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getUser).collect(Collectors.toSet()).contains(savedUser)).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getUser).collect(Collectors.toSet()).size()).isEqualTo(1);
+        @Test
+        @DisplayName("인증받지 않은 핸드폰 번호면 예외가 발생한다.")
+        void notVerifiedPhoneNumberException() {
+            //given
+            when(userQuery.existsByEmailAndProvider(request.getEmail(), null)).thenReturn(false);
+            when(termQuery.isAllRequiredTermIds(new HashSet<>(termAgrees))).thenReturn(true);
+            when(userQuery.existsByPhoneNumber(request.getPhoneNumber())).thenReturn(false);
+            when(verifiedPhoneNumberQuery.existsByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name())).thenReturn(false);
+
+            //then
+            assertThatThrownBy(() -> signUpService.signUp(request, multipartFile)).isInstanceOf(NotVerifiedPhoneNumberException.class);
+        }
+
+        @Test
+        @DisplayName("이미지가 null이면 기본 이미지를 유저의 이미지로 설정한다.")
+        void ifImageIsNullSetDefaultImageToUserImage() {
+            //given
+            when(userQuery.existsByEmailAndProvider(request.getEmail(), null)).thenReturn(false);
+            when(termQuery.isAllRequiredTermIds(new HashSet<>(termAgrees))).thenReturn(true);
+            when(userQuery.existsByPhoneNumber(request.getPhoneNumber())).thenReturn(false);
+            when(verifiedPhoneNumberQuery.existsByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name())).thenReturn(true);
+            when(verifiedPhoneNumberQuery.findByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name())).thenReturn(Optional.of(vPhoneNo));
+            when(passwordEncoder.encode(request.getPassword())).thenReturn(passwordEncoded);
+            when(userCommand.save(any(User.class))).thenReturn(savedUser);
+            when(termQuery.findAllByOrderIsIn(termAgrees)).thenReturn(agreeTermList);
+            when(fileQuery.getReferenceById(UserUtil.getUserDefaultImageName())).thenReturn(file);
+
+            //when
+            signUpService.signUp(request, null);
+
+            //then
+            assertThat(savedUser.getUserImage()).usingRecursiveComparison().isEqualTo(file);
+        }
+
+        @Test
+        @DisplayName("이미지가 null이 아니면 multipartfile로 생성한 이미지를 유저의 이미지로 설정한다.")
+        void ifImageNotNullSetMultipartImageToUserImage() throws IOException {
+            //given
+            when(userQuery.existsByEmailAndProvider(request.getEmail(), null)).thenReturn(false);
+            when(termQuery.isAllRequiredTermIds(new HashSet<>(termAgrees))).thenReturn(true);
+            when(userQuery.existsByPhoneNumber(request.getPhoneNumber())).thenReturn(false);
+            when(verifiedPhoneNumberQuery.existsByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name())).thenReturn(true);
+            when(verifiedPhoneNumberQuery.findByPhoneNumberAndUsagePurpose(request.getPhoneNumber(), SmsUsagePurpose.SIGN_UP.name())).thenReturn(Optional.of(vPhoneNo));
+            when(passwordEncoder.encode(request.getPassword())).thenReturn(passwordEncoded);
+            when(userCommand.save(any(User.class))).thenReturn(savedUser);
+            when(termQuery.findAllByOrderIsIn(termAgrees)).thenReturn(agreeTermList);
+            when(fileService.saveFileByMultipartFile(multipartFile, savedUser.getUserId())).thenReturn(newFile);
+            when(multipartFile.getBytes()).thenReturn(new byte[] {Byte.parseByte("123")});
+
+            //when
+            signUpService.signUp(request, multipartFile);
+
+            //then
+            assertThat(savedUser.getUserImage()).usingRecursiveComparison().isEqualTo(newFile);
+        }
     }
 
-    @Test
-    @DisplayName("소셜 회원가입 메서드 필수 약관 동의 테스트")
-    void 소셜_회원가입_메서드_필수_약관_동의_테스트() {
-        //given
-        List<Long> termAgrees = List.of(1L, 2L, 4L);
-        Set<Long> termAgreesSet = new HashSet<>(termAgrees);
-        SocialSignUpRequest request = SocialSignUpRequest.builder()
-            .termAgrees(termAgrees)
-            .build();
-
-        when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(false);
-        //when
-        assertThatThrownBy(() -> signUpService.socialSignUp(request, multipartFile)).isInstanceOf(NotAgreeAllRequiredTermException.class);
-
-        //then
-        verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesSet);
-    }
-
-    @Test
-    @DisplayName("소셜 회원가입 메서드 키 유효성 테스트")
-    void 소셜_회원가입_메서드_키_유효성_테스트() {
-        //given
+    @Nested
+    @DisplayName("소셜 회원가입 메서드는")
+    class SocialSignUp {
         List<Long> termAgrees = List.of(1L, 2L, 3L);
-        Set<Long> termAgreesSet = new HashSet<>(termAgrees);
-        SocialSignUpRequest request = SocialSignUpRequest.builder()
+        SocialSignUpRequest noImageRequest = SocialSignUpRequest.builder()
             .termAgrees(termAgrees)
-            .key("invalid key")
-            .build();
-
-        when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(true);
-        when(oAuth2TempAttributesQuery.findById(request.getKey())).thenReturn(Optional.empty());
-
-        //when
-        assertThatThrownBy(() -> signUpService.socialSignUp(request, multipartFile)).isInstanceOf(InvalidOAuth2TempKeyException.class);
-
-        //then
-        verify(termQuery, times(1)).isAllRequiredTermIds(termAgreesSet);
-        verify(oAuth2TempAttributesQuery, times(1)).findById(request.getKey());
-    }
-
-    @Test
-    @DisplayName("소셜 회원가입 메서드 이미지 저장 안함 테스트")
-    void 소셜_회원가입_메서드_이미지_저장_안함_테스트() {
-        //given
-        List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
-        List<Term> termAgrees = List.of(
-            Term.builder()
-                .title("term1")
-                .content("term1-content")
-                .order(1L)
-                .required(true)
-                .build(),
-            Term.builder()
-                .title("term2")
-                .content("term2-content")
-                .order(2L)
-                .required(true)
-                .build(),
-            Term.builder()
-                .title("term3")
-                .content("term3-content")
-                .order(3L)
-                .required(true)
-                .build()
-        );
-        Set<Long> termAgreesSet = new HashSet<>(termAgreeOrders);
-
-        PositionRequest position = PositionRequest.builder()
-            .latitude(36.8)
-            .longitude(36.8)
-            .name("36.8")
-            .build();
-
-        SocialSignUpRequest request = SocialSignUpRequest.builder()
-            .termAgrees(termAgreeOrders)
-            .key("valid key")
+            .key("temp key")
             .noImage(true)
             .petInfos(List.of(
                 CreatePetRequest.builder()
@@ -467,92 +233,16 @@ class SignUpServiceTest {
                     .petType(PetType.DOG)
                     .build()
             ))
-            .position(position)
+            .position(PositionRequest.builder()
+                .latitude(36.8)
+                .longitude(36.8)
+                .name("위치")
+                .build())
             .build();
 
-        OAuth2TempAttributes oAuth2TempAttributes = OAuth2TempAttributes.builder()
-            .name("이름")
-            .provider("GOOGLE")
-            .profileImageUrl("http://example.com")
-            .email("email@example.com")
-            .build();
-
-        User user = request.toUser(oAuth2TempAttributes.getEmail(), OAuth2Provider.valueOf(oAuth2TempAttributes.getProvider()));
-
-        when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(true);
-        when(oAuth2TempAttributesQuery.findById(request.getKey())).thenReturn(Optional.of(oAuth2TempAttributes));
-        when(userCommand.save(any(User.class))).thenReturn(user);
-        when(termQuery.findAllByOrderIsIn(eq(termAgreeOrders))).thenReturn(termAgrees);
-        //when
-        UserId userId = signUpService.socialSignUp(request, multipartFile);
-
-        //then
-        verify(termQuery).isAllRequiredTermIds(termAgreesSet);
-        verify(oAuth2TempAttributesQuery).findById(request.getKey());
-
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userCommand).save(userCaptor.capture());
-        assertThat(userCaptor.getValue()).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(user);
-
-        verify(fileService, times(0)).saveFileByMultipartFile(any(), any());
-        verify(fileService, times(0)).saveFileByUrl(any(), any());
-
-        ArgumentCaptor<List<Pet>> petListCaptor = ArgumentCaptor.forClass(List.class);
-        verify(petCommand).saveAll(petListCaptor.capture());
-        assertThat(petListCaptor.getValue().size()).isEqualTo(1);
-        assertThat(petListCaptor.getValue().get(0).getName()).isEqualTo(request.getPetInfos().get(0).getPetName());
-        assertThat(petListCaptor.getValue().get(0).getPetType()).isEqualTo(request.getPetInfos().get(0).getPetType());
-        assertThat(petListCaptor.getValue().get(0).getParent()).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(user);
-
-        ArgumentCaptor<Collection<UserTermAgree>> userTermAgreeListCaptor = ArgumentCaptor.forClass(Collection.class);
-        verify(termCommand, times(1)).saveAllUserTermAgrees(userTermAgreeListCaptor.capture());
-        Collection<UserTermAgree> capturedUserTermAgreeList = userTermAgreeListCaptor.getValue();
-        assertThat(capturedUserTermAgreeList.size()).isEqualTo(3);
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(0))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(1))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(2))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getUser).collect(Collectors.toSet()).contains(user)).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getUser).collect(Collectors.toSet()).size()).isEqualTo(1);
-
-        verify(oAuth2TempAttributesCommand).deleteById(oAuth2TempAttributes.getKey());
-    }
-
-    @Test
-    @DisplayName("소셜 회원가입 메서드 MultipartFile 이미지 저장 테스트")
-    void 소셜_회원가입_메서드_MultipartFile_이미지_저장_테스트() throws IOException {
-        //given
-        List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
-        List<Term> termAgrees = List.of(
-            Term.builder()
-                .title("term1")
-                .content("term1-content")
-                .order(1L)
-                .required(true)
-                .build(),
-            Term.builder()
-                .title("term2")
-                .content("term2-content")
-                .order(2L)
-                .required(true)
-                .build(),
-            Term.builder()
-                .title("term3")
-                .content("term3-content")
-                .order(3L)
-                .required(true)
-                .build()
-        );
-        Set<Long> termAgreesSet = new HashSet<>(termAgreeOrders);
-
-        PositionRequest position = PositionRequest.builder()
-            .latitude(36.8)
-            .longitude(36.8)
-            .name("36.8")
-            .build();
-
-        SocialSignUpRequest request = SocialSignUpRequest.builder()
-            .termAgrees(termAgreeOrders)
-            .key("valid key")
+        SocialSignUpRequest yesImageRequest = SocialSignUpRequest.builder()
+            .termAgrees(termAgrees)
+            .key("temp key")
             .noImage(false)
             .petInfos(List.of(
                 CreatePetRequest.builder()
@@ -560,7 +250,11 @@ class SignUpServiceTest {
                     .petType(PetType.DOG)
                     .build()
             ))
-            .position(position)
+            .position(PositionRequest.builder()
+                .latitude(36.8)
+                .longitude(36.8)
+                .name("위치")
+                .build())
             .build();
 
         OAuth2TempAttributes oAuth2TempAttributes = OAuth2TempAttributes.builder()
@@ -569,139 +263,94 @@ class SignUpServiceTest {
             .profileImageUrl("http://example.com")
             .email("email@example.com")
             .build();
-
-        User user = request.toUser(oAuth2TempAttributes.getEmail(), OAuth2Provider.valueOf(oAuth2TempAttributes.getProvider()));
-
-        when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(true);
-        when(oAuth2TempAttributesQuery.findById(request.getKey())).thenReturn(Optional.of(oAuth2TempAttributes));
-        when(userCommand.save(any(User.class))).thenReturn(user);
-        when(termQuery.findAllByOrderIsIn(eq(termAgreeOrders))).thenReturn(termAgrees);
-        when(multipartFile.getBytes()).thenReturn(new byte[12]);
-        //when
-        UserId userId = signUpService.socialSignUp(request, multipartFile);
-
-        //then
-        verify(termQuery).isAllRequiredTermIds(termAgreesSet);
-        verify(oAuth2TempAttributesQuery).findById(request.getKey());
-
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userCommand).save(userCaptor.capture());
-        assertThat(userCaptor.getValue()).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(user);
-
-        verify(fileService, times(1)).saveFileByMultipartFile(multipartFile, userId);
-        verify(fileService, times(0)).saveFileByUrl(any(), any());
-
-        ArgumentCaptor<List<Pet>> petListCaptor = ArgumentCaptor.forClass(List.class);
-        verify(petCommand).saveAll(petListCaptor.capture());
-        assertThat(petListCaptor.getValue().size()).isEqualTo(1);
-        assertThat(petListCaptor.getValue().get(0).getName()).isEqualTo(request.getPetInfos().get(0).getPetName());
-        assertThat(petListCaptor.getValue().get(0).getPetType()).isEqualTo(request.getPetInfos().get(0).getPetType());
-        assertThat(petListCaptor.getValue().get(0).getParent()).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(user);
-
-        ArgumentCaptor<Collection<UserTermAgree>> userTermAgreeListCaptor = ArgumentCaptor.forClass(Collection.class);
-        verify(termCommand, times(1)).saveAllUserTermAgrees(userTermAgreeListCaptor.capture());
-        Collection<UserTermAgree> capturedUserTermAgreeList = userTermAgreeListCaptor.getValue();
-        assertThat(capturedUserTermAgreeList.size()).isEqualTo(3);
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(0))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(1))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(2))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getUser).collect(Collectors.toSet()).contains(user)).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getUser).collect(Collectors.toSet()).size()).isEqualTo(1);
-
-        verify(oAuth2TempAttributesCommand).deleteById(oAuth2TempAttributes.getKey());
-    }
-
-    @Test
-    @DisplayName("소셜 회원가입 메서드 URL 이미지 저장 테스트")
-    void 소셜_회원가입_메서드_URL_이미지_저장_테스트() {
-        //given
-        List<Long> termAgreeOrders = List.of(1L, 2L, 3L);
-        List<Term> termAgrees = List.of(
-            Term.builder()
-                .title("term1")
-                .content("term1-content")
-                .order(1L)
-                .required(true)
-                .build(),
-            Term.builder()
-                .title("term2")
-                .content("term2-content")
-                .order(2L)
-                .required(true)
-                .build(),
-            Term.builder()
-                .title("term3")
-                .content("term3-content")
-                .order(3L)
-                .required(true)
-                .build()
-        );
-        Set<Long> termAgreesSet = new HashSet<>(termAgreeOrders);
-
-        PositionRequest position = PositionRequest.builder()
-            .latitude(36.8)
-            .longitude(36.8)
-            .name("36.8")
+        File file = File.builder()
+            .fileName("기본 이미지")
             .build();
+        User savedUser = noImageRequest.toUser(oAuth2TempAttributes.getEmail(), OAuth2Provider.valueOf(oAuth2TempAttributes.getProvider()));
+        List<Term> agreeTermList = termAgrees.stream()
+            .map(termOrder -> Term.builder()
+                .title(String.format("약관 %s", termOrder))
+                .content(String.format("약관 %s 내용", termOrder))
+                .order(termOrder)
+                .required(termOrder < 4)
+                .build())
+            .collect(Collectors.toList());
 
-        SocialSignUpRequest request = SocialSignUpRequest.builder()
-            .termAgrees(termAgreeOrders)
-            .key("valid key")
-            .noImage(false)
-            .petInfos(List.of(
-                CreatePetRequest.builder()
-                    .petName("루이")
-                    .petType(PetType.DOG)
-                    .build()
-            ))
-            .position(position)
-            .build();
+        @Test
+        @DisplayName("필수 약관을 하나라도 동의하지 않은 경우에는 예외가 발생한다.")
+        void notAgreeAllRequiredTermException() {
+            //given
+            when(termQuery.isAllRequiredTermIds(new HashSet<>(termAgrees))).thenReturn(false);
 
-        OAuth2TempAttributes oAuth2TempAttributes = OAuth2TempAttributes.builder()
-            .name("이름")
-            .provider("GOOGLE")
-            .profileImageUrl("http://example.com")
-            .email("email@example.com")
-            .build();
+            //then
+            assertThatThrownBy(() -> signUpService.socialSignUp(noImageRequest, multipartFile)).isInstanceOf(NotAgreeAllRequiredTermException.class);
+        }
 
-        User user = request.toUser(oAuth2TempAttributes.getEmail(), OAuth2Provider.valueOf(oAuth2TempAttributes.getProvider()));
+        @Test
+        @DisplayName("입력받은 소셜회원가입 임시 키가 유효하지 않으면 예외가 발생한다.")
+        void InvalidOAuth2TempKeyException() {
+            //given
+            when(termQuery.isAllRequiredTermIds(new HashSet<>(termAgrees))).thenReturn(true);
+            when(oAuth2TempAttributesQuery.findById(noImageRequest.getKey())).thenReturn(Optional.empty());
 
-        when(termQuery.isAllRequiredTermIds(eq(termAgreesSet))).thenReturn(true);
-        when(oAuth2TempAttributesQuery.findById(request.getKey())).thenReturn(Optional.of(oAuth2TempAttributes));
-        when(userCommand.save(any(User.class))).thenReturn(user);
-        when(termQuery.findAllByOrderIsIn(eq(termAgreeOrders))).thenReturn(termAgrees);
-        //when
-        UserId userId = signUpService.socialSignUp(request, null);
+            //then
+            assertThatThrownBy(() -> signUpService.socialSignUp(noImageRequest, multipartFile)).isInstanceOf(InvalidOAuth2TempKeyException.class);
+        }
 
-        //then
-        verify(termQuery).isAllRequiredTermIds(termAgreesSet);
-        verify(oAuth2TempAttributesQuery).findById(request.getKey());
+        @Test
+        @DisplayName("noImage 필드가 true이면 기본 이미지를 유저의 이미지로 설정한다.")
+        void ifNoImageIsTrueSetDefaultImageToUserImage() {
+            //given
+            when(termQuery.isAllRequiredTermIds(new HashSet<>(termAgrees))).thenReturn(true);
+            when(oAuth2TempAttributesQuery.findById(noImageRequest.getKey())).thenReturn(Optional.of(oAuth2TempAttributes));
+            when(userCommand.save(any(User.class))).thenReturn(savedUser);
+            when(fileQuery.getReferenceById(UserUtil.getUserDefaultImageName())).thenReturn(file);
+            when(termQuery.findAllByOrderIsIn(termAgrees)).thenReturn(agreeTermList);
 
-        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userCommand).save(userCaptor.capture());
-        assertThat(userCaptor.getValue()).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(user);
+            //when
+            UserId userId = signUpService.socialSignUp(noImageRequest, multipartFile);
 
-        verify(fileService, times(0)).saveFileByMultipartFile(any(), any());
-        verify(fileService, times(1)).saveFileByUrl(oAuth2TempAttributes.getProfileImageUrl(), userId);
+            //then
+            assertThat(userId).isEqualTo(savedUser.getUserId());
+            assertThat(savedUser.getUserImage()).isEqualTo(file);
+        }
 
-        ArgumentCaptor<List<Pet>> petListCaptor = ArgumentCaptor.forClass(List.class);
-        verify(petCommand).saveAll(petListCaptor.capture());
-        assertThat(petListCaptor.getValue().size()).isEqualTo(1);
-        assertThat(petListCaptor.getValue().get(0).getName()).isEqualTo(request.getPetInfos().get(0).getPetName());
-        assertThat(petListCaptor.getValue().get(0).getPetType()).isEqualTo(request.getPetInfos().get(0).getPetType());
-        assertThat(petListCaptor.getValue().get(0).getParent()).usingRecursiveComparison().ignoringFieldsMatchingRegexes("userId").isEqualTo(user);
+        @Test
+        @DisplayName("noImage 필드가 false이고 multipartfile가 null이 아니면 multipartfile로 생성한 이미지를 유저의 이미지로 설정한다.")
+        void ifNoImageIsFalseAndMultipartNotNullSetMultipartImageToUserImage() throws IOException {
+            //given
+            when(termQuery.isAllRequiredTermIds(new HashSet<>(termAgrees))).thenReturn(true);
+            when(oAuth2TempAttributesQuery.findById(yesImageRequest.getKey())).thenReturn(Optional.of(oAuth2TempAttributes));
+            when(userCommand.save(any(User.class))).thenReturn(savedUser);
+            when(fileService.saveFileByMultipartFile(multipartFile, savedUser.getUserId())).thenReturn(file);
+            when(termQuery.findAllByOrderIsIn(termAgrees)).thenReturn(agreeTermList);
+            when(multipartFile.getBytes()).thenReturn(new byte[] {Byte.parseByte("123")});
 
-        ArgumentCaptor<Collection<UserTermAgree>> userTermAgreeListCaptor = ArgumentCaptor.forClass(Collection.class);
-        verify(termCommand, times(1)).saveAllUserTermAgrees(userTermAgreeListCaptor.capture());
-        Collection<UserTermAgree> capturedUserTermAgreeList = userTermAgreeListCaptor.getValue();
-        assertThat(capturedUserTermAgreeList.size()).isEqualTo(3);
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(0))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(1))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getTerm).collect(Collectors.toList()).contains(termAgrees.get(2))).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getUser).collect(Collectors.toSet()).contains(user)).isTrue();
-        assertThat(capturedUserTermAgreeList.stream().map(UserTermAgree::getUser).collect(Collectors.toSet()).size()).isEqualTo(1);
+            //when
+            UserId userId = signUpService.socialSignUp(yesImageRequest, multipartFile);
 
-        verify(oAuth2TempAttributesCommand).deleteById(oAuth2TempAttributes.getKey());
+            //then
+            assertThat(userId).isEqualTo(savedUser.getUserId());
+            assertThat(savedUser.getUserImage()).isEqualTo(file);
+        }
+
+        @Test
+        @DisplayName("noImage 필드가 false이고 multipartfile가 null이면 소셜 로그인 시에 제공받은 이미지 url로 생성한 이미지를 유저의 이미지로 설정한다.")
+        void ifNoImageIsFalseAndMultipartIsNullSetMultipartImageToUserImage() throws IOException {
+            //given
+            when(termQuery.isAllRequiredTermIds(new HashSet<>(termAgrees))).thenReturn(true);
+            when(oAuth2TempAttributesQuery.findById(yesImageRequest.getKey())).thenReturn(Optional.of(oAuth2TempAttributes));
+            when(userCommand.save(any(User.class))).thenReturn(savedUser);
+            when(fileService.saveFileByUrl(oAuth2TempAttributes.getProfileImageUrl(), savedUser.getUserId())).thenReturn(file);
+            when(termQuery.findAllByOrderIsIn(termAgrees)).thenReturn(agreeTermList);
+
+            //when
+            UserId userId = signUpService.socialSignUp(yesImageRequest, null);
+
+            //then
+            assertThat(userId).isEqualTo(savedUser.getUserId());
+            assertThat(savedUser.getUserImage()).isEqualTo(file);
+        }
     }
 
     @Test
