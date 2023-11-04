@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -129,6 +130,7 @@ class ChatroomParticipantCustomRepositoryTest extends MySQLTestContainer {
 
             //when
             List<ChatroomParticipantResponse> result = chatroomParticipantCustomRepository.getChatroomParticipantResponseList(chatroom.getId());
+            result.sort(Comparator.comparing(ChatroomParticipantResponse::getNickname));
 
             //then
             assertThat(result).usingRecursiveComparison().isEqualTo(expectedResult);
