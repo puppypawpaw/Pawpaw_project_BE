@@ -18,3 +18,8 @@ spring:
           batch_size: 1000
         default_batch_fetch_size: 1000
         format_sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type: TRACE
