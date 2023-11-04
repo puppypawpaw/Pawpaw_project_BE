@@ -15,7 +15,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-@Nested
 @DisplayName("FileRepository는")
 class FileRepositoryTest extends MySQLTestContainer {
     @Autowired

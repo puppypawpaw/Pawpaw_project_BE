@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.dto.position;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pawpaw.mysql.position.Position;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -19,14 +19,14 @@ public class PositionRequest {
     @Schema(description = "경도", example = "36.4")
     private Double longitude;
     @NotBlank
-    @Schema(description = "장소 이름", example = "서울특별시 강동구 고덕동")
-    private String name;
+    @Schema(description = "주소", example = "서울특별시 강동구 고덕동")
+    private String address;
 
     public Position toEntity() {
         return Position.builder()
             .latitude(latitude)
             .longitude(longitude)
-            .name(name)
+            .address(address)
             .build();
     }
 }

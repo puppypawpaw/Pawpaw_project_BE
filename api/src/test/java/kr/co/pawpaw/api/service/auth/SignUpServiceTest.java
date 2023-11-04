@@ -13,15 +13,12 @@ import kr.co.pawpaw.common.exception.auth.DuplicatePhoneNumberException;
 import kr.co.pawpaw.common.exception.auth.InvalidOAuth2TempKeyException;
 import kr.co.pawpaw.common.exception.auth.NotVerifiedPhoneNumberException;
 import kr.co.pawpaw.common.exception.term.NotAgreeAllRequiredTermException;
-import kr.co.pawpaw.mysql.pet.domain.Pet;
 import kr.co.pawpaw.mysql.pet.domain.PetType;
 import kr.co.pawpaw.mysql.pet.service.command.PetCommand;
-import kr.co.pawpaw.mysql.position.Position;
 import kr.co.pawpaw.mysql.sms.domain.SmsUsagePurpose;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.service.query.FileQuery;
 import kr.co.pawpaw.mysql.term.domain.Term;
-import kr.co.pawpaw.mysql.term.domain.UserTermAgree;
 import kr.co.pawpaw.mysql.term.service.command.TermCommand;
 import kr.co.pawpaw.mysql.term.service.query.TermQuery;
 import kr.co.pawpaw.mysql.user.domain.OAuth2Provider;
@@ -38,7 +35,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -91,7 +87,7 @@ class SignUpServiceTest {
             .password("password")
             .nickname("nickname")
             .position(PositionRequest.builder()
-                .name("position")
+                .address("position")
                 .latitude(13.4)
                 .longitude(13.5)
                 .build())
@@ -236,7 +232,7 @@ class SignUpServiceTest {
             .position(PositionRequest.builder()
                 .latitude(36.8)
                 .longitude(36.8)
-                .name("위치")
+                .address("위치")
                 .build())
             .build();
 
@@ -253,7 +249,7 @@ class SignUpServiceTest {
             .position(PositionRequest.builder()
                 .latitude(36.8)
                 .longitude(36.8)
-                .name("위치")
+                .address("위치")
                 .build())
             .build();
 

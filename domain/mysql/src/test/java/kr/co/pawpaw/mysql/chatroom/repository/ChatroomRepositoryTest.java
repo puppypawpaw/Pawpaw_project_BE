@@ -11,7 +11,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Nested
 @DisplayName("ChatroomRepository는")
 class ChatroomRepositoryTest extends MySQLTestContainer {
     @Autowired

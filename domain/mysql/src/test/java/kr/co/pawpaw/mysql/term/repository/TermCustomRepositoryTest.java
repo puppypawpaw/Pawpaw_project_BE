@@ -15,7 +15,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(value = { TermCustomRepository.class, QuerydslConfig.class })
-@Nested
 @DisplayName("TermCustomRepository는")
 class TermCustomRepositoryTest extends MySQLTestContainer {
     @Autowired
