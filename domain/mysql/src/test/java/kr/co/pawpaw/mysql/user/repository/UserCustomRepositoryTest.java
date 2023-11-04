@@ -8,7 +8,7 @@ import kr.co.pawpaw.mysql.chatroom.repository.ChatroomParticipantRepository;
 import kr.co.pawpaw.mysql.chatroom.repository.ChatroomRepository;
 import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
-import kr.co.pawpaw.mysql.position.Position;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.repository.FileRepository;
 import kr.co.pawpaw.mysql.user.domain.User;
@@ -69,7 +69,7 @@ class UserCustomRepositoryTest extends MySQLTestContainer {
                     .name("user1-name")
                     .nickname("가")
                     .position(Position.builder()
-                        .name("user1-position")
+                        .address("user1-position")
                         .latitude(12.3)
                         .longitude(12.4)
                         .build())
@@ -81,7 +81,7 @@ class UserCustomRepositoryTest extends MySQLTestContainer {
                     .name("user2-name")
                     .nickname("가나")
                     .position(Position.builder()
-                        .name("user2-position")
+                        .address("user2-position")
                         .latitude(12.3)
                         .longitude(12.4)
                         .build())
@@ -92,7 +92,7 @@ class UserCustomRepositoryTest extends MySQLTestContainer {
                     .name("user3-name")
                     .nickname("가나다")
                     .position(Position.builder()
-                        .name("user3-position")
+                        .address("user3-position")
                         .latitude(12.3)
                         .longitude(12.4)
                         .build())
@@ -103,7 +103,7 @@ class UserCustomRepositoryTest extends MySQLTestContainer {
                     .name("user4-name")
                     .nickname("가나다라")
                     .position(Position.builder()
-                        .name("user4-position")
+                        .address("user4-position")
                         .latitude(12.3)
                         .longitude(12.4)
                         .build())
@@ -114,7 +114,7 @@ class UserCustomRepositoryTest extends MySQLTestContainer {
                     .name("user5-name")
                     .nickname("가나다라마")
                     .position(Position.builder()
-                        .name("user5-position")
+                        .address("user5-position")
                         .latitude(12.3)
                         .longitude(12.4)
                         .build())

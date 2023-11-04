@@ -1,7 +1,7 @@
 package kr.co.pawpaw.api.dto.position;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import kr.co.pawpaw.mysql.position.Position;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,14 +13,14 @@ public class PositionResponse {
     private Double latitude;
     @Schema(description = "경도")
     private Double longitude;
-    @Schema(description = "장소 이름")
-    private String name;
+    @Schema(description = "주소")
+    private String address;
 
     public static PositionResponse of(final Position position) {
         return new PositionResponse(
             position.getLatitude(),
             position.getLongitude(),
-            position.getName()
+            position.getAddress()
         );
     }
 }

@@ -1,6 +1,7 @@
 package kr.co.pawpaw.mysql.user.repository;
 
 import kr.co.pawpaw.mysql.common.MySQLTestContainer;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.user.domain.OAuth2Provider;
 import kr.co.pawpaw.mysql.user.domain.Role;
 import kr.co.pawpaw.mysql.user.domain.User;
@@ -32,12 +33,27 @@ class UserRepositoryTest extends MySQLTestContainer {
         //given
         User user1 = User.builder()
             .email("user1")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
             .build();
         User user2 = User.builder()
             .email("user2")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
             .build();
         User user3 = User.builder()
             .email("user3")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
             .build();
 
         userRepository.saveAll(List.of(user1, user3));
@@ -59,6 +75,11 @@ class UserRepositoryTest extends MySQLTestContainer {
         //given
         User user1 = User.builder()
             .email("user1")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
             .provider(OAuth2Provider.KAKAO)
             .build();
 
@@ -79,9 +100,27 @@ class UserRepositoryTest extends MySQLTestContainer {
     @DisplayName("existsByUserIdAndRole 메서드 테스트")
     void existsByUserIdAndRole() {
         //given
-        User user1 = User.builder().build();
-        User user2 = User.builder().build();
-        User user3 = User.builder().build();
+        User user1 = User.builder()
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
+            .build();
+        User user2 = User.builder()
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
+            .build();
+        User user3 = User.builder()
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
+            .build();
 
         userRepository.saveAll(List.of(user1, user3));
 
@@ -102,12 +141,27 @@ class UserRepositoryTest extends MySQLTestContainer {
         //given
         User user1 = User.builder()
             .email("user1")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
             .build();
         User user2 = User.builder()
             .email("user2")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
             .build();
         User user3 = User.builder()
             .email("user3")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
             .build();
 
         userRepository.saveAll(List.of(user1, user3));
@@ -136,6 +190,11 @@ class UserRepositoryTest extends MySQLTestContainer {
         //given
         User user1 = User.builder()
             .email("user1")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
             .provider(OAuth2Provider.KAKAO)
             .build();
 
@@ -159,6 +218,11 @@ class UserRepositoryTest extends MySQLTestContainer {
         User user1 = User.builder()
             .email("user1")
             .name("user1-name")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
             .phoneNumber("user1-phoneNumber")
             .provider(OAuth2Provider.KAKAO)
             .build();
@@ -180,6 +244,11 @@ class UserRepositoryTest extends MySQLTestContainer {
         User user = User.builder()
             .email("user1@gmail.com")
             .name("user1-name")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
             .phoneNumber("user1-phoneNumber")
             .provider(OAuth2Provider.NAVER)
             .build();

@@ -3,6 +3,7 @@ package kr.co.pawpaw.mysql.chatroom.repository;
 import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomSchedule;
 import kr.co.pawpaw.mysql.common.MySQLTestContainer;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,13 @@ class ChatroomScheduleRepositoryTest extends MySQLTestContainer {
     @Autowired
     private ChatroomRepository chatroomRepository;
 
-    private User user = User.builder().build();
+    private User user = User.builder()
+        .position(Position.builder()
+            .address("서울특별시 강동구")
+            .latitude(36.8)
+            .longitude(36.7)
+            .build())
+        .build();
     private Chatroom chatroom = Chatroom.builder()
         .name("chatroom-name")
         .description("chatroom-description")

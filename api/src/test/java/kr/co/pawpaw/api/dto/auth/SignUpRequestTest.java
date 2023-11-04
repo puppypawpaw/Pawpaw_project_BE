@@ -26,7 +26,7 @@ class SignUpRequestTest {
     private static final PositionRequest positionRequest = PositionRequest.builder()
         .latitude(36.8)
         .longitude(36.8)
-        .name("36.8")
+        .address("36.8")
         .build();
 
     @Test
@@ -131,7 +131,7 @@ class SignUpRequestTest {
         assertThat(user.getPhoneNumber()).isEqualTo(request.getPhoneNumber());
         assertThat(user.getPosition().getLongitude()).isEqualTo(request.getPosition().getLongitude());
         assertThat(user.getPosition().getLatitude()).isEqualTo(request.getPosition().getLatitude());
-        assertThat(user.getPosition().getName()).isEqualTo(request.getPosition().getName());
+        assertThat(user.getPosition().getAddress()).isEqualTo(request.getPosition().getAddress());
         assertThat(user.getPassword()).isEqualTo(password);
     }
 

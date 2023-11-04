@@ -5,6 +5,7 @@ import kr.co.pawpaw.mysql.chatroom.dto.ChatroomDetailData;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.repository.FileRepository;
 import kr.co.pawpaw.mysql.user.domain.User;
@@ -47,12 +48,22 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
 
     User user1 = User.builder()
         .name("user-name-1")
+        .position(Position.builder()
+            .address("서울특별시 강동구")
+            .latitude(36.8)
+            .longitude(36.7)
+            .build())
         .nickname("user-nickname-1")
         .phoneNumber("user-phoneNumber-1")
         .email("email1@liame.com")
         .build();
     User user2 = User.builder()
         .name("user-name-2")
+        .position(Position.builder()
+            .address("서울특별시 강동구")
+            .latitude(36.8)
+            .longitude(36.7)
+            .build())
         .nickname("user-nickname-2")
         .phoneNumber("user-phoneNumber-2")
         .email("email2@liame.com")
@@ -60,6 +71,11 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
 
     User user3 = User.builder()
         .name("user-name-3")
+        .position(Position.builder()
+            .address("서울특별시 강동구")
+            .latitude(36.8)
+            .longitude(36.7)
+            .build())
         .nickname("user-nickname-3")
         .phoneNumber("user-phoneNumber-3")
         .email("email3@liame.com")

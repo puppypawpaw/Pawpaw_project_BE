@@ -1,4 +1,4 @@
-package kr.co.pawpaw.mysql.position;
+package kr.co.pawpaw.mysql.common.domain;
 
 import lombok.*;
 
@@ -12,5 +12,5 @@ import javax.persistence.Embeddable;
 public class Position {
     private Double latitude;
     private Double longitude;
-    private String name;
+    private String address;
 }

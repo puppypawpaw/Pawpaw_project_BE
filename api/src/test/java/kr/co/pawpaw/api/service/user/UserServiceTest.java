@@ -6,7 +6,7 @@ import kr.co.pawpaw.api.dto.user.UpdateUserProfileRequest;
 import kr.co.pawpaw.api.dto.user.UserResponse;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
-import kr.co.pawpaw.mysql.position.Position;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.domain.FileType;
 import kr.co.pawpaw.mysql.storage.service.query.FileQuery;
@@ -47,7 +47,7 @@ class UserServiceTest {
     void whoAmI() {
         //given
         Position position = Position.builder()
-            .name("name")
+            .address("name")
             .latitude(36.8)
             .longitude(36.7)
             .build();
@@ -78,7 +78,7 @@ class UserServiceTest {
     @DisplayName("updateUserImage 메서드는")
     class updateUserImage {
         Position position = Position.builder()
-            .name("name")
+            .address("name")
             .latitude(36.8)
             .longitude(36.7)
             .build();
@@ -184,7 +184,7 @@ class UserServiceTest {
     void updateUserImageNotExists() {
         //given
         Position position = Position.builder()
-            .name("name")
+            .address("name")
             .latitude(36.8)
             .longitude(36.7)
             .build();
@@ -209,12 +209,12 @@ class UserServiceTest {
     @DisplayName("updateUserPosition 메서드는")
     class UpdateUserPosition {
         private Position oldPosition = Position.builder()
-            .name("old")
+            .address("old")
             .latitude(12.3)
             .longitude(12.4)
             .build();
         private Position newPosition = Position.builder()
-            .name("new")
+            .address("new")
             .latitude(32.1)
             .longitude(32.2)
             .build();
@@ -223,7 +223,7 @@ class UserServiceTest {
             .build();
         private UpdateUserPositionRequest request = UpdateUserPositionRequest.builder()
             .position(PositionRequest.builder()
-                .name(newPosition.getName())
+                .address(newPosition.getAddress())
                 .latitude(newPosition.getLatitude())
                 .longitude(newPosition.getLongitude())
                 .build())

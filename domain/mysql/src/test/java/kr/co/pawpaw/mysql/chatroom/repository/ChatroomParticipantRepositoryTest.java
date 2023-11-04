@@ -4,7 +4,7 @@ import kr.co.pawpaw.mysql.chatroom.domain.Chatroom;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipant;
 import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.mysql.common.MySQLTestContainer;
-import kr.co.pawpaw.mysql.position.Position;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -48,7 +47,7 @@ class ChatroomParticipantRepositoryTest extends MySQLTestContainer {
             .position(Position.builder()
                 .latitude(12.3)
                 .longitude(13.2)
-                .name("position")
+                .address("position")
                 .build())
             .build());
 
@@ -59,13 +58,19 @@ class ChatroomParticipantRepositoryTest extends MySQLTestContainer {
             .name("name")
             .build());
 
-        user = userRepository.save(User.builder().build());
+        user = userRepository.save(User.builder()
+                .position(Position.builder()
+                    .address("서울시 강동구")
+                    .latitude(36.8)
+                    .longitude(36.6)
+                    .build())
+            .build());
 
         chatroomParticipant = chatroomParticipantRepository.save(ChatroomParticipant.builder()
             .chatroom(chatroom)
             .role(ChatroomParticipantRole.PARTICIPANT)
             .user(user)
-            .build());;
+            .build());
     }
 
     @Test

@@ -3,6 +3,7 @@ package kr.co.pawpaw.mysql.email.repository;
 import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.email.domain.EmailLog;
 import kr.co.pawpaw.mysql.email.domain.EmailType;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +28,13 @@ class EmailLogRepositoryTest extends MySQLTestContainer {
     @DisplayName("저장 및 불러오기 테스트")
     void saveAndLoad() {
         //given
-        User user = User.builder().build();
+        User user = User.builder()
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
+            .build();
 
         userRepository.save(user);
 

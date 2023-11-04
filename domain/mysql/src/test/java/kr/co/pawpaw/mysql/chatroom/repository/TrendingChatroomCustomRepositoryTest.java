@@ -4,6 +4,7 @@ import kr.co.pawpaw.mysql.chatroom.domain.*;
 import kr.co.pawpaw.mysql.chatroom.dto.TrendingChatroomResponse;
 import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.repository.FileRepository;
 import kr.co.pawpaw.mysql.user.domain.User;
@@ -42,16 +43,31 @@ class TrendingChatroomCustomRepositoryTest extends MySQLTestContainer {
 
     User user1 = User.builder()
         .name("user1-name")
+        .position(Position.builder()
+            .address("서울시")
+            .latitude(36.8)
+            .longitude(36.7)
+            .build())
         .nickname("user1-nickname")
         .build();
 
     User user2 = User.builder()
         .name("user2-name")
+        .position(Position.builder()
+            .address("서울시")
+            .latitude(36.8)
+            .longitude(36.7)
+            .build())
         .nickname("user2-nickname")
         .build();
 
     User user3 = User.builder()
         .name("user3-name")
+        .position(Position.builder()
+            .address("서울시")
+            .latitude(36.8)
+            .longitude(36.7)
+            .build())
         .nickname("user3-nickname")
         .build();
 

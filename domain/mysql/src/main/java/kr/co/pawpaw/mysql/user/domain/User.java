@@ -1,7 +1,7 @@
 package kr.co.pawpaw.mysql.user.domain;
 
 import kr.co.pawpaw.mysql.common.BaseTimeEntity;
-import kr.co.pawpaw.mysql.position.Position;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import lombok.AccessLevel;
 import lombok.Builder;
