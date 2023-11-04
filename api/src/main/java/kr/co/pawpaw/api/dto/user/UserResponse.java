@@ -9,19 +9,19 @@ import lombok.Getter;
 
 @Getter
 public class UserResponse {
-    @Schema(description = "유저 아이디", type = "STRING")
+    @Schema(description = "유저 아이디", type = "STRING", example = "5abdf94f-f813-4511-b0ac-78832a05d16a")
     private UserId userId;
-    @Schema(description = "유저 이메일", type = "STRING")
+    @Schema(description = "유저 이메일", type = "STRING", example = "abc@gmail.com")
     private String email;
-    @Schema(description = "유저 역할", type = "STRING")
+    @Schema(description = "유저 역할", type = "STRING", example = "ADMIN | USER")
     private Role role;
-    @Schema(description = "유저 닉네임", type = "STRING")
+    @Schema(description = "유저 닉네임", type = "STRING", example = "수박이")
     private String nickname;
     @Schema(description = "유저 한줄 소개", type="STRING", example="3살 강쥐 수박이, 2살 앵무새 메론")
     private String briefIntroduction;
-    @Schema(description = "유저 위치", type = "STRING")
+    @Schema(description = "유저 위치")
     private PositionResponse position;
-    @Schema(description = "유저 이미지 URL", type = "STRING")
+    @Schema(description = "유저 이미지 URL", type = "STRING", example = "https://example.com")
     private String imageUrl;
 
     private UserResponse(
