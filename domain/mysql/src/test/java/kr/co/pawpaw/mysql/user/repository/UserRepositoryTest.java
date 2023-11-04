@@ -17,7 +17,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("UserRepository는")
-@Nested
 class UserRepositoryTest extends MySQLTestContainer {
     @Autowired
     private UserRepository userRepository;

@@ -15,7 +15,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Nested
 @DisplayName("EmailLogRepository는")
 class EmailLogRepositoryTest extends MySQLTestContainer {
     @Autowired

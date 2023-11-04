@@ -26,7 +26,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(value = { QuerydslConfig.class, ChatroomScheduleCustomRepository.class })
-@Nested
 @DisplayName("ChatroomScheduleCustomRepository는")
 class ChatroomScheduleCustomRepositoryTest extends MySQLTestContainer {
     @Autowired

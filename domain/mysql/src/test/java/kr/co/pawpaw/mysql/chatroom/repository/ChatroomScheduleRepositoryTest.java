@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Nested
 @DisplayName("ChatroomScheduleRepository 는")
 class ChatroomScheduleRepositoryTest extends MySQLTestContainer {
     @Autowired

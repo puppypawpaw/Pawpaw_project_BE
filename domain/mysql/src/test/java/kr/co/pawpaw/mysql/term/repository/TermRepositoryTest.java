@@ -12,7 +12,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Nested
 @DisplayName("TermRepository는")
 class TermRepositoryTest extends MySQLTestContainer {
     @Autowired

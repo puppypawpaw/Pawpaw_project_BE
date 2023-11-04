@@ -22,7 +22,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Nested
 @DisplayName("TrendingChatroomCustomRepository의")
 @Import(value = { TrendingChatroomCustomRepository.class, QuerydslConfig.class })
 class TrendingChatroomCustomRepositoryTest extends MySQLTestContainer {
