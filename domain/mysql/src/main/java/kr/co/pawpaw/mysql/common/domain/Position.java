@@ -13,4 +13,13 @@ public class Position {
     private Double latitude;
     private Double longitude;
     private String address;
+
+    public boolean isInside(
+        final double latMin,
+        final double latMax,
+        final double longMin,
+        final double longMax
+    ) {
+        return latMin < latitude && latitude < latMax && longMin < longitude && longitude < longMax;
+    }
 }

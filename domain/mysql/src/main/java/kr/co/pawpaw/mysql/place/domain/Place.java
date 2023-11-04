@@ -23,6 +23,7 @@ public class Place extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private PlaceType placeType;
 
+    @Column(columnDefinition = "VARCHAR(2048) NOT NULL, FULLTEXT INDEX name_fulltext (name) WITH PARSER ngram")
     private String name;
 
     @Embedded

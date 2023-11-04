@@ -25,6 +25,27 @@ public class PlaceController {
     private final PlaceService placeService;
 
     @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+    })
+    @Operation(
+        method = "GET",
+        summary = "장소 검색",
+        description = "장소 검색"
+    )
+    @GetMapping("/search")
+    public ResponseEntity<List<PlaceResponse>> queryPlace(
+        @AuthenticatedUserId final UserId userId,
+        @RequestParam(required = false) final String query,
+        @RequestParam(required = false) final PlaceType placeType,
+        @RequestParam(required = false) final Double latMin,
+        @RequestParam(required = false) final Double latMax,
+        @RequestParam(required = false) final Double longMin,
+        @RequestParam(required = false) final Double longMax
+    ) {
+        return ResponseEntity.ok(placeService.queryPlace(userId, placeType, query, latMin, latMax, longMin, longMax));
+    }
+
+    @ApiResponses(value = {
         @ApiResponse(responseCode = "204")
     })
     @Operation(

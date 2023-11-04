@@ -15,7 +15,28 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class PlaceService {
+    private final PlaceQuery placeQuery;
     private final PlaceCommand placeCommand;
+
+    public List<PlaceResponse> queryPlace(
+        final UserId userId,
+        final PlaceType placeType,
+        final String query,
+        final Double latitudeMin,
+        final Double latitudeMax,
+        final Double longitudeMin,
+        final Double longitudeMax
+    ) {
+        return placeQuery.findByQueryAndPlaceTypeAndPositionRange(
+            query,
+            placeType,
+            latitudeMin,
+            latitudeMax,
+            longitudeMin,
+            longitudeMax,
+            userId
+        );
+    }
 
     public void createPlaceAll(final List<CreatePlaceRequest> requestList) {
         placeCommand.saveAll(requestList.stream()
