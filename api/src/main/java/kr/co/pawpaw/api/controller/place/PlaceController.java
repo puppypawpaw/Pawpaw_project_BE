@@ -1,19 +1,23 @@
 package kr.co.pawpaw.api.controller.place;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.config.annotation.CheckPermission;
 import kr.co.pawpaw.api.dto.place.CreatePlaceRequest;
+import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
 import kr.co.pawpaw.api.service.place.PlaceService;
 import kr.co.pawpaw.mysql.place.domain.PlaceType;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -60,6 +64,34 @@ public class PlaceController {
         @RequestBody final List<CreatePlaceRequest> requestList
     ) {
         placeService.createPlaceAll(requestList);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "404",
+            description= "존재하지 않는 장소입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "POST",
+        summary = "장소 리뷰 생성",
+        description = "장소 리뷰 생성"
+    )
+    @PostMapping(value = "/{placeId}/review", consumes = {
+        MediaType.APPLICATION_JSON_VALUE,
+        MediaType.MULTIPART_FORM_DATA_VALUE
+    })
+    public ResponseEntity<Void> createPlaceReview(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId,
+        @RequestPart(required = false) final List<MultipartFile> images,
+        @RequestPart final CreatePlaceReviewRequest body
+    ) {
+        placeService.createPlaceReview(placeId, userId, images, body);
 
         return ResponseEntity.noContent().build();
     }
