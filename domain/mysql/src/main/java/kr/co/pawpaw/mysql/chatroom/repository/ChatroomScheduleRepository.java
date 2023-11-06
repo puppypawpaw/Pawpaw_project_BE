@@ -8,4 +8,6 @@ public interface ChatroomScheduleRepository extends JpaRepository<ChatroomSchedu
         final Long chatroomId,
         final Long chatroomScheduleId
     );
+
+    void deleteByChatroomId(final Long chatroomId);
 }

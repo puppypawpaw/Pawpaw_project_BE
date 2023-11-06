@@ -96,6 +96,11 @@ public class ChatroomScheduleService {
         chatroomScheduleCommand.deleteById(chatroomScheduleId);
     }
 
+    public void deleteByChatroomId(final Long chatroomId) {
+        chatroomScheduleParticipantCommand.deleteByChatroomScheduleChatroomId(chatroomId);
+        chatroomScheduleCommand.deleteByChatroomId(chatroomId);
+    }
+
     private void checkAlreadyParticipant(final Long chatroomScheduleId, final UserId userId) {
         if (chatroomScheduleParticipantQuery.existsByChatroomScheduleUserUserId(chatroomScheduleId, userId)) {
             throw new AlreadyChatroomScheduleParticipantException();

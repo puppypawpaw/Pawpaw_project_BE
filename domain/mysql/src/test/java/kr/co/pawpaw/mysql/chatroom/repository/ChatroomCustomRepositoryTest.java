@@ -80,6 +80,8 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
         .email("email3@liame.com")
         .build();
 
+    User nonPartipantUser = User.builder().build();
+
     File coverFile = File.builder()
         .fileName(UUID.randomUUID().toString())
         .byteSize(123L)
@@ -146,35 +148,15 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
         .uploader(user1)
         .build();
 
-    ChatroomParticipant manager = ChatroomParticipant.builder()
-        .role(ChatroomParticipantRole.MANAGER)
-        .chatroom(chatroom)
-        .user(user1)
-        .build();
+    ChatroomParticipant manager;
 
-    ChatroomParticipant participant = ChatroomParticipant.builder()
-        .role(ChatroomParticipantRole.PARTICIPANT)
-        .chatroom(chatroom)
-        .user(user2)
-        .build();
+    ChatroomParticipant participant;
 
-    ChatroomParticipant manager2 = ChatroomParticipant.builder()
-        .role(ChatroomParticipantRole.MANAGER)
-        .chatroom(chatroom2)
-        .user(user1)
-        .build();
+    ChatroomParticipant manager2;
 
-    ChatroomParticipant participant2 = ChatroomParticipant.builder()
-        .role(ChatroomParticipantRole.PARTICIPANT)
-        .chatroom(chatroom2)
-        .user(user2)
-        .build();
+    ChatroomParticipant participant2;
 
-    ChatroomParticipant manager3 = ChatroomParticipant.builder()
-        .role(ChatroomParticipantRole.MANAGER)
-        .chatroom(chatroom3)
-        .user(user3)
-        .build();
+    ChatroomParticipant manager3;
 
     ChatroomSchedule chatroomSchedule1 = ChatroomSchedule.builder()
         .creator(user1)
@@ -199,11 +181,31 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
         chatroom = chatroomRepository.save(chatroom);
         chatroom2 = chatroomRepository.save(chatroom2);
         chatroom3 = chatroomRepository.save(chatroom3);
-        manager = chatroomParticipantRepository.save(manager);
-        participant = chatroomParticipantRepository.save(participant);
-        manager2 = chatroomParticipantRepository.save(manager2);
-        participant2 = chatroomParticipantRepository.save(participant2);
-        manager3 = chatroomParticipantRepository.save(manager3);
+        manager = chatroomParticipantRepository.save(ChatroomParticipant.builder()
+            .role(ChatroomParticipantRole.MANAGER)
+            .chatroom(chatroom)
+            .user(user1)
+            .build());
+        participant = chatroomParticipantRepository.save(ChatroomParticipant.builder()
+            .role(ChatroomParticipantRole.PARTICIPANT)
+            .chatroom(chatroom)
+            .user(user2)
+            .build());
+        manager2 = chatroomParticipantRepository.save(ChatroomParticipant.builder()
+            .role(ChatroomParticipantRole.MANAGER)
+            .chatroom(chatroom2)
+            .user(user1)
+            .build());
+        participant2 = chatroomParticipantRepository.save(ChatroomParticipant.builder()
+            .role(ChatroomParticipantRole.PARTICIPANT)
+            .chatroom(chatroom2)
+            .user(user2)
+            .build());
+        manager3 = chatroomParticipantRepository.save(ChatroomParticipant.builder()
+            .role(ChatroomParticipantRole.MANAGER)
+            .chatroom(chatroom3)
+            .user(user3)
+            .build());
         chatroom.updateManager(manager);
         chatroom2.updateManager(manager2);
         chatroom3.updateManager(manager3);
@@ -246,8 +248,8 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
         @DisplayName("채팅방의 검색어와 이름이 한글자 이상 일치하는 것을 검색한다.")
         void findChatroomMatchBetweenKeywordAndName() {
             //when
-            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery(nameKeyword1);
-            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery(nameKeyword2);
+            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery(nameKeyword1, nonPartipantUser.getUserId());
+            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery(nameKeyword2, nonPartipantUser.getUserId());
 
             //then
             assertThat(chatroomRepository.findAll().size()).isEqualTo(3);
@@ -259,8 +261,8 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
         @DisplayName("채팅방의 검색어와 설명이 한글자 이상 일치하는 것을 검색한다.")
         void findChatroomMatchBetweenKeywordAndDescription() {
             //when
-            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery(descriptionKeyword1);
-            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery(descriptionKeyword2);
+            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery(descriptionKeyword1, nonPartipantUser.getUserId());
+            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery(descriptionKeyword2, nonPartipantUser.getUserId());
 
             //then
             assertThat(chatroomRepository.findAll().size()).isEqualTo(3);
@@ -272,13 +274,27 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
         @DisplayName("채팅방의 검색어와 해시태그가 한글자 이상 일치하는 것을 검색한다.")
         void findChatroomMatchBetweenKeywordAndHashTag() {
             //when
-            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery("1");
-            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery("2");
+            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery("1", nonPartipantUser.getUserId());
+            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery("2", nonPartipantUser.getUserId());
 
             //then
             assertThat(chatroomRepository.findAll().size()).isEqualTo(3);
             assertThat(result1.size()).isEqualTo(3);
             assertThat(result2.size()).isEqualTo(3);
+        }
+
+        @Test
+        @DisplayName("검색한 유저가 참가하지 않는 채팅방만 검색된다.")
+        void onlyFindNotParticipatedChatroom() {
+            //when
+            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery("1", user1.getUserId());
+            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery("1", user3.getUserId());
+
+            Object result = chatroomParticipantRepository.findAll();
+
+            //then
+            assertThat(result1.size()).isEqualTo(1);
+            assertThat(result2.size()).isEqualTo(2);
         }
     }
 

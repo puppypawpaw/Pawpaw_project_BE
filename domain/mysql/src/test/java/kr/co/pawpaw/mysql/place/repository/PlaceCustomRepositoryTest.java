@@ -5,13 +5,14 @@ import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.common.dto.PositionResponse;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
 import kr.co.pawpaw.mysql.place.domain.Place;
+import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.domain.PlaceType;
+import kr.co.pawpaw.mysql.place.domain.ReviewInfo;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
+import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
+import kr.co.pawpaw.mysql.user.repository.UserRepository;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,6 +34,10 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
     private PlaceCustomRepository placeCustomRepository;
     @Autowired
     private PlaceRepository placeRepository;
+    @Autowired
+    private PlaceReviewRepository placeReviewRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Nested
     @DisplayName("findByQueryAndPlaceTypeAndPositionRange 메서드는")
@@ -239,6 +245,88 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
 
             //then
             assertThat(result).usingRecursiveComparison().isEqualTo(resultExpected);
+        }
+    }
+
+    @Nested
+    @DisplayName("updatePlaceReviewInfo 메서드는")
+    class UpdatePlaceReviewInfo {
+        Place place = Place.builder()
+            .placeImageUrls(List.of("place-4-imageUrl-1", "place-4-imageUrl-2"))
+            .placeType(PlaceType.PARK)
+            .name("우돈숯불명가")
+            .position(Position.builder()
+                .latitude(37.546352)
+                .longitude(127.17076)
+                .address("서울특별시 강동구 상일동 309-1 1층 전체 전용주차5대")
+                .build())
+            .openHours("항상 압니다.")
+            .build();
+
+        User user = User.builder()
+            .name("user-name-1")
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
+            .nickname("user-nickname-1")
+            .phoneNumber("user-phoneNumber-1")
+            .email("email1@liame.com")
+            .build();
+
+        PlaceReview placeReview;
+
+        @BeforeEach
+        void setup() {
+            place = placeRepository.save(place);
+            user = userRepository.save(user);
+            placeReview = placeReviewRepository.save(PlaceReview.builder()
+                    .place(place)
+                    .reviewer(user)
+                    .isQuiet(true)
+                    .isClean(true)
+                    .score(5L)
+                    .content("굳")
+                .build());
+        }
+
+        @Test
+        @DisplayName("PlaceReview의 리뷰 내용을 place에 업데이트한다.")
+        void updatePlaceByPlaceReview() {
+            //given
+            ReviewInfo expectedResult = ReviewInfo.builder()
+                .totalScore(5)
+                .reviewCnt(1)
+                .quietCnt(1)
+                .cleanCnt(1)
+                .build();
+
+            //when
+            placeCustomRepository.updatePlaceReviewInfo(place, placeReview);
+            Optional<Place> findPlace = placeRepository.findById(place.getId());
+
+            //then
+            assertThat(findPlace.isPresent()).isTrue();
+            assertThat(findPlace.get().getReviewInfo()).usingRecursiveComparison().isEqualTo(expectedResult);
+        }
+
+        @Test
+        @DisplayName("수행 후 영속성 컨텍스트에 변경내용이 반영된다.")
+        void refreshPersistenceContext() {
+            //given
+            ReviewInfo expectedResult = ReviewInfo.builder()
+                .totalScore(5)
+                .reviewCnt(1)
+                .quietCnt(1)
+                .cleanCnt(1)
+                .build();
+
+            //when
+            placeCustomRepository.updatePlaceReviewInfo(place, placeReview);
+
+            //then
+            assertThat(place.getReviewInfo()).usingRecursiveComparison().isEqualTo(expectedResult);
         }
     }
 }

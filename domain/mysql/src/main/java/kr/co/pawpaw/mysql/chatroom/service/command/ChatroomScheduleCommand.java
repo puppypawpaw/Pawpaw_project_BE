@@ -14,7 +14,11 @@ public class ChatroomScheduleCommand {
         return chatroomScheduleRepository.save(chatroomSchedule);
     }
 
-    public void deleteById(final Long chatroomId) {
-        chatroomScheduleRepository.deleteById(chatroomId);
+    public void deleteById(final Long id) {
+        chatroomScheduleRepository.deleteById(id);
+    }
+
+    public void deleteByChatroomId(final Long chatroomId) {
+        chatroomScheduleRepository.deleteByChatroomId(chatroomId);
     }
 }
