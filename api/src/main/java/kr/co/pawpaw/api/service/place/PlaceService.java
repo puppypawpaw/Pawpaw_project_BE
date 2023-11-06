@@ -3,19 +3,23 @@ package kr.co.pawpaw.api.service.place;
 import kr.co.pawpaw.api.dto.place.CreatePlaceRequest;
 import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
 import kr.co.pawpaw.api.service.file.FileService;
+import kr.co.pawpaw.common.exception.place.AlreadyPlaceReviewExistsException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceException;
 import kr.co.pawpaw.mysql.place.domain.Place;
 import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.domain.PlaceReviewImage;
 import kr.co.pawpaw.mysql.place.domain.PlaceType;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
+import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
 import kr.co.pawpaw.mysql.place.service.command.PlaceCommand;
 import kr.co.pawpaw.mysql.place.service.command.PlaceReviewCommand;
 import kr.co.pawpaw.mysql.place.service.query.PlaceQuery;
+import kr.co.pawpaw.mysql.place.service.query.PlaceReviewQuery;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import kr.co.pawpaw.mysql.user.service.query.UserQuery;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +36,28 @@ public class PlaceService {
     private final UserQuery userQuery;
     private final PlaceCommand placeCommand;
     private final PlaceReviewCommand placeReviewCommand;
+    private final PlaceReviewQuery placeReviewQuery;
     private final FileService fileService;
+
+    public PlaceReviewResponse getMyPlaceReview(
+        final UserId userId,
+        final Long placeId
+    ) {
+        return placeReviewQuery.findByPlaceIdAndReviewerUserId(placeId, userId);
+    }
+
+    public Slice<PlaceReviewResponse> getPlaceReviewList(
+        final UserId userId,
+        final Long placeId,
+        final Long beforeReviewId,
+        final int size
+    ) {
+        if (!placeQuery.existsById(placeId)) {
+            throw new NotFoundPlaceException();
+        }
+
+        return placeReviewQuery.findByPlaceIdAndIdBefore(userId, placeId, beforeReviewId, size);
+    }
 
     public List<PlaceResponse> queryPlace(
         final UserId userId,

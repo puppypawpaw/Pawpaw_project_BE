@@ -12,8 +12,10 @@ import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
 import kr.co.pawpaw.api.service.place.PlaceService;
 import kr.co.pawpaw.mysql.place.domain.PlaceType;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
+import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -94,5 +96,49 @@ public class PlaceController {
         placeService.createPlaceReview(placeId, userId, images, body);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "404",
+            description= "존재하지 않는 장소입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "GET",
+        summary = "장소 리뷰 조회",
+        description = "장소 리뷰 조회(무한스크롤). 본인 리뷰는 조회 안됨. 내 장소 리뷰 조회 기능 쓰셈"
+    )
+    @GetMapping("/{placeId}/review")
+    public ResponseEntity<Slice<PlaceReviewResponse>> getPlaceReviewList(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId,
+        @RequestParam(name = "beforeReviewId", required = false) final Long beforeReviewId,
+        @RequestParam(name = "size", defaultValue = "10") final int size
+    ) {
+        return ResponseEntity.ok(placeService.getPlaceReviewList(userId, placeId, beforeReviewId, size));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 장소입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "GET",
+        summary = "내 장소 리뷰 조회",
+        description = "내가 작성한 장소 리뷰 조회"
+    )
+    @GetMapping("/{placeId}/myReview")
+    public ResponseEntity<PlaceReviewResponse> getMyPlaceReview(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId
+    ) {
+        return ResponseEntity.ok(placeService.getMyPlaceReview(userId, placeId));
     }
 }

@@ -15,17 +15,17 @@ public class CreatePlaceReviewRequest {
     @Schema(description = "평점(5점만점)", example = "4")
     private long score;
     @Schema(description = "조경이 좋아요", type = "BOOLEAN", example = "true")
-    private boolean isScenic;
+    private boolean scenic;
     @Schema(description = "조용해요", type = "BOOLEAN", example = "true")
-    private boolean isQuiet;
+    private boolean quiet;
     @Schema(description = "깨끗해요", type = "BOOLEAN", example = "true")
-    private boolean isClean;
+    private boolean clean;
     @Schema(description = "쾌적해요", type = "BOOLEAN", example = "true")
-    private boolean isComfortable;
+    private boolean comfortable;
     @Schema(description = "안전해요", type = "BOOLEAN", example = "true")
-    private boolean isSafe;
+    private boolean safe;
     @Schema(description = "접근성이 좋아요", type = "BOOLEAN", example = "true")
-    private boolean isAccessible;
+    private boolean accessible;
     @Schema(description = "리뷰 내용", type = "STRING", example = "그래프가 제 취향과 너무 잘 맞아서 방문했습니다. 쾌적 그래프가 높던데 역시나 넘나 쾌적하고 뭉이랑 감자도 신나게 놀았어요")
     private String content;
 
@@ -37,12 +37,12 @@ public class CreatePlaceReviewRequest {
             .place(place)
             .reviewer(reviewer)
             .score(score)
-            .isScenic(isScenic)
-            .isQuiet(isQuiet)
-            .isClean(isClean)
-            .isComfortable(isComfortable)
-            .isSafe(isSafe)
-            .isAccessible(isAccessible)
+            .isScenic(scenic)
+            .isQuiet(quiet)
+            .isClean(clean)
+            .isComfortable(comfortable)
+            .isSafe(safe)
+            .isAccessible(accessible)
             .content(content)
             .build();
     }

@@ -43,6 +43,10 @@ public class PlaceQuery {
         return placeRepository.findById(placeId);
     }
 
+    public boolean existsById(final Long placeId) {
+        return placeRepository.existsById(placeId);
+    }
+
     private double latMinNullCheck(final Double min) {
         return Objects.nonNull(min) ? min : -90;
     }
