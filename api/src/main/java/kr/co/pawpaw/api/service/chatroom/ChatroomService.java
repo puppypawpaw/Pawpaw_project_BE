@@ -63,8 +63,8 @@ public class ChatroomService {
     private final ChatroomHashTagCommand chatroomHashTagCommand;
 
     @Transactional(readOnly = true)
-    public List<ChatroomResponse> searchChatroom(final String query) {
-        return chatroomQuery.findBySearchQuery(query);
+    public List<ChatroomResponse> searchChatroom(final String query, final UserId userId) {
+        return chatroomQuery.findBySearchQuery(query, userId);
     }
 
     @Transactional
