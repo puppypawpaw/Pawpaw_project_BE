@@ -34,6 +34,7 @@ public class AppRunner implements ApplicationRunner {
     private final FileCommand fileCommand;
     private final FileQuery fileQuery;
     private final StorageRepository storageRepository;
+
     @Override
     @Transactional
     public void run(final ApplicationArguments args) {
@@ -45,11 +46,11 @@ public class AppRunner implements ApplicationRunner {
     private void insertUserDefaultImage() {
         if (!fileQuery.existsByFileName(UserUtil.getUserDefaultImageName())) {
             fileCommand.save(File.builder()
-                    .byteSize(74649L)
-                    .type(FileType.DEFAULT)
-                    .contentType("image/jpeg")
-                    .fileName(UserUtil.getUserDefaultImageName())
-                    .fileUrl(storageRepository.getUrl(UserUtil.getUserDefaultImageName()))
+                .byteSize(74649L)
+                .type(FileType.DEFAULT)
+                .contentType("image/jpeg")
+                .fileName(UserUtil.getUserDefaultImageName())
+                .fileUrl(storageRepository.getUrl(UserUtil.getUserDefaultImageName()))
                 .build());
         }
     }
@@ -161,9 +162,9 @@ public class AppRunner implements ApplicationRunner {
             .collect(Collectors.toSet());
 
         newTerm.forEach((order, term) -> {
-           if (!oldOrder.contains(order)) {
-               termCommand.save(term);
-           }
+            if (!oldOrder.contains(order)) {
+                termCommand.save(term);
+            }
         });
 
         oldTerm.forEach(term -> {

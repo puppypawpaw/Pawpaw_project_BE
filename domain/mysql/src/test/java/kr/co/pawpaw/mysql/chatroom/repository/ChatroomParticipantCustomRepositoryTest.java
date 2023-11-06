@@ -6,7 +6,7 @@ import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomParticipantResponse;
 import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
-import kr.co.pawpaw.mysql.position.Position;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.repository.FileRepository;
 import kr.co.pawpaw.mysql.user.domain.User;
@@ -16,9 +16,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(value = { QuerydslConfig.class, ChatroomParticipantCustomRepository.class })
-@Nested
 @DisplayName("ChatroomParticipantCustomRepository 클래스의")
 class ChatroomParticipantCustomRepositoryTest extends MySQLTestContainer {
     @Autowired
@@ -68,7 +67,7 @@ class ChatroomParticipantCustomRepositoryTest extends MySQLTestContainer {
                     .name("user1-name")
                     .nickname("user1-nickname")
                     .position(Position.builder()
-                        .name("user1-position")
+                        .address("user1-position")
                         .latitude(12.3)
                         .longitude(12.4)
                         .build())
@@ -80,7 +79,7 @@ class ChatroomParticipantCustomRepositoryTest extends MySQLTestContainer {
                     .name("user2-name")
                     .nickname("user2-nickname")
                     .position(Position.builder()
-                        .name("user2-position")
+                        .address("user2-position")
                         .latitude(32.1)
                         .longitude(32.2)
                         .build())
@@ -130,6 +129,7 @@ class ChatroomParticipantCustomRepositoryTest extends MySQLTestContainer {
 
             //when
             List<ChatroomParticipantResponse> result = chatroomParticipantCustomRepository.getChatroomParticipantResponseList(chatroom.getId());
+            result.sort(Comparator.comparing(ChatroomParticipantResponse::getNickname));
 
             //then
             assertThat(result).usingRecursiveComparison().isEqualTo(expectedResult);

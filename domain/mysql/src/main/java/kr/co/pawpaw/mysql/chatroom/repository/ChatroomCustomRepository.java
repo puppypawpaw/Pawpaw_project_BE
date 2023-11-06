@@ -4,7 +4,6 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.group.Group;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.StringPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pawpaw.mysql.chatroom.domain.QChatroom;
@@ -15,11 +14,11 @@ import kr.co.pawpaw.mysql.chatroom.dto.ChatroomDetailData;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomResponse;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomSimpleResponse;
 import kr.co.pawpaw.mysql.chatroom.dto.QChatroomSimpleResponse;
+import kr.co.pawpaw.mysql.common.util.QueryUtil;
 import kr.co.pawpaw.mysql.storage.domain.QFile;
 import kr.co.pawpaw.mysql.user.domain.QUser;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.set;
 
-@Slf4j
 @Repository
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -50,9 +48,9 @@ public class ChatroomCustomRepository {
 
     public List<ChatroomResponse> findBySearchQuery(final String query) {
         // Full text search
-        BooleanBuilder nameFullTextCondition = fullTextSearchCondition(qChatroom.name, query);
-        BooleanBuilder descriptionFullTextCondition = fullTextSearchCondition(qChatroom.description, query);
-        BooleanBuilder hashTagFullTextCondition = fullTextSearchCondition(qChatroomHashTag.hashTag, query);
+        BooleanBuilder nameFullTextCondition = QueryUtil.fullTextSearchCondition(qChatroom.name, query);
+        BooleanBuilder descriptionFullTextCondition = QueryUtil.fullTextSearchCondition(qChatroom.description, query);
+        BooleanBuilder hashTagFullTextCondition = QueryUtil.fullTextSearchCondition(qChatroomHashTag.hashTag, query);
 
         return queryFactory
             .from(qChatroom)
@@ -188,13 +186,5 @@ public class ChatroomCustomRepository {
             .leftJoin(qChatroomParticipant).on(qChatroom.eq(qChatroomParticipant.chatroom))
             .where(qChatroom.id.eq(chatroomId))
             .fetchOne();
-    }
-
-    private BooleanBuilder fullTextSearchCondition(StringPath qPath, String query) {
-        return new BooleanBuilder()
-            .and(Expressions.numberTemplate(
-                Double.class,
-                "function('match',{0},{1})", qPath, query
-            ).gt(0));
     }
 }

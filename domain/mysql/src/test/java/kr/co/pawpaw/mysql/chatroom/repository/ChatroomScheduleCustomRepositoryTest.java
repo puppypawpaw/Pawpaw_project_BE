@@ -7,6 +7,7 @@ import kr.co.pawpaw.mysql.chatroom.dto.ChatroomScheduleData;
 import kr.co.pawpaw.mysql.chatroom.dto.ChatroomScheduleParticipantResponse;
 import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.repository.FileRepository;
 import kr.co.pawpaw.mysql.user.domain.User;
@@ -25,7 +26,6 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Import(value = { QuerydslConfig.class, ChatroomScheduleCustomRepository.class })
-@Nested
 @DisplayName("ChatroomScheduleCustomRepository는")
 class ChatroomScheduleCustomRepositoryTest extends MySQLTestContainer {
     @Autowired
@@ -53,6 +53,11 @@ class ChatroomScheduleCustomRepositoryTest extends MySQLTestContainer {
     @BeforeEach
     void setup() {
         creator = userRepository.save(User.builder()
+                .position(Position.builder()
+                    .address("서울특별시 강동구")
+                    .latitude(36.8)
+                    .longitude(36.7)
+                    .build())
             .build());
 
         creatorImageFile = fileRepository.save(File.builder()

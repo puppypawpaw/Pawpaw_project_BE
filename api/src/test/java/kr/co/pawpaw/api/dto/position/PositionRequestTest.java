@@ -1,6 +1,6 @@
 package kr.co.pawpaw.api.dto.position;
 
-import kr.co.pawpaw.mysql.position.Position;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import org.junit.jupiter.api.Test;
 
 import javax.validation.ConstraintViolation;
@@ -31,12 +31,12 @@ class PositionRequestTest {
         PositionRequest request4 = PositionRequest.builder()
             .longitude(36.8)
             .latitude(36.7)
-            .name("name")
+            .address("name")
             .build();
 
-        List<String> violationPropertyPaths1 = List.of("longitude", "latitude", "name");
-        List<String> violationPropertyPaths2 = List.of("latitude", "name");
-        List<String> violationPropertyPaths3 = List.of("name");
+        List<String> violationPropertyPaths1 = List.of("longitude", "latitude", "address");
+        List<String> violationPropertyPaths2 = List.of("latitude", "address");
+        List<String> violationPropertyPaths3 = List.of("address");
         List<String> violationPropertyPaths4 = List.of();
 
         //when
@@ -70,12 +70,12 @@ class PositionRequestTest {
         PositionRequest request = PositionRequest.builder()
             .longitude(36.8)
             .latitude(36.7)
-            .name("name")
+            .address("name")
             .build();
         Position resultExpected = Position.builder()
-            .longitude(request.getLongitude())
             .latitude(request.getLatitude())
-            .name(request.getName())
+            .longitude(request.getLongitude())
+            .address(request.getAddress())
             .build();
         //when
         Position result = request.toEntity();

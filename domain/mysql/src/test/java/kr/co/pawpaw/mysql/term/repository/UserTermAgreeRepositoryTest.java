@@ -1,6 +1,7 @@
 package kr.co.pawpaw.mysql.term.repository;
 
 import kr.co.pawpaw.mysql.common.MySQLTestContainer;
+import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.term.domain.Term;
 import kr.co.pawpaw.mysql.term.domain.UserTermAgree;
 import kr.co.pawpaw.mysql.user.domain.User;
@@ -15,7 +16,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Nested
 @DisplayName("UserTermAgreeRepository는")
 class UserTermAgreeRepositoryTest extends MySQLTestContainer {
     @Autowired
@@ -36,9 +36,21 @@ class UserTermAgreeRepositoryTest extends MySQLTestContainer {
     @DisplayName("저장 및 불러오기 테스트")
     void saveAndFindTest() {
         //given
-        User user1 = User.builder().build();
+        User user1 = User.builder()
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
+            .build();
 
-        User user2 = User.builder().build();
+        User user2 = User.builder()
+            .position(Position.builder()
+                .address("서울특별시 강동구")
+                .latitude(36.8)
+                .longitude(36.7)
+                .build())
+            .build();
 
         userRepository.saveAll(List.of(user1, user2));
 

@@ -24,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PetController {
     private final PetService petService;
+
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200"),
         @ApiResponse(

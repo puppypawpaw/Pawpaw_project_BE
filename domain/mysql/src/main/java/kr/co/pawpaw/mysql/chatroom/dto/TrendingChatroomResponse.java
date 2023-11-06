@@ -16,7 +16,7 @@ public class TrendingChatroomResponse {
     private String name;
     @Schema(description = "채팅방 소개", example = "반려동물을 키우는 사람이라면 누구나 들어와서 자랑해주세요~")
     private String description;
-    @Schema(description = "채팅방 해시태그 목록", example = "['강아지', '고양이', '20대 이상']")
+    @Schema(description = "채팅방 해시태그 목록", example = "[\"강아지\",\"고양이\"]")
     private List<String> hashTagList;
     @Schema(description = "채팅방 매니저 이름", example = "지상최강감자")
     private String managerName;

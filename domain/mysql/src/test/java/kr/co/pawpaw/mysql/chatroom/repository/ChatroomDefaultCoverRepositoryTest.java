@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Nested
 @DisplayName("ChatroomDefaultCoverRepository의")
 class ChatroomDefaultCoverRepositoryTest extends MySQLTestContainer {
     @Autowired
