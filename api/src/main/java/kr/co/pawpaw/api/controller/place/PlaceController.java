@@ -76,6 +76,11 @@ public class PlaceController {
             responseCode = "404",
             description= "존재하지 않는 장소입니다.",
             content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "409",
+            description = "이미 리뷰를 작성한 장소입니다.",
+            content = @Content
         )
     })
     @Operation(

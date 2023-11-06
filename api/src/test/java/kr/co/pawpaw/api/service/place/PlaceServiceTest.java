@@ -2,12 +2,14 @@ package kr.co.pawpaw.api.service.place;
 
 import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
 import kr.co.pawpaw.api.service.file.FileService;
+import kr.co.pawpaw.common.exception.place.AlreadyPlaceReviewExistsException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceException;
 import kr.co.pawpaw.mysql.place.domain.Place;
 import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.service.command.PlaceCommand;
 import kr.co.pawpaw.mysql.place.service.command.PlaceReviewCommand;
 import kr.co.pawpaw.mysql.place.service.query.PlaceQuery;
+import kr.co.pawpaw.mysql.place.service.query.PlaceReviewQuery;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.service.query.UserQuery;
@@ -44,6 +46,8 @@ class PlaceServiceTest {
     private FileService fileService;
     @Mock
     private MultipartFile multipartFile;
+    @Mock
+    private PlaceReviewQuery placeReviewQuery;
 
     @InjectMocks
     private PlaceService placeService;
@@ -55,7 +59,7 @@ class PlaceServiceTest {
         Place place = Place.builder().build();
         User user = User.builder().build();
         CreatePlaceReviewRequest request = CreatePlaceReviewRequest.builder()
-            .isSafe(true)
+            .safe(true)
             .score(5L)
             .content("안전해요")
             .build();
@@ -76,12 +80,23 @@ class PlaceServiceTest {
             when(userQuery.getReferenceById(user.getUserId())).thenReturn(user);
             when(placeQuery.findByPlaceId(placeId)).thenReturn(Optional.empty());
 
-            //when
+            //then
             assertThatThrownBy(() -> placeService.createPlaceReview(placeId, user.getUserId(), List.of(multipartFile), request))
                 .isInstanceOf(NotFoundPlaceException.class);
 
-            //then
+        }
 
+        @Test
+        @DisplayName("이미 리뷰를 작성한 장소이면 예외가 발생한다.")
+        void AlreadyPlaceReviewExistsException() {
+            //given
+            when(userQuery.getReferenceById(user.getUserId())).thenReturn(user);
+            when(placeQuery.findByPlaceId(place.getId())).thenReturn(Optional.of(place));
+            when(placeReviewQuery.existsByPlaceIdAndReviewerUserId(place.getId(), user.getUserId())).thenReturn(true);
+
+            //then
+            assertThatThrownBy(() -> placeService.createPlaceReview(placeId, user.getUserId(), List.of(multipartFile), request))
+                .isInstanceOf(AlreadyPlaceReviewExistsException.class);
         }
 
         @Test
@@ -90,6 +105,7 @@ class PlaceServiceTest {
             //given
             when(userQuery.getReferenceById(user.getUserId())).thenReturn(user);
             when(placeQuery.findByPlaceId(place.getId())).thenReturn(Optional.of(place));
+            when(placeReviewQuery.existsByPlaceIdAndReviewerUserId(place.getId(), user.getUserId())).thenReturn(false);
 
             //when
             placeService.createPlaceReview(placeId, user.getUserId(), List.of(), request);
@@ -106,6 +122,7 @@ class PlaceServiceTest {
             //given
             when(userQuery.getReferenceById(user.getUserId())).thenReturn(user);
             when(placeQuery.findByPlaceId(place.getId())).thenReturn(Optional.of(place));
+            when(placeReviewQuery.existsByPlaceIdAndReviewerUserId(place.getId(), user.getUserId())).thenReturn(false);
 
             //when
             placeService.createPlaceReview(placeId, user.getUserId(), null, request);
@@ -123,6 +140,7 @@ class PlaceServiceTest {
             when(userQuery.getReferenceById(user.getUserId())).thenReturn(user);
             when(placeQuery.findByPlaceId(place.getId())).thenReturn(Optional.of(place));
             when(fileService.saveFileByMultipartFile(multipartFile, user.getUserId())).thenReturn(file);
+            when(placeReviewQuery.existsByPlaceIdAndReviewerUserId(place.getId(), user.getUserId())).thenReturn(false);
 
             //when
             placeService.createPlaceReview(placeId, user.getUserId(), List.of(multipartFile), request);

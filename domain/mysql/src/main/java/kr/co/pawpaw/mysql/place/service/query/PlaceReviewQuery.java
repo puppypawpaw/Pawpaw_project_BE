@@ -29,4 +29,11 @@ public class PlaceReviewQuery {
     ) {
         return placeReviewCustomRepository.findByPlaceIdAndIdBefore(userId, placeId, beforeReviewId, size);
     }
+
+    public boolean existsByPlaceIdAndReviewerUserId(
+        final Long placeId,
+        final UserId userId
+    ) {
+        return placeReviewRepository.existsByPlaceIdAndReviewerUserId(placeId, userId);
+    }
 }

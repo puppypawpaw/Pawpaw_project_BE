@@ -97,6 +97,10 @@ public class PlaceService {
         Place place = placeQuery.findByPlaceId(placeId)
             .orElseThrow(NotFoundPlaceException::new);
 
+        if (placeReviewQuery.existsByPlaceIdAndReviewerUserId(placeId, userId)) {
+            throw new AlreadyPlaceReviewExistsException();
+        }
+
         PlaceReview placeReview = request.toPlaceReview(place, reviewer);
         List<PlaceReviewImage> placeReviewImageList = createPlaceReviewImageList(userId, placeReviewImageMultipartFileList);
 
