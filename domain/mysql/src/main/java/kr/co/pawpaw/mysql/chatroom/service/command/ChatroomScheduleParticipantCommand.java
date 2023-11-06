@@ -21,4 +21,8 @@ public class ChatroomScheduleParticipantCommand {
     public void deleteByChatroomScheduleId(final Long chatroomScheduleId) {
         chatroomScheduleParticipantRepository.deleteByChatroomScheduleId(chatroomScheduleId);
     }
+
+    public void deleteByChatroomScheduleChatroomId(final Long chatroomId) {
+        chatroomScheduleParticipantRepository.deleteByChatroomScheduleChatroomId(chatroomId);
+    }
 }

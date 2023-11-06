@@ -15,4 +15,8 @@ public class ChatroomHashTagCommand {
     public List<ChatroomHashTag> saveAll(final List<ChatroomHashTag> hashTagList) {
         return chatroomHashtagRepository.saveAll(hashTagList);
     }
+
+    public void deleteByChatroomId(final Long chatroomId) {
+        chatroomHashtagRepository.deleteByChatroomId(chatroomId);
+    }
 }

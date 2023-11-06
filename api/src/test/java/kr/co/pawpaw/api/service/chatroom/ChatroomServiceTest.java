@@ -83,6 +83,9 @@ class ChatroomServiceTest {
     private RedisPublisher redisPublisher;
     @Mock
     private ChatroomHashTagCommand chatroomHashTagCommand;
+
+    @Mock
+    private ChatroomScheduleService chatroomScheduleService;
     @InjectMocks
     private ChatroomService chatroomService;
 
