@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlaceReviewRepository extends JpaRepository<PlaceReview, Long> {
     boolean existsByPlaceIdAndReviewerUserId(final Long id, final UserId userId);
+
+    void deleteByPlaceIdAndReviewerUserId(final Long placeId, final UserId userId);
 }

@@ -80,6 +80,11 @@ public class PlaceService {
     }
 
     @Transactional
+    public void deleteMyPlaceReview(final UserId userId, final Long placeId) {
+        placeReviewCommand.deleteByPlaceIdAndReviewerUserId(placeId, userId);
+    }
+
+    @Transactional
     public void createPlaceAll(final List<CreatePlaceRequest> requestList) {
         placeCommand.saveAll(requestList.stream()
             .map(CreatePlaceRequest::toPlace)

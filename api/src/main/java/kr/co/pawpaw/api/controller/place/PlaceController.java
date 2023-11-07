@@ -146,4 +146,22 @@ public class PlaceController {
     ) {
         return ResponseEntity.ok(placeService.getMyPlaceReview(userId, placeId));
     }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+    })
+    @Operation(
+        method = "GET",
+        summary = "내 장소 리뷰 삭제",
+        description = "내가 작성한 장소 리뷰 삭제"
+    )
+    @DeleteMapping("/{placeId}/myReview")
+    public ResponseEntity<Void> deleteMyPlaceReview(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId
+    ) {
+        placeService.deleteMyPlaceReview(userId, placeId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
