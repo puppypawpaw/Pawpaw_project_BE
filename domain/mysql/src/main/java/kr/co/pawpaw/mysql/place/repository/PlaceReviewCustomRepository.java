@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pawpaw.mysql.place.domain.QPlaceReview;
 import kr.co.pawpaw.mysql.place.domain.QPlaceReviewImage;
 import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
+import kr.co.pawpaw.mysql.place.dto.QPlaceReviewImageResponse;
 import kr.co.pawpaw.mysql.place.dto.QPlaceReviewResponse;
 import kr.co.pawpaw.mysql.storage.domain.QFile;
 import kr.co.pawpaw.mysql.user.domain.UserId;
@@ -72,7 +73,10 @@ public class PlaceReviewCustomRepository {
                 QPlaceReview.placeReview.reviewer.nickname,
                 QPlaceReview.placeReview.reviewer.briefIntroduction,
                 QPlaceReview.placeReview.reviewer.userImage.fileUrl,
-                list(QFile.file.fileUrl),
+                list(new QPlaceReviewImageResponse(
+                    QPlaceReviewImage.placeReviewImage.id,
+                    QFile.file.fileUrl
+                ).skipNulls()),
                 QPlaceReview.placeReview.score,
                 QPlaceReview.placeReview.isScenic,
                 QPlaceReview.placeReview.isQuiet,

@@ -6,6 +6,7 @@ import kr.co.pawpaw.mysql.config.QuerydslConfig;
 import kr.co.pawpaw.mysql.place.domain.Place;
 import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.domain.PlaceReviewImage;
+import kr.co.pawpaw.mysql.place.dto.PlaceReviewImageResponse;
 import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.storage.repository.FileRepository;
@@ -266,7 +267,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                     user3.getBriefIntroduction(),
                     user3.getUserImage().getFileUrl(),
                     user3ReviewImage.stream()
-                        .map(image -> image.getImage().getFileUrl())
+                        .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                         .collect(Collectors.toList()),
                     user3Review.getScore(),
                     user3Review.isScenic(),
@@ -284,7 +285,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                     user2.getBriefIntroduction(),
                     user2.getUserImage().getFileUrl(),
                     user2ReviewImage.stream()
-                        .map(image -> image.getImage().getFileUrl())
+                        .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                         .collect(Collectors.toList()),
                     user2Review.getScore(),
                     user2Review.isScenic(),
@@ -302,7 +303,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                     user1.getBriefIntroduction(),
                     user1.getUserImage().getFileUrl(),
                     user1ReviewImage.stream()
-                        .map(image -> image.getImage().getFileUrl())
+                        .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                         .collect(Collectors.toList()),
                     user1Review.getScore(),
                     user1Review.isScenic(),
@@ -323,7 +324,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                     user4.getBriefIntroduction(),
                     user4.getUserImage().getFileUrl(),
                     user4ReviewImage.stream()
-                        .map(image -> image.getImage().getFileUrl())
+                        .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                         .collect(Collectors.toList()),
                     user4Review.getScore(),
                     user4Review.isScenic(),
@@ -341,7 +342,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                     user3.getBriefIntroduction(),
                     user3.getUserImage().getFileUrl(),
                     user3ReviewImage.stream()
-                        .map(image -> image.getImage().getFileUrl())
+                        .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                         .collect(Collectors.toList()),
                     user3Review.getScore(),
                     user3Review.isScenic(),
@@ -359,7 +360,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                     user2.getBriefIntroduction(),
                     user2.getUserImage().getFileUrl(),
                     user2ReviewImage.stream()
-                        .map(image -> image.getImage().getFileUrl())
+                        .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                         .collect(Collectors.toList()),
                     user2Review.getScore(),
                     user2Review.isScenic(),
@@ -377,7 +378,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                     user1.getBriefIntroduction(),
                     user1.getUserImage().getFileUrl(),
                     user1ReviewImage.stream()
-                        .map(image -> image.getImage().getFileUrl())
+                        .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                         .collect(Collectors.toList()),
                     user1Review.getScore(),
                     user1Review.isScenic(),
@@ -581,7 +582,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                 me.getBriefIntroduction(),
                 me.getUserImage().getFileUrl(),
                 myReviewImage.stream()
-                    .map(image -> image.getImage().getFileUrl())
+                    .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                     .collect(Collectors.toList()),
                 myReview.getScore(),
                 myReview.isScenic(),
@@ -600,7 +601,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                 user1.getBriefIntroduction(),
                 user1.getUserImage().getFileUrl(),
                 user1ReviewImage.stream()
-                    .map(image -> image.getImage().getFileUrl())
+                    .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                     .collect(Collectors.toList()),
                 user1Review.getScore(),
                 user1Review.isScenic(),
@@ -619,7 +620,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                 user2.getBriefIntroduction(),
                 user2.getUserImage().getFileUrl(),
                 user2ReviewImage.stream()
-                    .map(image -> image.getImage().getFileUrl())
+                    .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                     .collect(Collectors.toList()),
                 user2Review.getScore(),
                 user2Review.isScenic(),
@@ -638,7 +639,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                 user3.getBriefIntroduction(),
                 user3.getUserImage().getFileUrl(),
                 user3ReviewImage.stream()
-                    .map(image -> image.getImage().getFileUrl())
+                    .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                     .collect(Collectors.toList()),
                 user3Review.getScore(),
                 user3Review.isScenic(),
@@ -657,7 +658,7 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
                 user4.getBriefIntroduction(),
                 user4.getUserImage().getFileUrl(),
                 user4ReviewImage.stream()
-                    .map(image -> image.getImage().getFileUrl())
+                    .map(image -> new PlaceReviewImageResponse(image.getId(), image.getImage().getFileUrl()))
                     .collect(Collectors.toList()),
                 user4Review.getScore(),
                 user4Review.isScenic(),
