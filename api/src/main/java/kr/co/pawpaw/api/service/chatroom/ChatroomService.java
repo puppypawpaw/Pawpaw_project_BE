@@ -13,10 +13,7 @@ import kr.co.pawpaw.dynamodb.chat.service.query.ChatQuery;
 import kr.co.pawpaw.dynamodb.util.chat.ChatUtil;
 import kr.co.pawpaw.mysql.chatroom.domain.*;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
-import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomCommand;
-import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomParticipantCommand;
-import kr.co.pawpaw.mysql.chatroom.service.command.TrendingChatroomCommand;
-import kr.co.pawpaw.mysql.chatroom.service.command.ChatroomHashTagCommand;
+import kr.co.pawpaw.mysql.chatroom.service.command.*;
 import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomDefaultCoverQuery;
 import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomParticipantQuery;
 import kr.co.pawpaw.mysql.chatroom.service.query.ChatroomQuery;
@@ -61,10 +58,11 @@ public class ChatroomService {
     private final FileService fileService;
     private final RedisPublisher redisPublisher;
     private final ChatroomHashTagCommand chatroomHashTagCommand;
+    private final ChatroomScheduleService chatroomScheduleService;
 
     @Transactional(readOnly = true)
-    public List<ChatroomResponse> searchChatroom(final String query) {
-        return chatroomQuery.findBySearchQuery(query);
+    public List<ChatroomResponse> searchChatroom(final String query, final UserId userId) {
+        return chatroomQuery.findBySearchQuery(query, userId);
     }
 
     @Transactional
@@ -77,6 +75,8 @@ public class ChatroomService {
 
         chatroomParticipantCommand.delete(chatroomParticipantList.get(0));
         trendingChatroomCommand.deleteByChatroomId(chatroomId);
+        chatroomScheduleService.deleteByChatroomId(chatroomId);
+        chatroomHashTagCommand.deleteByChatroomId(chatroomId);
         chatroomCommand.deleteById(chatroomId);
     }
 

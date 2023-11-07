@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -47,7 +48,9 @@ public class Place extends BaseTimeEntity {
         final Position position,
         final String openHours
     ) {
-        this.placeImageUrls.addAll(placeImageUrls);
+        if (Objects.nonNull(placeImageUrls)) {
+            this.placeImageUrls.addAll(placeImageUrls);
+        }
         this.placeType = placeType;
         this.name = name;
         this.position = position;

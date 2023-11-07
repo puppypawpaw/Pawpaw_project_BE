@@ -42,11 +42,12 @@ public class ChatroomCustomRepository {
     private static final QChatroomParticipant qChatroomParticipant = new QChatroomParticipant("qChatroomParticipant");
     private static final QChatroomParticipant qChatroomParticipantManager = new QChatroomParticipant("qChatroomParticipantManager");
     private static final QUser qUserManager = QUser.user;
+    private static final QUser qUserParticipant = new QUser("qUserParticipant");
     private static final QFile qFileCover = new QFile("qFileCover");
     private static final QFile qFileManager = new QFile("qFileManager");
     private static final QChatroomSchedule qChatroomSchedule = QChatroomSchedule.chatroomSchedule;
 
-    public List<ChatroomResponse> findBySearchQuery(final String query) {
+    public List<ChatroomResponse> findBySearchQuery(final String query, final UserId userId) {
         // Full text search
         BooleanBuilder nameFullTextCondition = QueryUtil.fullTextSearchCondition(qChatroom.name, query);
         BooleanBuilder descriptionFullTextCondition = QueryUtil.fullTextSearchCondition(qChatroom.description, query);
@@ -59,11 +60,15 @@ public class ChatroomCustomRepository {
             .leftJoin(qUserManager.userImage, qFileManager)
             .leftJoin(qChatroom.chatroomParticipants, qChatroomParticipant)
             .leftJoin(qChatroomHashTag).on(qChatroom.eq(qChatroomHashTag.chatroom))
-            .where(nameFullTextCondition
-                .or(descriptionFullTextCondition)
-                .or(qChatroom.in(JPAExpressions.select(qChatroomHashTag.chatroom)
-                    .from(qChatroomHashTag)
-                    .where(hashTagFullTextCondition)))
+            .where(
+                qChatroom.id.notIn(JPAExpressions.select(qChatroomParticipant.chatroom.id)
+                        .from(qChatroomParticipant)
+                        .where(qChatroomParticipant.user.userId.eq(userId)))
+                .and(nameFullTextCondition
+                    .or(descriptionFullTextCondition)
+                    .or(qChatroom.in(JPAExpressions.select(qChatroomHashTag.chatroom)
+                        .from(qChatroomHashTag)
+                        .where(hashTagFullTextCondition))))
             )
             .transform(groupBy(qChatroom.id)
                 .as(

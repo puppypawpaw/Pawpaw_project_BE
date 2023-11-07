@@ -62,7 +62,10 @@ public enum ErrorCode {
     INVALID_PET_TYPE(400, "PE001", "유효하지 않은 반려동물 종류입니다."),
     NOT_FOUND_PET(404, "PE002", "존재하지 않는 반려동물 입니다."),
     // 파일 업로드
-    FILE_SIZE_LIMIT_EXCEPTION(413, "FU001", "파일 크기 제한을 초과하였습니다.");
+    FILE_SIZE_LIMIT_EXCEPTION(413, "FU001", "파일 크기 제한을 초과하였습니다."),
+    // 장소(PAW_ZONE)
+    NOT_FOUND_PLACE(404, "PL001", "존재하지 않는 장소입니다."),
+    ALREADY_PLACE_REVIEW_EXISTS(409, "PL002", "이미 리뷰를 작성한 장소입니다.");
 
     private final int status;
     private final String code;

@@ -50,7 +50,7 @@ public class ChatroomController {
         @RequestParam @Size(min=1) final String query,
         @AuthenticatedUserId final UserId userId
     ) {
-        return ResponseEntity.ok(chatroomService.searchChatroom(query));
+        return ResponseEntity.ok(chatroomService.searchChatroom(query, userId));
     }
 
     @ApiResponses(value = {
