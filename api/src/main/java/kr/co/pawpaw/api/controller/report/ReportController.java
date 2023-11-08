@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.service.report.ReportService;
 import kr.co.pawpaw.mysql.user.domain.UserId;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "reports", description = "신고 API")
 @RestController
 @RequiredArgsConstructor
-@Getter
 @Slf4j
 @RequestMapping("/api/report")
 public class ReportController {
@@ -32,7 +30,7 @@ public class ReportController {
             summary = "게시글 신고",
             description = "해당하는 게시글을 신고한다."
     )
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<Boolean> addReport(@RequestParam Long boardId, @AuthenticatedUserId UserId userId) {
         return ResponseEntity.ok(reportService.addReport(boardId, userId));
     }
@@ -46,7 +44,7 @@ public class ReportController {
             summary = "게시글 신고 취소",
             description = "게시글 신고를 취소한다."
     )
-    @DeleteMapping("/cancel")
+    @DeleteMapping
     public ResponseEntity<Boolean> cancelReport(@RequestParam Long boardId, @AuthenticatedUserId UserId userId) {
         return ResponseEntity.ok(reportService.cancelReport(boardId, userId));
     }
