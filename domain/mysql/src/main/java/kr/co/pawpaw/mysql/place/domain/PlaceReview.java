@@ -37,7 +37,7 @@ public class PlaceReview extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @OneToMany(mappedBy = "placeReview", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "placeReview", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
     private final List<PlaceReviewImage> placeReviewImageList = new ArrayList<>();
 
     @Builder

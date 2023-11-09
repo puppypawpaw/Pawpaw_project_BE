@@ -1,5 +1,6 @@
 package kr.co.pawpaw.mysql.place.service.query;
 
+import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
 import kr.co.pawpaw.mysql.place.repository.PlaceReviewCustomRepository;
 import kr.co.pawpaw.mysql.place.repository.PlaceReviewRepository;
@@ -8,11 +9,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class PlaceReviewQuery {
     private final PlaceReviewCustomRepository placeReviewCustomRepository;
     private final PlaceReviewRepository placeReviewRepository;
+
+    public Optional<PlaceReview> findByPlaceIdAndId(final Long placeId, final Long placeReviewId) {
+        return placeReviewRepository.findByPlaceIdAndId(placeId, placeReviewId);
+    }
 
     public PlaceReviewResponse findByPlaceIdAndReviewerUserId(
         final Long placeId,

@@ -9,14 +9,15 @@ import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.config.annotation.CheckPermission;
 import kr.co.pawpaw.api.dto.place.CreatePlaceRequest;
 import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
+import kr.co.pawpaw.api.dto.place.CreatePlaceReviewResponse;
 import kr.co.pawpaw.api.service.place.PlaceService;
+import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.domain.PlaceType;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
 import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,17 +89,38 @@ public class PlaceController {
         summary = "장소 리뷰 생성",
         description = "장소 리뷰 생성"
     )
-    @PostMapping(value = "/{placeId}/review", consumes = {
-        MediaType.APPLICATION_JSON_VALUE,
-        MediaType.MULTIPART_FORM_DATA_VALUE
-    })
-    public ResponseEntity<Void> createPlaceReview(
+    @PostMapping(value = "/{placeId}/review")
+    public ResponseEntity<CreatePlaceReviewResponse> createPlaceReview(
         @AuthenticatedUserId final UserId userId,
         @PathVariable final Long placeId,
-        @RequestPart(required = false) final List<MultipartFile> images,
         @RequestPart final CreatePlaceReviewRequest body
     ) {
-        placeService.createPlaceReview(placeId, userId, images, body);
+        PlaceReview placeReview = placeService.createPlaceReview(placeId, userId, body);
+
+        return ResponseEntity.ok(CreatePlaceReviewResponse.of(placeReview));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "404",
+            description= "존재하지 않는 장소 리뷰입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "POST",
+        summary = "장소 리뷰 이미지 생성",
+        description = "장소 리뷰 이미지 생성"
+    )
+    @PostMapping(value = "/{placeId}/review/{placeReviewId}/image")
+    public ResponseEntity<Void> createPlaceReviewImage(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId,
+        @PathVariable final Long placeReviewId,
+        @RequestPart(required = false) final List<MultipartFile> images
+    ) {
+        placeService.createPlaceReviewImageList(userId, placeId, placeReviewId, images);
 
         return ResponseEntity.noContent().build();
     }

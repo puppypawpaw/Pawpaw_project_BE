@@ -4,6 +4,7 @@ import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.common.exception.place.AlreadyPlaceReviewExistsException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceException;
+import kr.co.pawpaw.common.exception.place.NotFoundPlaceReviewException;
 import kr.co.pawpaw.mysql.place.domain.Place;
 import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.service.command.PlaceCommand;
@@ -12,24 +13,28 @@ import kr.co.pawpaw.mysql.place.service.query.PlaceQuery;
 import kr.co.pawpaw.mysql.place.service.query.PlaceReviewQuery;
 import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.user.domain.User;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import kr.co.pawpaw.mysql.user.service.query.UserQuery;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PlaceService 의")
@@ -64,8 +69,6 @@ class PlaceServiceTest {
             .content("안전해요")
             .build();
 
-        File file = File.builder().build();
-
         @BeforeEach
         void setup() throws NoSuchFieldException, IllegalAccessException {
             Field idField = Place.class.getDeclaredField("id");
@@ -81,7 +84,7 @@ class PlaceServiceTest {
             when(placeQuery.findByPlaceId(placeId)).thenReturn(Optional.empty());
 
             //then
-            assertThatThrownBy(() -> placeService.createPlaceReview(placeId, user.getUserId(), List.of(multipartFile), request))
+            assertThatThrownBy(() -> placeService.createPlaceReview(placeId, user.getUserId(), request))
                 .isInstanceOf(NotFoundPlaceException.class);
 
         }
@@ -95,62 +98,56 @@ class PlaceServiceTest {
             when(placeReviewQuery.existsByPlaceIdAndReviewerUserId(place.getId(), user.getUserId())).thenReturn(true);
 
             //then
-            assertThatThrownBy(() -> placeService.createPlaceReview(placeId, user.getUserId(), List.of(multipartFile), request))
+            assertThatThrownBy(() -> placeService.createPlaceReview(placeId, user.getUserId(), request))
                 .isInstanceOf(AlreadyPlaceReviewExistsException.class);
         }
+    }
+
+    @Nested
+    @DisplayName("createPlaceReviewImageList 메서드는")
+    class CreatePlaceReviewImageList {
+        Long placeId = 1L;
+        Long placeReviewId = 1L;
+        UserId userId = UserId.create();
+        PlaceReview placeReview = PlaceReview.builder().build();
+        List<MultipartFile> multipartFileList = List.of(new MockMultipartFile("file1", new byte[2]), new MockMultipartFile("file2", new byte[3]));
+        List<File> fileList = multipartFileList.stream()
+            .map(multipartFile -> File.builder().build())
+            .collect(Collectors.toList());
 
         @Test
-        @DisplayName("PlaceReview 작성시 이미지를 업로드하지 않으면 PlaceReviewImage가 생성되지 않는다.(빈 리스트)")
-        void ifNotUploadImageThenNotCreateReviewImageEmptyList() {
+        @DisplayName("이미지를 추가할 장소 리뷰가 존재하지 않으면 예외가 발생한다.")
+        void notFoundPlaceReviewException() {
             //given
-            when(userQuery.getReferenceById(user.getUserId())).thenReturn(user);
-            when(placeQuery.findByPlaceId(place.getId())).thenReturn(Optional.of(place));
-            when(placeReviewQuery.existsByPlaceIdAndReviewerUserId(place.getId(), user.getUserId())).thenReturn(false);
-
-            //when
-            placeService.createPlaceReview(placeId, user.getUserId(), List.of(), request);
+            when(placeReviewQuery.findByPlaceIdAndId(placeId, placeReviewId)).thenReturn(Optional.empty());
 
             //then
-            ArgumentCaptor<PlaceReview> placeReviewArgumentCaptor = ArgumentCaptor.forClass(PlaceReview.class);
-            verify(placeReviewCommand).save(placeReviewArgumentCaptor.capture());
-            assertThat(placeReviewArgumentCaptor.getValue().getPlaceReviewImageList().size()).isEqualTo(0);
+            assertThatThrownBy(() -> placeService.createPlaceReviewImageList(userId, placeId, placeReviewId, multipartFileList))
+                .isInstanceOf(NotFoundPlaceReviewException.class);
         }
 
         @Test
-        @DisplayName("PlaceReview 작성시 이미지를 업로드하지 않으면 PlaceReviewImage가 생성되지 않는다.(null 리스트)")
-        void ifNotUploadImageThenNotCreateReviewImageNullList() {
+        @DisplayName("생성된 리뷰 이미지의 리뷰 필드를 검색한 리뷰로 설정한다.")
+        void setReviewOfReviewImageToSearchReview() {
             //given
-            when(userQuery.getReferenceById(user.getUserId())).thenReturn(user);
-            when(placeQuery.findByPlaceId(place.getId())).thenReturn(Optional.of(place));
-            when(placeReviewQuery.existsByPlaceIdAndReviewerUserId(place.getId(), user.getUserId())).thenReturn(false);
+            when(placeReviewQuery.findByPlaceIdAndId(placeId, placeReviewId)).thenReturn(Optional.of(placeReview));
+            AtomicInteger ai = new AtomicInteger(0);
+            multipartFileList.forEach(multipartFile -> {
+                when(fileService.saveFileByMultipartFile(multipartFile, userId)).thenReturn(fileList.get(ai.getAndIncrement()));
+            });
 
             //when
-            placeService.createPlaceReview(placeId, user.getUserId(), null, request);
+            placeService.createPlaceReviewImageList(userId, placeId, placeReviewId, multipartFileList);
 
             //then
-            ArgumentCaptor<PlaceReview> placeReviewArgumentCaptor = ArgumentCaptor.forClass(PlaceReview.class);
-            verify(placeReviewCommand).save(placeReviewArgumentCaptor.capture());
-            assertThat(placeReviewArgumentCaptor.getValue().getPlaceReviewImageList().size()).isEqualTo(0);
+            assertThat(placeReview.getPlaceReviewImageList().size())
+                .isEqualTo(multipartFileList.size());
+
+            placeReview.getPlaceReviewImageList()
+                .forEach(reviewImage -> {
+                    assertThat(reviewImage.getPlaceReview()).isEqualTo(placeReview);
+                });
         }
 
-        @Test
-        @DisplayName("PlaceReview객체 안에 있는 PlaceReviewImageList는 PlaceReview를 참조한다.")
-        void placeReviewImageRefPlaceReview() {
-            //given
-            when(userQuery.getReferenceById(user.getUserId())).thenReturn(user);
-            when(placeQuery.findByPlaceId(place.getId())).thenReturn(Optional.of(place));
-            when(fileService.saveFileByMultipartFile(multipartFile, user.getUserId())).thenReturn(file);
-            when(placeReviewQuery.existsByPlaceIdAndReviewerUserId(place.getId(), user.getUserId())).thenReturn(false);
-
-            //when
-            placeService.createPlaceReview(placeId, user.getUserId(), List.of(multipartFile), request);
-
-            //then
-            ArgumentCaptor<PlaceReview> placeReviewArgumentCaptor = ArgumentCaptor.forClass(PlaceReview.class);
-            verify(placeReviewCommand).save(placeReviewArgumentCaptor.capture());
-            PlaceReview placeReview = placeReviewArgumentCaptor.getValue();
-            assertThat(placeReview.getPlaceReviewImageList().size()).isEqualTo(1);
-            assertThat(placeReview.getPlaceReviewImageList().stream().filter(placeReviewImage -> placeReviewImage.getPlaceReview().equals(placeReview)).count()).isEqualTo(1);
-        }
     }
 }

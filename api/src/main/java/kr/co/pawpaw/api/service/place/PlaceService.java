@@ -5,6 +5,7 @@ import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.common.exception.place.AlreadyPlaceReviewExistsException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceException;
+import kr.co.pawpaw.common.exception.place.NotFoundPlaceReviewException;
 import kr.co.pawpaw.mysql.place.domain.Place;
 import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.domain.PlaceReviewImage;
@@ -92,10 +93,9 @@ public class PlaceService {
     }
 
     @Transactional
-    public void createPlaceReview(
+    public PlaceReview createPlaceReview(
         final Long placeId,
         final UserId userId,
-        final List<MultipartFile> placeReviewImageMultipartFileList,
         final CreatePlaceReviewRequest request
     ) {
         User reviewer = userQuery.getReferenceById(userId);
@@ -107,11 +107,26 @@ public class PlaceService {
         }
 
         PlaceReview placeReview = request.toPlaceReview(place, reviewer);
-        List<PlaceReviewImage> placeReviewImageList = createPlaceReviewImageList(userId, placeReviewImageMultipartFileList);
 
-        placeReview.addReviewImageList(placeReviewImageList);
         placeReviewCommand.save(placeReview);
         placeCommand.updatePlaceReviewInfo(place, placeReview);
+
+        return placeReview;
+    }
+
+    @Transactional
+    public void createPlaceReviewImageList(
+        final UserId userId,
+        final Long placeId,
+        final Long placeReviewId,
+        final List<MultipartFile> placeReviewImageMultipartFileList
+    ) {
+        PlaceReview placeReview = placeReviewQuery.findByPlaceIdAndId(placeId, placeReviewId)
+                .orElseThrow(NotFoundPlaceReviewException::new);
+
+        placeReview.addReviewImageList(createPlaceReviewImageList(userId, placeReviewImageMultipartFileList));
+
+        placeReviewCommand.save(placeReview);
     }
 
     private List<PlaceReviewImage> createPlaceReviewImageList(
