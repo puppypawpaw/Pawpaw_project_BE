@@ -2,7 +2,6 @@ package kr.co.pawpaw.mysql.board.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pawpaw.mysql.board.domain.Board;
-import kr.co.pawpaw.mysql.board.domain.QBoard;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +28,7 @@ public class BoardCustomRepository {
         List<Board> boards = queryFactory.selectFrom(board)
                 .leftJoin(board.user, user).fetchJoin()
                 .leftJoin(board.reply, reply).fetchJoin()
+                .where(board.reportedCount.lt(5))
                 .orderBy(
                         board.createdDate.desc(),
                         reply.createdDate.asc()
@@ -49,6 +49,7 @@ public class BoardCustomRepository {
                 .leftJoin(board.user, user).fetchJoin()
                 .leftJoin(board.reply, reply).fetchJoin()
                 .where(board.id.eq(boardId))
+                .where(board.reportedCount.lt(5))
                 .orderBy(
                         board.createdDate.desc(),
                         reply.createdDate.asc()
@@ -60,6 +61,7 @@ public class BoardCustomRepository {
         List<Board> boards = queryFactory.selectFrom(board)
                 .leftJoin(board.user, user).fetchJoin()
                 .leftJoin(board.reply, reply).fetchJoin()
+                .where(board.reportedCount.lt(5))
                 .orderBy(
                         board.createdDate.desc(),
                         reply.createdDate.asc()
