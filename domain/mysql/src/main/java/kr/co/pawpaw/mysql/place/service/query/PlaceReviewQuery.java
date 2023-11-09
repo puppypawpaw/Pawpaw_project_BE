@@ -21,11 +21,18 @@ public class PlaceReviewQuery {
         return placeReviewRepository.findByPlaceIdAndIdAndReviewerUserId(placeId, placeReviewId, userId);
     }
 
-    public PlaceReviewResponse findByPlaceIdAndReviewerUserId(
+    public PlaceReviewResponse findByPlaceIdAndReviewerUserIdAsPlaceReviewResponse(
         final Long placeId,
         final UserId userId
     ) {
         return placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(placeId, userId);
+    }
+
+    public Optional<PlaceReview> findByPlaceIdAndReviewerUserId(
+        final Long placeId,
+        final UserId userId
+    ) {
+        return placeReviewRepository.findByPlaceIdAndReviewerUserId(placeId, userId);
     }
 
     public Slice<PlaceReviewResponse> findByPlaceIdAndIdBefore(

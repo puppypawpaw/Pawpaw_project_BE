@@ -69,4 +69,24 @@ public class PlaceReview extends BaseTimeEntity {
         this.placeReviewImageList.addAll(placeReviewImageList);
         this.placeReviewImageList.forEach(placeReviewImage -> placeReviewImage.updatePlaceReview(this));
     }
+
+    public void updateReview(
+        final Long score,
+        final boolean isScenic,
+        final boolean isQuiet,
+        final boolean isClean,
+        final boolean isComfortable,
+        final boolean isSafe,
+        final boolean isAccessible,
+        final String content
+    ) {
+        this.score = score;
+        this.isScenic = isScenic;
+        this.isQuiet = isQuiet;
+        this.isClean = isClean;
+        this.isComfortable = isComfortable;
+        this.isSafe = isSafe;
+        this.isAccessible = isAccessible;
+        this.content = content;
+    }
 }

@@ -6,7 +6,6 @@ import com.querydsl.jpa.impl.JPAUpdateClause;
 import kr.co.pawpaw.mysql.common.dto.PositionResponse;
 import kr.co.pawpaw.mysql.common.util.QueryUtil;
 import kr.co.pawpaw.mysql.place.domain.Place;
-import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.domain.PlaceType;
 import kr.co.pawpaw.mysql.place.domain.QPlace;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
@@ -76,23 +75,30 @@ public class PlaceCustomRepository {
     }
 
     public void updatePlaceReviewInfo(
-        final Place place,
-        final PlaceReview placeReview
+        final Long placeId,
+        final long cntAdd,
+        final long scoreAdd,
+        final long quietAdd,
+        final long accessibleAdd,
+        final long safeAdd,
+        final long scenicAdd,
+        final long cleanAdd,
+        final long comfortableAdd
     ) {
         JPAUpdateClause updateClause = queryFactory.update(QPlace.place)
-            .where(QPlace.place.id.eq(place.getId()))
-            .set(QPlace.place.reviewInfo.reviewCnt, QPlace.place.reviewInfo.reviewCnt.add(1))
-            .set(QPlace.place.reviewInfo.totalScore, QPlace.place.reviewInfo.totalScore.add(placeReview.getScore()));
+            .where(QPlace.place.id.eq(placeId))
+            .set(QPlace.place.reviewInfo.reviewCnt, QPlace.place.reviewInfo.reviewCnt.add(cntAdd))
+            .set(QPlace.place.reviewInfo.totalScore, QPlace.place.reviewInfo.totalScore.add(scoreAdd));
 
-        if (placeReview.isQuiet()) updateClause.set(QPlace.place.reviewInfo.quietCnt, QPlace.place.reviewInfo.quietCnt.add(1));
-        if (placeReview.isAccessible()) updateClause.set(QPlace.place.reviewInfo.accessibleCnt, QPlace.place.reviewInfo.accessibleCnt.add(1));
-        if (placeReview.isSafe()) updateClause.set(QPlace.place.reviewInfo.safeCnt, QPlace.place.reviewInfo.safeCnt.add(1));
-        if (placeReview.isScenic()) updateClause.set(QPlace.place.reviewInfo.scenicCnt, QPlace.place.reviewInfo.scenicCnt.add(1));
-        if (placeReview.isClean()) updateClause.set(QPlace.place.reviewInfo.cleanCnt, QPlace.place.reviewInfo.cleanCnt.add(1));
-        if (placeReview.isComfortable()) updateClause.set(QPlace.place.reviewInfo.comfortableCnt, QPlace.place.reviewInfo.comfortableCnt.add(1));
+        if (quietAdd != 0) updateClause.set(QPlace.place.reviewInfo.quietCnt, QPlace.place.reviewInfo.quietCnt.add(quietAdd));
+        if (accessibleAdd != 0) updateClause.set(QPlace.place.reviewInfo.accessibleCnt, QPlace.place.reviewInfo.accessibleCnt.add(accessibleAdd));
+        if (safeAdd != 0) updateClause.set(QPlace.place.reviewInfo.safeCnt, QPlace.place.reviewInfo.safeCnt.add(safeAdd));
+        if (scenicAdd != 0) updateClause.set(QPlace.place.reviewInfo.scenicCnt, QPlace.place.reviewInfo.scenicCnt.add(scenicAdd));
+        if (cleanAdd != 0) updateClause.set(QPlace.place.reviewInfo.cleanCnt, QPlace.place.reviewInfo.cleanCnt.add(cleanAdd));
+        if (comfortableAdd != 0) updateClause.set(QPlace.place.reviewInfo.comfortableCnt, QPlace.place.reviewInfo.comfortableCnt.add(comfortableAdd));
 
         updateClause.execute();
-        entityManager.refresh(entityManager.find(Place.class, place.getId()));
+        entityManager.refresh(entityManager.find(Place.class, placeId));
     }
 
     private Double getRatio(final double son, final double mom) {

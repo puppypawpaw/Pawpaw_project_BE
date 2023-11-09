@@ -3,7 +3,6 @@ package kr.co.pawpaw.api.service.place;
 import kr.co.pawpaw.api.dto.place.CreatePlaceRequest;
 import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
 import kr.co.pawpaw.api.service.file.FileService;
-import kr.co.pawpaw.common.exception.place.AlreadyPlaceReviewExistsException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceReviewException;
 import kr.co.pawpaw.mysql.place.domain.Place;
@@ -46,7 +45,7 @@ public class PlaceService {
         final UserId userId,
         final Long placeId
     ) {
-        return placeReviewQuery.findByPlaceIdAndReviewerUserId(placeId, userId);
+        return placeReviewQuery.findByPlaceIdAndReviewerUserIdAsPlaceReviewResponse(placeId, userId);
     }
 
     public Slice<PlaceReviewResponse> getPlaceReviewList(
@@ -84,7 +83,22 @@ public class PlaceService {
 
     @Transactional
     public void deleteMyPlaceReview(final UserId userId, final Long placeId) {
-        placeReviewCommand.deleteByPlaceIdAndReviewerUserId(placeId, userId);
+        PlaceReview placeReview = placeReviewCommand.findByPlaceIdAndReviewerUserId(placeId, userId)
+            .orElseThrow(NotFoundPlaceReviewException::new);
+
+        placeReviewCommand.delete(placeReview);
+
+        placeCommand.updatePlaceReviewInfo(
+            placeId,
+            -1,
+            -placeReview.getScore(),
+            -booleanToInt(placeReview.isQuiet()),
+            -booleanToInt(placeReview.isAccessible()),
+            -booleanToInt(placeReview.isSafe()),
+            -booleanToInt(placeReview.isScenic()),
+            -booleanToInt(placeReview.isClean()),
+            -booleanToInt(placeReview.isComfortable())
+        );
     }
 
     @Transactional
@@ -95,7 +109,7 @@ public class PlaceService {
     }
 
     @Transactional
-    public PlaceReview createPlaceReview(
+    public PlaceReview createOrUpdatePlaceReview(
         final Long placeId,
         final UserId userId,
         final CreatePlaceReviewRequest request
@@ -104,16 +118,72 @@ public class PlaceService {
         Place place = placeQuery.findByPlaceId(placeId)
             .orElseThrow(NotFoundPlaceException::new);
 
-        if (placeReviewQuery.existsByPlaceIdAndReviewerUserId(placeId, userId)) {
-            throw new AlreadyPlaceReviewExistsException();
-        }
+        PlaceReview placeReview = placeReviewQuery.findByPlaceIdAndReviewerUserId(placeId, userId)
+            .orElse(null);
 
+        if (Objects.isNull(placeReview))
+            return createPlaceReview(request, reviewer, place);
+
+        return updatePlaceReview(request, placeReview, placeId);
+    }
+
+    private PlaceReview updatePlaceReview(
+        final CreatePlaceReviewRequest request,
+        final PlaceReview placeReview,
+        final Long placeId
+    ) {
+        placeCommand.updatePlaceReviewInfo(
+            placeId,
+            0,
+            request.getScore() - placeReview.getScore(),
+            booleanToInt(request.isQuiet()) - booleanToInt(placeReview.isQuiet()),
+            booleanToInt(request.isAccessible()) - booleanToInt(placeReview.isAccessible()),
+            booleanToInt(request.isSafe()) - booleanToInt(placeReview.isSafe()),
+            booleanToInt(request.isScenic()) - booleanToInt(placeReview.isScenic()),
+            booleanToInt(request.isClean()) - booleanToInt(placeReview.isClean()),
+            booleanToInt(request.isComfortable()) - booleanToInt(placeReview.isComfortable())
+        );
+
+        placeReview.updateReview(
+            request.getScore(),
+            request.isScenic(),
+            request.isQuiet(),
+            request.isClean(),
+            request.isComfortable(),
+            request.isSafe(),
+            request.isAccessible(),
+            request.getContent()
+        );
+
+        return placeReview;
+    }
+
+    private PlaceReview createPlaceReview(
+        final CreatePlaceReviewRequest request,
+        final User reviewer,
+        final Place place
+    ) {
         PlaceReview placeReview = request.toPlaceReview(place, reviewer);
 
         placeReviewCommand.save(placeReview);
-        placeCommand.updatePlaceReviewInfo(place, placeReview);
+
+        placeCommand.updatePlaceReviewInfo(
+            place.getId(),
+            1,
+            placeReview.getScore(),
+            booleanToInt(placeReview.isQuiet()),
+            booleanToInt(placeReview.isAccessible()),
+            booleanToInt(placeReview.isSafe()),
+            booleanToInt(placeReview.isScenic()),
+            booleanToInt(placeReview.isClean()),
+            booleanToInt(placeReview.isComfortable())
+        );
 
         return placeReview;
+    }
+
+    private int booleanToInt(final boolean bool) {
+        return bool ? 1 : 0;
     }
 
     @Transactional

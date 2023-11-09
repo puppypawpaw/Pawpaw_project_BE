@@ -37,6 +37,9 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
     private PlaceRepository placeRepository;
 
     @Autowired
+    private PlaceReviewImageRepository placeReviewImageRepository;
+
+    @Autowired
     private PlaceReviewRepository placeReviewRepository;
 
     @Autowired
@@ -213,6 +216,11 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
             user2Review = placeReviewRepository.save(user2Review);
             user3Review = placeReviewRepository.save(user3Review);
             user4Review = placeReviewRepository.save(user4Review);
+            placeReviewImageRepository.saveAll(myReview.getPlaceReviewImageList());
+            placeReviewImageRepository.saveAll(user1Review.getPlaceReviewImageList());
+            placeReviewImageRepository.saveAll(user2Review.getPlaceReviewImageList());
+            placeReviewImageRepository.saveAll(user3Review.getPlaceReviewImageList());
+            placeReviewImageRepository.saveAll(user4Review.getPlaceReviewImageList());
         }
 
         @Test
@@ -569,6 +577,11 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
             user2Review = placeReviewRepository.save(user2Review);
             user3Review = placeReviewRepository.save(user3Review);
             user4Review = placeReviewRepository.save(user4Review);
+            placeReviewImageRepository.saveAll(myReview.getPlaceReviewImageList());
+            placeReviewImageRepository.saveAll(user1Review.getPlaceReviewImageList());
+            placeReviewImageRepository.saveAll(user2Review.getPlaceReviewImageList());
+            placeReviewImageRepository.saveAll(user3Review.getPlaceReviewImageList());
+            placeReviewImageRepository.saveAll(user4Review.getPlaceReviewImageList());
         }
 
         @Test

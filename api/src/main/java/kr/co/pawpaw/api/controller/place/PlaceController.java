@@ -78,25 +78,20 @@ public class PlaceController {
             responseCode = "404",
             description= "존재하지 않는 장소입니다.",
             content = @Content
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            description = "이미 리뷰를 작성한 장소입니다.",
-            content = @Content
         )
     })
     @Operation(
-        method = "POST",
-        summary = "장소 리뷰 생성",
-        description = "장소 리뷰 생성"
+        method = "PUT",
+        summary = "장소 리뷰 생성 및 수정",
+        description = "장소 리뷰 및 수정"
     )
-    @PostMapping(value = "/{placeId}/review")
+    @PutMapping(value = "/{placeId}/review")
     public ResponseEntity<CreatePlaceReviewResponse> createPlaceReview(
         @AuthenticatedUserId final UserId userId,
         @PathVariable final Long placeId,
-        @RequestPart final CreatePlaceReviewRequest body
+        @RequestBody final CreatePlaceReviewRequest body
     ) {
-        PlaceReview placeReview = placeService.createPlaceReview(placeId, userId, body);
+        PlaceReview placeReview = placeService.createOrUpdatePlaceReview(placeId, userId, body);
 
         return ResponseEntity.ok(CreatePlaceReviewResponse.of(placeReview));
     }

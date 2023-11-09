@@ -6,6 +6,8 @@ import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class PlaceReviewCommand {
@@ -15,7 +17,11 @@ public class PlaceReviewCommand {
         return placeReviewRepository.save(placeReview);
     }
 
-    public void deleteByPlaceIdAndReviewerUserId(final Long placeId, final UserId userId) {
-        placeReviewRepository.deleteByPlaceIdAndReviewerUserId(placeId, userId);
+    public void delete(final PlaceReview placeReview) {
+        placeReviewRepository.delete(placeReview);
+    }
+
+    public Optional<PlaceReview> findByPlaceIdAndReviewerUserId(final Long placeId, final UserId userId) {
+        return placeReviewRepository.findByPlaceIdAndReviewerUserId(placeId, userId);
     }
 }
