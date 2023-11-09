@@ -37,7 +37,7 @@ public class PlaceReview extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @OneToMany(mappedBy = "placeReview", cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+    @OneToMany(mappedBy = "placeReview", cascade = CascadeType.REMOVE)
     private final List<PlaceReviewImage> placeReviewImageList = new ArrayList<>();
 
     @Builder
@@ -67,6 +67,6 @@ public class PlaceReview extends BaseTimeEntity {
 
     public void addReviewImageList(final Collection<PlaceReviewImage> placeReviewImageList) {
         this.placeReviewImageList.addAll(placeReviewImageList);
-        placeReviewImageList.forEach(placeReviewImage -> placeReviewImage.updatePlaceReview(this));
+        this.placeReviewImageList.forEach(placeReviewImage -> placeReviewImage.updatePlaceReview(this));
     }
 }

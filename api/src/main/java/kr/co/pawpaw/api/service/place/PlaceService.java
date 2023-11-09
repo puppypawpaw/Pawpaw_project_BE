@@ -14,6 +14,7 @@ import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
 import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
 import kr.co.pawpaw.mysql.place.service.command.PlaceCommand;
 import kr.co.pawpaw.mysql.place.service.command.PlaceReviewCommand;
+import kr.co.pawpaw.mysql.place.service.command.PlaceReviewImageCommand;
 import kr.co.pawpaw.mysql.place.service.query.PlaceQuery;
 import kr.co.pawpaw.mysql.place.service.query.PlaceReviewQuery;
 import kr.co.pawpaw.mysql.user.domain.User;
@@ -38,6 +39,7 @@ public class PlaceService {
     private final PlaceCommand placeCommand;
     private final PlaceReviewCommand placeReviewCommand;
     private final PlaceReviewQuery placeReviewQuery;
+    private final PlaceReviewImageCommand placeReviewImageCommand;
     private final FileService fileService;
 
     public PlaceReviewResponse getMyPlaceReview(
@@ -121,12 +123,12 @@ public class PlaceService {
         final Long placeReviewId,
         final List<MultipartFile> placeReviewImageMultipartFileList
     ) {
-        PlaceReview placeReview = placeReviewQuery.findByPlaceIdAndId(placeId, placeReviewId)
+        PlaceReview placeReview = placeReviewQuery.findByPlaceIdAndId(placeId, placeReviewId, userId)
                 .orElseThrow(NotFoundPlaceReviewException::new);
 
         placeReview.addReviewImageList(createPlaceReviewImageList(userId, placeReviewImageMultipartFileList));
 
-        placeReviewCommand.save(placeReview);
+        placeReviewImageCommand.saveAll(placeReview.getPlaceReviewImageList());
     }
 
     private List<PlaceReviewImage> createPlaceReviewImageList(

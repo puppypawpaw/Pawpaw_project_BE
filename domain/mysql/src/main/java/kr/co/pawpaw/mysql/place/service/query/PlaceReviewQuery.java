@@ -17,8 +17,8 @@ public class PlaceReviewQuery {
     private final PlaceReviewCustomRepository placeReviewCustomRepository;
     private final PlaceReviewRepository placeReviewRepository;
 
-    public Optional<PlaceReview> findByPlaceIdAndId(final Long placeId, final Long placeReviewId) {
-        return placeReviewRepository.findByPlaceIdAndId(placeId, placeReviewId);
+    public Optional<PlaceReview> findByPlaceIdAndId(final Long placeId, final Long placeReviewId, final UserId userId) {
+        return placeReviewRepository.findByPlaceIdAndIdAndReviewerUserId(placeId, placeReviewId, userId);
     }
 
     public PlaceReviewResponse findByPlaceIdAndReviewerUserId(

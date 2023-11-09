@@ -18,6 +18,7 @@ import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -104,7 +105,7 @@ public class PlaceController {
         @ApiResponse(responseCode = "204"),
         @ApiResponse(
             responseCode = "404",
-            description= "존재하지 않는 장소 리뷰입니다.",
+            description = "존재하지 않는 장소 리뷰입니다.",
             content = @Content
         )
     })
@@ -113,7 +114,7 @@ public class PlaceController {
         summary = "장소 리뷰 이미지 생성",
         description = "장소 리뷰 이미지 생성"
     )
-    @PostMapping(value = "/{placeId}/review/{placeReviewId}/image")
+    @PostMapping(value = "/{placeId}/review/{placeReviewId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> createPlaceReviewImage(
         @AuthenticatedUserId final UserId userId,
         @PathVariable final Long placeId,

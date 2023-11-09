@@ -119,7 +119,7 @@ class PlaceServiceTest {
         @DisplayName("이미지를 추가할 장소 리뷰가 존재하지 않으면 예외가 발생한다.")
         void notFoundPlaceReviewException() {
             //given
-            when(placeReviewQuery.findByPlaceIdAndId(placeId, placeReviewId)).thenReturn(Optional.empty());
+            when(placeReviewQuery.findByPlaceIdAndId(placeId, placeReviewId, userId)).thenReturn(Optional.empty());
 
             //then
             assertThatThrownBy(() -> placeService.createPlaceReviewImageList(userId, placeId, placeReviewId, multipartFileList))
@@ -130,7 +130,7 @@ class PlaceServiceTest {
         @DisplayName("생성된 리뷰 이미지의 리뷰 필드를 검색한 리뷰로 설정한다.")
         void setReviewOfReviewImageToSearchReview() {
             //given
-            when(placeReviewQuery.findByPlaceIdAndId(placeId, placeReviewId)).thenReturn(Optional.of(placeReview));
+            when(placeReviewQuery.findByPlaceIdAndId(placeId, placeReviewId, userId)).thenReturn(Optional.of(placeReview));
             AtomicInteger ai = new AtomicInteger(0);
             multipartFileList.forEach(multipartFile -> {
                 when(fileService.saveFileByMultipartFile(multipartFile, userId)).thenReturn(fileList.get(ai.getAndIncrement()));

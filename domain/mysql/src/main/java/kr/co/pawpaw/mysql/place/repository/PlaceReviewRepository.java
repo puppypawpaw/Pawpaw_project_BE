@@ -11,5 +11,5 @@ public interface PlaceReviewRepository extends JpaRepository<PlaceReview, Long> 
 
     void deleteByPlaceIdAndReviewerUserId(final Long placeId, final UserId userId);
 
-    Optional<PlaceReview> findByPlaceIdAndId(final Long placeId, final Long placeReviewId);
+    Optional<PlaceReview> findByPlaceIdAndIdAndReviewerUserId(final Long placeId, final Long placeReviewId, final UserId userId);
 }
