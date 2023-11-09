@@ -131,6 +131,20 @@ public class PlaceService {
         placeReviewImageCommand.saveAll(placeReview.getPlaceReviewImageList());
     }
 
+    @Transactional
+    public void deletePlaceReviewImage(
+        final UserId userId,
+        final Long placeId,
+        final Long placeReviewId,
+        final List<Long> placeReviewImageIdList
+    ) {
+        if (!placeReviewQuery.existsByPlaceIdAndReviewerUserId(placeId, userId)) {
+            throw new NotFoundPlaceReviewException();
+        }
+
+        placeReviewImageCommand.deleteByPlaceReviewIdAndPlaceReviewImageIdIn(placeReviewId, placeReviewImageIdList);
+    }
+
     private List<PlaceReviewImage> createPlaceReviewImageList(
         final UserId userId,
         final List<MultipartFile> placeReviewImageMultipartFileList

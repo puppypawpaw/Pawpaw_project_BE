@@ -127,6 +127,31 @@ public class PlaceController {
     }
 
     @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 장소 리뷰입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "DELETE",
+        summary = "장소 리뷰 이미지 삭제",
+        description = "장소 리뷰 이미지 삭제"
+    )
+    @DeleteMapping(value = "/{placeId}/review/{placeReviewId}/image")
+    public ResponseEntity<Void> deletePlaceReviewImage(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId,
+        @PathVariable final Long placeReviewId,
+        @RequestParam final List<Long> placeReviewImageIdList
+    ) {
+        placeService.deletePlaceReviewImage(userId, placeId, placeReviewId, placeReviewImageIdList);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
         @ApiResponse(responseCode = "200"),
         @ApiResponse(
             responseCode = "404",

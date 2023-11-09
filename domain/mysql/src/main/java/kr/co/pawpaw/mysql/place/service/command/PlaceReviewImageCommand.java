@@ -12,6 +12,10 @@ import java.util.Collection;
 public class PlaceReviewImageCommand {
     private final PlaceReviewImageRepository placeReviewImageRepository;
 
+    public void deleteByPlaceReviewIdAndPlaceReviewImageIdIn(final Long placeReviewId, final Collection<Long> placeReviewImageIdCollection) {
+        placeReviewImageRepository.deleteByPlaceReviewIdAndIdIn(placeReviewId, placeReviewImageIdCollection);
+    }
+
     public Collection<PlaceReviewImage> saveAll(final Collection<PlaceReviewImage> placeReviewImageCollection) {
         return placeReviewImageRepository.saveAll(placeReviewImageCollection);
     }

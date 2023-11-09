@@ -148,6 +148,25 @@ class PlaceServiceTest {
                     assertThat(reviewImage.getPlaceReview()).isEqualTo(placeReview);
                 });
         }
+    }
 
+    @Nested
+    @DisplayName("deletePlaceReviewImage 메서드는")
+    class DeletePlaceReviewImage {
+        Long placeId = 1L;
+        Long placeReviewId = 1L;
+        List<Long> placeReviewImageIdList = List.of(1L, 2L, 3L);
+        UserId userId = UserId.create();
+
+        @Test
+        @DisplayName("요청을 보낸 유저가 해당 장소에 리뷰를 작성하지 않았으면 예외가 발생한다.")
+        void notFoundPlaceReviewException() {
+            //given
+            when(placeReviewQuery.existsByPlaceIdAndReviewerUserId(placeId, userId)).thenReturn(false);
+
+            //then
+            assertThatThrownBy(() -> placeService.deletePlaceReviewImage(userId, placeId, placeReviewId, placeReviewImageIdList))
+                .isInstanceOf(NotFoundPlaceReviewException.class);
+        }
     }
 }
