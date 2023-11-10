@@ -1,7 +1,6 @@
 package kr.co.pawpaw.mysql.place.service.command;
 
 import kr.co.pawpaw.mysql.place.domain.Place;
-import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.repository.PlaceCustomRepository;
 import kr.co.pawpaw.mysql.place.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +19,26 @@ public class PlaceCommand {
     }
 
     public void updatePlaceReviewInfo(
-        final Place place,
-        final PlaceReview placeReview
+        final Long placeId,
+        final long cntAdd,
+        final long scoreAdd,
+        final long quietAdd,
+        final long accessibleAdd,
+        final long safeAdd,
+        final long scenicAdd,
+        final long cleanAdd,
+        final long comfortableAdd
     ) {
-        placeCustomRepository.updatePlaceReviewInfo(place, placeReview);
+        placeCustomRepository.updatePlaceReviewInfo(
+            placeId,
+            cntAdd,
+            scoreAdd,
+            quietAdd,
+            accessibleAdd,
+            safeAdd,
+            scenicAdd,
+            cleanAdd,
+            comfortableAdd
+        );
     }
 }

@@ -71,7 +71,8 @@ public enum ErrorCode {
     FILE_SIZE_LIMIT_EXCEPTION(413, "FU001", "파일 크기 제한을 초과하였습니다."),
     // 장소(PAW_ZONE)
     NOT_FOUND_PLACE(404, "PL001", "존재하지 않는 장소입니다."),
-    ALREADY_PLACE_REVIEW_EXISTS(409, "PL002", "이미 리뷰를 작성한 장소입니다.");
+    ALREADY_PLACE_REVIEW_EXISTS(409, "PL002", "이미 리뷰를 작성한 장소입니다."),
+    NOT_FOUND_PLACE_REVIEW(404, "PL003", "존재하지 않는 장소 리뷰입니다.");
 
     private final int status;
     private final String code;

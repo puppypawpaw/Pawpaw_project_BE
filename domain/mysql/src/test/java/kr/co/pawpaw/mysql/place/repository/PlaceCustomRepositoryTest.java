@@ -303,7 +303,18 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .build();
 
             //when
-            placeCustomRepository.updatePlaceReviewInfo(place, placeReview);
+            placeCustomRepository.updatePlaceReviewInfo(
+                place.getId(),
+                1,
+                placeReview.getScore(),
+                placeReview.isQuiet() ? 1 : 0,
+                placeReview.isAccessible() ? 1: 0,
+                placeReview.isSafe() ? 1 : 0,
+                placeReview.isScenic() ? 1 : 0,
+                placeReview.isClean() ? 1 : 0,
+                placeReview.isComfortable() ? 1 : 0
+            );
+
             Optional<Place> findPlace = placeRepository.findById(place.getId());
 
             //then
@@ -323,7 +334,17 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .build();
 
             //when
-            placeCustomRepository.updatePlaceReviewInfo(place, placeReview);
+            placeCustomRepository.updatePlaceReviewInfo(
+                place.getId(),
+                1,
+                placeReview.getScore(),
+                placeReview.isQuiet() ? 1 : 0,
+                placeReview.isAccessible() ? 1: 0,
+                placeReview.isSafe() ? 1 : 0,
+                placeReview.isScenic() ? 1 : 0,
+                placeReview.isClean() ? 1 : 0,
+                placeReview.isComfortable() ? 1 : 0
+            );
 
             //then
             assertThat(place.getReviewInfo()).usingRecursiveComparison().isEqualTo(expectedResult);
