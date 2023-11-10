@@ -153,7 +153,7 @@ public class BoardRestController {
     public ResponseEntity<Slice<BoardListDto>> getSearchList(
             @AuthenticatedUserId UserId userId,
             @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
-            @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "4") int pageSize,
+            @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "100000", required = false) int pageSize,
             @Parameter(description = "검색어") @RequestParam(value = "query", required = false) String query) {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return ResponseEntity.ok(boardService.searchBoardsByQuery(userId, pageable, query));
