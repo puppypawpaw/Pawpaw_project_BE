@@ -1,5 +1,6 @@
 package kr.co.pawpaw.mysql.board.repository;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import kr.co.pawpaw.mysql.board.domain.Board;
 import kr.co.pawpaw.mysql.user.domain.UserId;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -76,5 +78,33 @@ public class BoardCustomRepository {
             boards.remove(pageable.getPageSize());
 
         return new SliceImpl<>(boards, pageable, hasNext);
+    }
+
+    public Slice<Board> getBoardListWithRepliesBySearch(Pageable pageable, String searchQuery) {
+        List<Board> boards = queryFactory.selectFrom(board)
+                .leftJoin(board.user, user).fetchJoin()
+                .leftJoin(board.reply, reply).fetchJoin()
+                .where(board.reportedCount.lt(5))
+                .where(searchBySearchQuery(searchQuery))
+                .orderBy(
+                        board.createdDate.desc(),
+                        reply.createdDate.asc()
+                )
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        boolean hasNext = boards.size() > pageable.getPageSize();
+        if (hasNext)
+            boards.remove(pageable.getPageSize());
+
+        return new SliceImpl<>(boards, pageable, hasNext);
+    }
+
+    private BooleanExpression searchBySearchQuery(String searchQuery) {
+        if (StringUtils.hasText(searchQuery)) {
+            return board.content.contains(searchQuery);
+        }
+        return null;
     }
 }
