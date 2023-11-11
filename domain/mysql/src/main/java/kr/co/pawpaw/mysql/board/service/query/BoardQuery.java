@@ -32,8 +32,8 @@ public class BoardQuery {
     public Slice<Board> getBoardListWithRepliesByUser_UserId(Pageable pageable, UserId userId){
         return boardCustomRepository.getBoardListWithRepliesByUser_UserId(pageable, userId);
     }
-    public Slice<Board> searchBoardsByQuery(@Param("query") String query, Pageable pageable){
-        return boardRepository.searchBoardsByQuery(query, pageable);
+    public Slice<Board> getBoardListWithRepliesBySearch(@Param("query") String query, Pageable pageable){
+        return boardCustomRepository.getBoardListWithRepliesBySearch(pageable, query);
     }
     public Board findBoardWithFileUrlsById(@Param("id") Long id){
         return boardRepository.findBoardWithFileUrlsById(id);

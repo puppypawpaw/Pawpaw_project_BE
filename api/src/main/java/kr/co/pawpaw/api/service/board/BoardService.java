@@ -15,7 +15,6 @@ import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.mysql.board.domain.Board;
 import kr.co.pawpaw.mysql.board.service.command.BoardCommand;
 import kr.co.pawpaw.mysql.board.service.query.BoardQuery;
-import kr.co.pawpaw.mysql.storage.domain.File;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import kr.co.pawpaw.mysql.user.service.query.UserQuery;
@@ -31,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -164,10 +164,11 @@ public class BoardService {
     @Transactional(readOnly = true)
     public Slice<BoardListDto> searchBoardsByQuery(UserId userId, Pageable pageable, String query) {
         userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
-        if (!StringUtils.hasText(query) || query.isBlank())
-            throw new BoardException.BoardSearchQueryException();
 
-        Slice<Board> boardListWithRepliesForSearch = boardQuery.searchBoardsByQuery(query, pageable);
+        if (!StringUtils.hasText(query) || query.isBlank()){
+            return new SliceImpl<>(Collections.emptyList(), pageable, false);
+        }
+        Slice<Board> boardListWithRepliesForSearch = boardQuery.getBoardListWithRepliesBySearch(query, pageable);
 
         List<BoardListDto> boardListDtos = getBoardListDtos(userId, pageable, boardListWithRepliesForSearch);
 
