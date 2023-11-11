@@ -33,6 +33,12 @@ public enum ErrorCode {
     BOARD_SEARCH_QUERY_EMPTY_EXCEPTION(400, "BOARD_SEARCH_QUERY_EMPTY_EXCEPTION", "검색어를 입력해주세요"),
     BOOKMARK_REGISTRATION_EXCEPTION(400, "BOOKMARK_REGISTRATION_EXCEPTION", "북마크 등록에 실패했습니다"),
     BOOKMARK_DELETE_EXCEPTION(400, "BOOKMARK_DELETE_EXCEPTION", "북마크 취소에 실패했습니다"),
+
+    // 게시글 신고
+    REPORT_CANNOT_EXCEPTION(400, "REPORT_CANNOT_EXCEPTION", "게시글 신고에 실패했습니다."),
+    REPORT_CANCEL_EXCEPTION(400, "REPORT_CANCEL_EXCEPTION", "게시글 신고 취소에 실패했습니다."),
+    REPORT_CANNOT_MYSELF(400, "REPORT_CANNOT_MYSELF", "자신의 게시글을 신고할 수 없습니다."),
+
     // 댓글
     REPLY_NOTFOUND_EXCEPTION(400, "REPLY_NOTFOUND_EXCEPTION", "댓글을 찾지 못했습니다"),
     REPLY_REGISTRATION_EXCEPTION(400, "REPLY_REGISTRATION_EXCEPTION", "댓글 등록에 실패했습니다"),
@@ -65,7 +71,8 @@ public enum ErrorCode {
     FILE_SIZE_LIMIT_EXCEPTION(413, "FU001", "파일 크기 제한을 초과하였습니다."),
     // 장소(PAW_ZONE)
     NOT_FOUND_PLACE(404, "PL001", "존재하지 않는 장소입니다."),
-    ALREADY_PLACE_REVIEW_EXISTS(409, "PL002", "이미 리뷰를 작성한 장소입니다.");
+    ALREADY_PLACE_REVIEW_EXISTS(409, "PL002", "이미 리뷰를 작성한 장소입니다."),
+    NOT_FOUND_PLACE_REVIEW(404, "PL003", "존재하지 않는 장소 리뷰입니다.");
 
     private final int status;
     private final String code;

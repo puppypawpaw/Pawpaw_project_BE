@@ -9,7 +9,9 @@ import kr.co.pawpaw.api.config.annotation.AuthenticatedUserId;
 import kr.co.pawpaw.api.config.annotation.CheckPermission;
 import kr.co.pawpaw.api.dto.place.CreatePlaceRequest;
 import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
+import kr.co.pawpaw.api.dto.place.CreatePlaceReviewResponse;
 import kr.co.pawpaw.api.service.place.PlaceService;
+import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.domain.PlaceType;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
 import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
@@ -76,29 +78,70 @@ public class PlaceController {
             responseCode = "404",
             description= "존재하지 않는 장소입니다.",
             content = @Content
-        ),
+        )
+    })
+    @Operation(
+        method = "PUT",
+        summary = "장소 리뷰 생성 및 수정",
+        description = "장소 리뷰 및 수정"
+    )
+    @PutMapping(value = "/{placeId}/review")
+    public ResponseEntity<CreatePlaceReviewResponse> createPlaceReview(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId,
+        @RequestBody final CreatePlaceReviewRequest body
+    ) {
+        PlaceReview placeReview = placeService.createOrUpdatePlaceReview(placeId, userId, body);
+
+        return ResponseEntity.ok(CreatePlaceReviewResponse.of(placeReview));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
         @ApiResponse(
-            responseCode = "409",
-            description = "이미 리뷰를 작성한 장소입니다.",
+            responseCode = "404",
+            description = "존재하지 않는 장소 리뷰입니다.",
             content = @Content
         )
     })
     @Operation(
         method = "POST",
-        summary = "장소 리뷰 생성",
-        description = "장소 리뷰 생성"
+        summary = "장소 리뷰 이미지 생성",
+        description = "장소 리뷰 이미지 생성"
     )
-    @PostMapping(value = "/{placeId}/review", consumes = {
-        MediaType.APPLICATION_JSON_VALUE,
-        MediaType.MULTIPART_FORM_DATA_VALUE
-    })
-    public ResponseEntity<Void> createPlaceReview(
+    @PostMapping(value = "/{placeId}/review/{placeReviewId}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> createPlaceReviewImage(
         @AuthenticatedUserId final UserId userId,
         @PathVariable final Long placeId,
-        @RequestPart(required = false) final List<MultipartFile> images,
-        @RequestPart final CreatePlaceReviewRequest body
+        @PathVariable final Long placeReviewId,
+        @RequestPart(required = false) final List<MultipartFile> images
     ) {
-        placeService.createPlaceReview(placeId, userId, images, body);
+        placeService.createPlaceReviewImageList(userId, placeId, placeReviewId, images);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 장소 리뷰입니다.",
+            content = @Content
+        )
+    })
+    @Operation(
+        method = "DELETE",
+        summary = "장소 리뷰 이미지 삭제",
+        description = "장소 리뷰 이미지 삭제"
+    )
+    @DeleteMapping(value = "/{placeId}/review/{placeReviewId}/image")
+    public ResponseEntity<Void> deletePlaceReviewImage(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId,
+        @PathVariable final Long placeReviewId,
+        @RequestParam final List<Long> placeReviewImageIdList
+    ) {
+        placeService.deletePlaceReviewImage(userId, placeId, placeReviewId, placeReviewImageIdList);
 
         return ResponseEntity.noContent().build();
     }
@@ -145,5 +188,23 @@ public class PlaceController {
         @PathVariable final Long placeId
     ) {
         return ResponseEntity.ok(placeService.getMyPlaceReview(userId, placeId));
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+    })
+    @Operation(
+        method = "GET",
+        summary = "내 장소 리뷰 삭제",
+        description = "내가 작성한 장소 리뷰 삭제"
+    )
+    @DeleteMapping("/{placeId}/myReview")
+    public ResponseEntity<Void> deleteMyPlaceReview(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId
+    ) {
+        placeService.deleteMyPlaceReview(userId, placeId);
+
+        return ResponseEntity.noContent().build();
     }
 }

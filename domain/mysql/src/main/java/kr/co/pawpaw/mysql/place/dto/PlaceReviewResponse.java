@@ -19,8 +19,8 @@ public class PlaceReviewResponse {
     private String reviewerBriefIntroduction;
     @Schema(description = "장소 리뷰 작성자 이미지 URL", example = "https://image.com")
     private String reviewerImageUrl;
-    @Schema(description = "장소 리뷰 이미지 URL 목록", example = "[\"https://image.com/1\",\"https://image.com/2\"]")
-    private List<String> placeReviewImageUrlList;
+    @Schema(description = "장소 리뷰 이미지 응답 목록")
+    private List<PlaceReviewImageResponse> placeReviewImageList;
     @Schema(description = "장소 리뷰 점수", example = "5")
     private Long score;
     @Schema(description = "장소 리뷰 - 조경좋음 여부", type = "BOOLEAN", example = "true")
@@ -45,7 +45,7 @@ public class PlaceReviewResponse {
         final String reviewerNickname,
         final String reviewerBriefIntroduction,
         final String reviewerImageUrl,
-        final List<String> placeReviewImageUrlList,
+        final List<PlaceReviewImageResponse> placeReviewImageList,
         final Long score,
         final boolean isScenic,
         final boolean isQuiet,
@@ -60,7 +60,7 @@ public class PlaceReviewResponse {
         this.reviewerNickname = reviewerNickname;
         this.reviewerBriefIntroduction = reviewerBriefIntroduction;
         this.reviewerImageUrl = reviewerImageUrl;
-        this.placeReviewImageUrlList = placeReviewImageUrlList;
+        this.placeReviewImageList = placeReviewImageList;
         this.score = score;
         this.isScenic = isScenic;
         this.isQuiet = isQuiet;
