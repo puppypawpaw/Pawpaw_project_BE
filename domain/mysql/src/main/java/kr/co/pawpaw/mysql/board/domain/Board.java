@@ -40,6 +40,9 @@ public final class Board extends BaseTimeEntity {
     @Column(name = "reply_count")
     private int replyCount;
 
+    @Column(name = "reported_count")
+    private int reportedCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -73,6 +76,13 @@ public final class Board extends BaseTimeEntity {
     }
     public void minusReplyCount(){
         this.replyCount = replyCount - 1;
+    }
+
+    public void plusReportedCount(){
+        this.reportedCount = reportedCount +1;
+    }
+    public void minusReportedCount(){
+        this.reportedCount = reportedCount - 1;
     }
     public void addBookmark(){
         this.isBookmarked = true;
