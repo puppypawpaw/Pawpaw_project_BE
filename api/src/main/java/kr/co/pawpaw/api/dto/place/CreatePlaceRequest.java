@@ -2,10 +2,13 @@ package kr.co.pawpaw.api.dto.place;
 
 import kr.co.pawpaw.api.dto.position.PositionRequest;
 import kr.co.pawpaw.mysql.place.domain.Place;
+import kr.co.pawpaw.mysql.place.domain.PlaceImageUrl;
 import kr.co.pawpaw.mysql.place.domain.PlaceType;
 import lombok.*;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -21,10 +24,18 @@ public class CreatePlaceRequest {
     public Place toPlace() {
         return Place.builder()
             .name(name)
-            .placeImageUrls(placeImageUrls)
             .placeType(placeType)
             .position(positionRequest.toEntity())
             .openHours(openHours)
             .build();
+    }
+
+    public List<PlaceImageUrl> toPlaceImageUrls(final Place place) {
+        return this.placeImageUrls.stream()
+            .map(url -> PlaceImageUrl.builder()
+                .url(url)
+                .place(place)
+                .build())
+            .collect(Collectors.toList());
     }
 }
