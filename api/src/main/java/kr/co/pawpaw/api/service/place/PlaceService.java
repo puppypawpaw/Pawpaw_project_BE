@@ -3,17 +3,18 @@ package kr.co.pawpaw.api.service.place;
 import kr.co.pawpaw.api.dto.place.CreatePlaceRequest;
 import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
 import kr.co.pawpaw.api.service.file.FileService;
+import kr.co.pawpaw.common.exception.place.AlreadyPlaceBookmarkExistsException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceReviewException;
-import kr.co.pawpaw.mysql.place.domain.Place;
-import kr.co.pawpaw.mysql.place.domain.PlaceReview;
-import kr.co.pawpaw.mysql.place.domain.PlaceReviewImage;
-import kr.co.pawpaw.mysql.place.domain.PlaceType;
+import kr.co.pawpaw.common.exception.user.NotFoundUserException;
+import kr.co.pawpaw.mysql.place.domain.*;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
 import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
+import kr.co.pawpaw.mysql.place.service.command.PlaceBookmarkCommand;
 import kr.co.pawpaw.mysql.place.service.command.PlaceCommand;
 import kr.co.pawpaw.mysql.place.service.command.PlaceReviewCommand;
 import kr.co.pawpaw.mysql.place.service.command.PlaceReviewImageCommand;
+import kr.co.pawpaw.mysql.place.service.query.PlaceBookmarkQuery;
 import kr.co.pawpaw.mysql.place.service.query.PlaceQuery;
 import kr.co.pawpaw.mysql.place.service.query.PlaceReviewQuery;
 import kr.co.pawpaw.mysql.user.domain.User;
@@ -40,6 +41,37 @@ public class PlaceService {
     private final PlaceReviewQuery placeReviewQuery;
     private final PlaceReviewImageCommand placeReviewImageCommand;
     private final FileService fileService;
+    private final PlaceBookmarkCommand placeBookmarkCommand;
+    private final PlaceBookmarkQuery placeBookmarkQuery;
+
+    @Transactional
+    public void addBookmarkPlace(
+        final UserId userId,
+        final Long placeId
+    ) {
+        Place place = placeQuery.findByPlaceId(placeId)
+                .orElseThrow(NotFoundPlaceException::new);
+
+        User user = userQuery.findByUserId(userId)
+                .orElseThrow(NotFoundUserException::new);
+
+        if (placeBookmarkQuery.existsByPlaceIdAndUserId(placeId, userId)) {
+            throw new AlreadyPlaceBookmarkExistsException();
+        }
+
+        placeBookmarkCommand.save(PlaceBookmark.builder()
+                .place(place)
+                .user(user)
+            .build());
+    }
+
+    @Transactional
+    public void deleteBookmarkPlace(
+        final UserId userId,
+        final Long placeId
+    ) {
+        placeBookmarkCommand.deleteByPlaceIdAndUserUserId(placeId, userId);
+    }
 
     public PlaceReviewResponse getMyPlaceReview(
         final UserId userId,
