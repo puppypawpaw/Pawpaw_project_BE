@@ -3,17 +3,15 @@ package kr.co.pawpaw.api.service.place;
 import kr.co.pawpaw.api.dto.place.CreatePlaceRequest;
 import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
 import kr.co.pawpaw.api.service.file.FileService;
+import kr.co.pawpaw.common.exception.place.AlreadyPlaceBookmarkExistsException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceReviewException;
-import kr.co.pawpaw.mysql.place.domain.Place;
-import kr.co.pawpaw.mysql.place.domain.PlaceReview;
-import kr.co.pawpaw.mysql.place.domain.PlaceReviewImage;
-import kr.co.pawpaw.mysql.place.domain.PlaceType;
+import kr.co.pawpaw.common.exception.user.NotFoundUserException;
+import kr.co.pawpaw.mysql.place.domain.*;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
 import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
-import kr.co.pawpaw.mysql.place.service.command.PlaceCommand;
-import kr.co.pawpaw.mysql.place.service.command.PlaceReviewCommand;
-import kr.co.pawpaw.mysql.place.service.command.PlaceReviewImageCommand;
+import kr.co.pawpaw.mysql.place.service.command.*;
+import kr.co.pawpaw.mysql.place.service.query.PlaceBookmarkQuery;
 import kr.co.pawpaw.mysql.place.service.query.PlaceQuery;
 import kr.co.pawpaw.mysql.place.service.query.PlaceReviewQuery;
 import kr.co.pawpaw.mysql.user.domain.User;
@@ -25,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -40,6 +39,38 @@ public class PlaceService {
     private final PlaceReviewQuery placeReviewQuery;
     private final PlaceReviewImageCommand placeReviewImageCommand;
     private final FileService fileService;
+    private final PlaceBookmarkCommand placeBookmarkCommand;
+    private final PlaceBookmarkQuery placeBookmarkQuery;
+    private final PlaceImageUrlCommand placeImageUrlCommand;
+
+    @Transactional
+    public void addBookmarkPlace(
+        final UserId userId,
+        final Long placeId
+    ) {
+        Place place = placeQuery.findByPlaceId(placeId)
+                .orElseThrow(NotFoundPlaceException::new);
+
+        User user = userQuery.findByUserId(userId)
+                .orElseThrow(NotFoundUserException::new);
+
+        if (placeBookmarkQuery.existsByPlaceIdAndUserId(placeId, userId)) {
+            throw new AlreadyPlaceBookmarkExistsException();
+        }
+
+        placeBookmarkCommand.save(PlaceBookmark.builder()
+                .place(place)
+                .user(user)
+            .build());
+    }
+
+    @Transactional
+    public void deleteBookmarkPlace(
+        final UserId userId,
+        final Long placeId
+    ) {
+        placeBookmarkCommand.deleteByPlaceIdAndUserUserId(placeId, userId);
+    }
 
     public PlaceReviewResponse getMyPlaceReview(
         final UserId userId,
@@ -103,9 +134,20 @@ public class PlaceService {
 
     @Transactional
     public void createPlaceAll(final List<CreatePlaceRequest> requestList) {
-        placeCommand.saveAll(requestList.stream()
+        List<Place> placeList = placeCommand.saveAll(requestList.stream()
             .map(CreatePlaceRequest::toPlace)
             .collect(Collectors.toList()));
+
+        List<PlaceImageUrl> placeImageUrlList = new ArrayList<>();
+
+        for (int i = requestList.size(); i > 0; --i) {
+            Place place = placeList.get(i - 1);
+            CreatePlaceRequest request = requestList.get(i - 1);
+
+            placeImageUrlList.addAll(request.toPlaceImageUrls(place));
+        }
+
+        placeImageUrlCommand.saveAll(placeImageUrlList);
     }
 
     @Transactional

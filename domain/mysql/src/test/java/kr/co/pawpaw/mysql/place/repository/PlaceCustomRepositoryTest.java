@@ -4,10 +4,7 @@ import kr.co.pawpaw.mysql.common.MySQLTestContainer;
 import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.common.dto.PositionResponse;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
-import kr.co.pawpaw.mysql.place.domain.Place;
-import kr.co.pawpaw.mysql.place.domain.PlaceReview;
-import kr.co.pawpaw.mysql.place.domain.PlaceType;
-import kr.co.pawpaw.mysql.place.domain.ReviewInfo;
+import kr.co.pawpaw.mysql.place.domain.*;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
@@ -24,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -35,17 +33,19 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
     @Autowired
     private PlaceRepository placeRepository;
     @Autowired
+    private PlaceImageUrlRepository placeImageUrlRepository;
+    @Autowired
     private PlaceReviewRepository placeReviewRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PlaceBookmarkRepository placeBookmarkRepository;
 
     @Nested
     @DisplayName("findByQueryAndPlaceTypeAndPositionRange 메서드는")
-    @Transactional(propagation = Propagation.NEVER)
     class FindByQueryAndPlaceTypeAndPositionRange {
         private List<Place> placeList = List.of(
             Place.builder()
-                .placeImageUrls(List.of("place-1-imageUrl-1", "place-1-imageUrl-2"))
                 .placeType(PlaceType.RESTAURANT)
                 .name("블루페이지")
                 .position(Position.builder()
@@ -56,7 +56,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .openHours("항상 열려있습니다.")
                 .build(),
             Place.builder()
-                .placeImageUrls(List.of("place-2-imageUrl-1", "place-2-imageUrl-2"))
                 .placeType(PlaceType.CAFE)
                 .name("하다식당")
                 .position(Position.builder()
@@ -67,7 +66,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .openHours("항상 닫혀있습니다.")
                 .build(),
             Place.builder()
-                .placeImageUrls(List.of("place-3-imageUrl-1", "place-3-imageUrl-2"))
                 .placeType(PlaceType.CAFE)
                 .name("철판살롱")
                 .position(Position.builder()
@@ -78,7 +76,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .openHours("항상 모릅니다.")
                 .build(),
             Place.builder()
-                .placeImageUrls(List.of("place-4-imageUrl-1", "place-4-imageUrl-2"))
                 .placeType(PlaceType.PARK)
                 .name("우돈숯불명가")
                 .position(Position.builder()
@@ -89,7 +86,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .openHours("항상 압니다.")
                 .build(),
             Place.builder()
-                .placeImageUrls(List.of("place-5-imageUrl-1", "place-5-imageUrl-2"))
                 .placeType(PlaceType.PARK)
                 .name("도깨비족발")
                 .position(Position.builder()
@@ -100,7 +96,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .openHours("몰라요.")
                 .build(),
             Place.builder()
-                .placeImageUrls(List.of("place-6-imageUrl-1", "place-6-imageUrl-2"))
                 .placeType(PlaceType.PARK)
                 .name("곱창팩토리 천호본점")
                 .position(Position.builder()
@@ -112,7 +107,11 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .build()
         );
 
-        private final UserId userId = UserId.create();
+        List<PlaceBookmark> placeBookmarkList;
+
+        List<PlaceImageUrl> placeImageUrlList;
+        User user = User.builder().build();
+
         private final double latMin = -90.0;
         private final double latMax = 90.0;
         private final double longMin = -180.0;
@@ -121,27 +120,52 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
         @BeforeEach
         void setup() {
             placeList = placeRepository.saveAll(placeList);
+            placeImageUrlList = placeImageUrlRepository.saveAll(placeList.stream()
+                .flatMap(place -> Stream.of(
+                    PlaceImageUrl.builder()
+                        .place(place)
+                        .url(place.getName() + "-url1")
+                        .build(),
+                    PlaceImageUrl.builder()
+                        .place(place)
+                        .url(place.getName() + "-url2")
+                        .build()
+                )).collect(Collectors.toList()));
+            user = userRepository.save(user);
+            placeBookmarkList = placeBookmarkRepository.saveAll(List.of(PlaceBookmark.builder()
+                    .user(user)
+                    .place(placeList.get(0))
+                .build()));
         }
 
         @AfterEach
         void afterSetup() {
+            placeImageUrlRepository.deleteAll();
+            placeBookmarkRepository.deleteAll();
+            userRepository.deleteAll();
             placeRepository.deleteAll();
         }
 
         @ParameterizedTest
         @CsvSource(value = {"블루", "곱창", "팩토리", "null"}, nullValues = {"null"})
         @DisplayName("장소 이름 검색어로 장소를 검색할 수 있다.")
+        @Transactional(propagation = Propagation.NOT_SUPPORTED)
         void searchByNameQuery(final String query) {
             //given
             List<PlaceResponse> resultExpected = placeList.stream()
                 .filter(place -> Objects.isNull(query) || place.getName().contains(query))
                 .map(place -> new PlaceResponse(
                     place.getId(),
-                    place.getPlaceImageUrls(),
+                    placeImageUrlList.stream()
+                        .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
+                        .map(PlaceImageUrl::getUrl)
+                        .collect(Collectors.toSet()),
                     place.getName(),
                     PositionResponse.of(place.getPosition()),
                     place.getOpenHours(),
-                    false,
+                    placeBookmarkList.stream()
+                        .map(PlaceBookmark::getPlace)
+                        .collect(Collectors.toList()).contains(place),
                     null,
                     null,
                     null,
@@ -159,7 +183,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 latMax,
                 longMin,
                 longMax,
-                userId
+                user.getUserId()
             );
 
             //then
@@ -175,11 +199,16 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .filter(place -> Objects.isNull(placeType) || place.getPlaceType().equals(placeType))
                 .map(place -> new PlaceResponse(
                     place.getId(),
-                    place.getPlaceImageUrls(),
+                    placeImageUrlList.stream()
+                        .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
+                        .map(PlaceImageUrl::getUrl)
+                        .collect(Collectors.toSet()),
                     place.getName(),
                     PositionResponse.of(place.getPosition()),
                     place.getOpenHours(),
-                    false,
+                    placeBookmarkList.stream()
+                        .map(PlaceBookmark::getPlace)
+                        .collect(Collectors.toList()).contains(place),
                     null,
                     null,
                     null,
@@ -197,7 +226,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 latMax,
                 longMin,
                 longMax,
-                userId
+                user.getUserId()
             );
 
             //then
@@ -218,11 +247,17 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .filter(place -> place.getPosition().isInside(latMin, latMax, longMin, longMax))
                 .map(place -> new PlaceResponse(
                     place.getId(),
-                    place.getPlaceImageUrls(),
+                    placeImageUrlList.stream()
+                        .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
+                        .map(PlaceImageUrl::getUrl)
+                        .collect(Collectors.toSet()),
                     place.getName(),
                     PositionResponse.of(place.getPosition()),
                     place.getOpenHours(),
-                    false,
+                    placeBookmarkList.stream()
+                        .map(PlaceBookmark::getPlace)
+                        .collect(Collectors.toList())
+                        .contains(place),
                     null,
                     null,
                     null,
@@ -240,7 +275,48 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 latMax,
                 longMin,
                 longMax,
-                userId
+                user.getUserId()
+            );
+
+            //then
+            assertThat(result).usingRecursiveComparison().isEqualTo(resultExpected);
+        }
+
+        @Test
+        @DisplayName("북마크 여부를 검사할 수 있다.")
+        void checkBookmark() {
+            //given
+            List<PlaceResponse> resultExpected = placeList.stream()
+                .map(place -> new PlaceResponse(
+                    place.getId(),
+                    placeImageUrlList.stream()
+                        .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
+                        .map(PlaceImageUrl::getUrl)
+                        .collect(Collectors.toSet()),
+                    place.getName(),
+                    PositionResponse.of(place.getPosition()),
+                    place.getOpenHours(),
+                    placeBookmarkList.stream()
+                        .map(PlaceBookmark::getPlace)
+                        .collect(Collectors.toList()).contains(place),
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null
+                )).collect(Collectors.toList());
+
+            //when
+            List<PlaceResponse> result = placeCustomRepository.findByQueryAndPlaceTypeAndPositionRange(
+                null,
+                null,
+                latMin,
+                latMax,
+                longMin,
+                longMax,
+                user.getUserId()
             );
 
             //then
@@ -252,7 +328,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
     @DisplayName("updatePlaceReviewInfo 메서드는")
     class UpdatePlaceReviewInfo {
         Place place = Place.builder()
-            .placeImageUrls(List.of("place-4-imageUrl-1", "place-4-imageUrl-2"))
             .placeType(PlaceType.PARK)
             .name("우돈숯불명가")
             .position(Position.builder()

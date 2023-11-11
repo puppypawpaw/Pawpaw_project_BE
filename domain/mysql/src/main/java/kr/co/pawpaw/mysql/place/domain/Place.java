@@ -30,10 +30,6 @@ public class Place extends BaseTimeEntity {
     @Embedded
     private Position position;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Column(columnDefinition = "TEXT")
-    private final List<String> placeImageUrls = new ArrayList<>();
-
     @Column(columnDefinition = "TEXT")
     private String openHours;
 
@@ -42,15 +38,11 @@ public class Place extends BaseTimeEntity {
 
     @Builder
     private Place(
-        final Collection<String> placeImageUrls,
         final PlaceType placeType,
         final String name,
         final Position position,
         final String openHours
     ) {
-        if (Objects.nonNull(placeImageUrls)) {
-            this.placeImageUrls.addAll(placeImageUrls);
-        }
         this.placeType = placeType;
         this.name = name;
         this.position = position;

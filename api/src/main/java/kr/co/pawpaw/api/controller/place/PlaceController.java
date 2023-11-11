@@ -207,4 +207,55 @@ public class PlaceController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204"),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 장소입니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "존재하지 않는 유저입니다.",
+            content = @Content
+        ),
+        @ApiResponse(
+            responseCode = "409",
+            description = "이미 북마크한 장소입니다.",
+            content = @Content
+        ),
+    })
+    @Operation(
+        method = "POST",
+        summary = "장소 즐겨찾기 추가",
+        description = "장소 즐겨찾기 추가"
+    )
+    @PostMapping("/{placeId}/bookmarks")
+    public ResponseEntity<Void> addBookmarkPlace(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId
+    ) {
+        placeService.addBookmarkPlace(userId, placeId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204")
+    })
+    @Operation(
+        method = "DELETE",
+        summary = "장소 즐겨찾기 삭제",
+        description = "장소 즐겨찾기 삭제"
+    )
+    @DeleteMapping("/{placeId}/bookmarks")
+    public ResponseEntity<Void> bookmarkPlace(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId
+    ) {
+        placeService.deleteBookmarkPlace(userId, placeId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

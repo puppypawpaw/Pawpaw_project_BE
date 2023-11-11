@@ -35,7 +35,6 @@ class PlaceReviewImageRepositoryTest extends MySQLTestContainer {
     class DeleteByPlaceReviewIdAndIdIn {
         Place placeToReview = Place.builder()
             .placeType(PlaceType.RESTAURANT)
-            .placeImageUrls(List.of("url1", "url2"))
             .name("placeName")
             .openHours("안 열어 임마")
             .position(Position.builder()

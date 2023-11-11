@@ -2,13 +2,16 @@ package kr.co.pawpaw.api.service.place;
 
 import kr.co.pawpaw.api.dto.place.CreatePlaceReviewRequest;
 import kr.co.pawpaw.api.service.file.FileService;
+import kr.co.pawpaw.common.exception.place.AlreadyPlaceBookmarkExistsException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceReviewException;
+import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.mysql.place.domain.Place;
 import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.service.command.PlaceCommand;
 import kr.co.pawpaw.mysql.place.service.command.PlaceReviewCommand;
 import kr.co.pawpaw.mysql.place.service.command.PlaceReviewImageCommand;
+import kr.co.pawpaw.mysql.place.service.query.PlaceBookmarkQuery;
 import kr.co.pawpaw.mysql.place.service.query.PlaceQuery;
 import kr.co.pawpaw.mysql.place.service.query.PlaceReviewQuery;
 import kr.co.pawpaw.mysql.storage.domain.File;
@@ -58,9 +61,61 @@ class PlaceServiceTest {
     private MultipartFile multipartFile;
     @Mock
     private PlaceReviewQuery placeReviewQuery;
+    @Mock
+    private PlaceBookmarkQuery placeBookmarkQuery;
 
     @InjectMocks
     private PlaceService placeService;
+
+    @Nested
+    @DisplayName("addBookmarkPlace 메서드는")
+    class AddBookmarkPlace {
+        Long placeId = 1L;
+        Place place = Place.builder().build();
+        User user = User.builder().build();
+
+        @Test
+        @DisplayName("존재하지 않는 장소면 예외가 발생한다.")
+        void NotFoundPlaceException() {
+            //given
+            when(placeQuery.findByPlaceId(placeId))
+                .thenReturn(Optional.empty());
+
+            //then
+            assertThatThrownBy(() -> placeService.addBookmarkPlace(user.getUserId(), placeId))
+                .isInstanceOf(NotFoundPlaceException.class);
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 유저면 예외가 발생한다.")
+        void NotFoundUserException() {
+            //given
+            when(placeQuery.findByPlaceId(placeId))
+                .thenReturn(Optional.of(place));
+            when(userQuery.findByUserId(user.getUserId()))
+                .thenReturn(Optional.empty());
+
+            //then
+            assertThatThrownBy(() -> placeService.addBookmarkPlace(user.getUserId(), placeId))
+                .isInstanceOf(NotFoundUserException.class);
+        }
+
+        @Test
+        @DisplayName("이미 북마크를 생성한 장소면 예외가 발생한다.")
+        void AlreadyExistsBookmarkException() {
+            //given
+            when(placeQuery.findByPlaceId(placeId))
+                .thenReturn(Optional.of(place));
+            when(userQuery.findByUserId(user.getUserId()))
+                .thenReturn(Optional.of(user));
+            when(placeBookmarkQuery.existsByPlaceIdAndUserId(placeId, user.getUserId())).thenReturn(true);
+
+            //then
+            assertThatThrownBy(() -> placeService.addBookmarkPlace(user.getUserId(), placeId))
+                .isInstanceOf(AlreadyPlaceBookmarkExistsException.class);
+        }
+
+    }
 
     @Nested
     @DisplayName("createPlaceReview 메서드는")

@@ -3,12 +3,11 @@ package kr.co.pawpaw.mysql.place.repository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
-import kr.co.pawpaw.mysql.common.dto.PositionResponse;
+import kr.co.pawpaw.mysql.common.dto.QPositionResponse;
 import kr.co.pawpaw.mysql.common.util.QueryUtil;
-import kr.co.pawpaw.mysql.place.domain.Place;
-import kr.co.pawpaw.mysql.place.domain.PlaceType;
-import kr.co.pawpaw.mysql.place.domain.QPlace;
+import kr.co.pawpaw.mysql.place.domain.*;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
+import kr.co.pawpaw.mysql.place.dto.QPlaceResponse;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -16,7 +15,9 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.set;
 
 @Repository
 @RequiredArgsConstructor
@@ -47,31 +48,30 @@ public class PlaceCustomRepository {
             .and(QueryUtil.withInPositionCondition(QPlace.place.position.latitude, QPlace.place.position.longitude, latitudeMin, latitudeMax, longitudeMin, longitudeMax));
 
         return queryFactory
-            .selectFrom(QPlace.place)
-            .innerJoin(QPlace.place.placeImageUrls)
+            .from(QPlace.place)
+            .innerJoin(QPlaceImageUrl.placeImageUrl).on(QPlaceImageUrl.placeImageUrl.place.eq(QPlace.place))
+            .leftJoin(QPlaceBookmark.placeBookmark).on(QPlaceBookmark.placeBookmark.place.eq(QPlace.place))
             .where(condition)
-            .distinct()
-            .fetch()
-            .stream()
-            .map(place -> new PlaceResponse(
-                place.getId(),
-                place.getPlaceImageUrls(),
-                place.getName(),
-                new PositionResponse(
-                    place.getPosition().getLatitude(),
-                    place.getPosition().getLongitude(),
-                    place.getPosition().getAddress()
-                ),
-                place.getOpenHours(),
-                false, // TODO userId 기반 북마크 여부 확인
-                getRatio(place.getReviewInfo().getTotalScore(), place.getReviewInfo().getReviewCnt()),
-                getRatio(place.getReviewInfo().getScenicCnt(), place.getReviewInfo().getReviewCnt()),
-                getRatio(place.getReviewInfo().getQuietCnt(), place.getReviewInfo().getReviewCnt()),
-                getRatio(place.getReviewInfo().getComfortableCnt(), place.getReviewInfo().getReviewCnt()),
-                getRatio(place.getReviewInfo().getAccessibleCnt(), place.getReviewInfo().getReviewCnt()),
-                getRatio(place.getReviewInfo().getCleanCnt(), place.getReviewInfo().getReviewCnt()),
-                getRatio(place.getReviewInfo().getSafeCnt(), place.getReviewInfo().getReviewCnt())
-            )).collect(Collectors.toList());
+            .transform(groupBy(QPlace.place.id)
+                .list(new QPlaceResponse(
+                    QPlace.place.id,
+                    set(QPlaceImageUrl.placeImageUrl.url),
+                    QPlace.place.name,
+                    new QPositionResponse(
+                        QPlace.place.position.latitude,
+                        QPlace.place.position.longitude,
+                        QPlace.place.position.address
+                    ),
+                    QPlace.place.openHours,
+                    QPlaceBookmark.placeBookmark.id.isNotNull(),
+                    QPlace.place.reviewInfo.totalScore.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.scenicCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.quietCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.comfortableCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.accessibleCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.cleanCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.safeCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt)
+                )));
     }
 
     public void updatePlaceReviewInfo(
