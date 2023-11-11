@@ -5,14 +5,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.mysql.common.dto.PositionResponse;
 import lombok.Getter;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 public class PlaceResponse {
     @Schema(description = "장소 아이디", example = "1")
     private Long id;
     @Schema(description = "이미지URL 목록", example = "[\"www.naver.com\",\"www.google.com\"]")
-    private List<String> imageUrlList;
+    private Set<String> imageUrlList;
     @Schema(description = "장소 이름", example = "탑골 공원")
     private String name;
     private PositionResponse position;
@@ -38,7 +38,7 @@ public class PlaceResponse {
     @QueryProjection
     public PlaceResponse(
         final Long id,
-        final List<String> imageUrlList,
+        final Set<String> imageUrlList,
         final String name,
         final PositionResponse position,
         final String openHours,
