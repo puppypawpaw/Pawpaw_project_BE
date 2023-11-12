@@ -12,8 +12,12 @@ import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -248,8 +252,8 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
         @DisplayName("채팅방의 검색어와 이름이 한글자 이상 일치하는 것을 검색한다.")
         void findChatroomMatchBetweenKeywordAndName() {
             //when
-            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery(nameKeyword1, nonPartipantUser.getUserId());
-            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery(nameKeyword2, nonPartipantUser.getUserId());
+            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery(nameKeyword1, nonPartipantUser.getUserId(), null).getContent();
+            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery(nameKeyword2, nonPartipantUser.getUserId(), null).getContent();
 
             //then
             assertThat(chatroomRepository.findAll().size()).isEqualTo(3);
@@ -261,8 +265,8 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
         @DisplayName("채팅방의 검색어와 설명이 한글자 이상 일치하는 것을 검색한다.")
         void findChatroomMatchBetweenKeywordAndDescription() {
             //when
-            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery(descriptionKeyword1, nonPartipantUser.getUserId());
-            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery(descriptionKeyword2, nonPartipantUser.getUserId());
+            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery(descriptionKeyword1, nonPartipantUser.getUserId(), null).getContent();
+            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery(descriptionKeyword2, nonPartipantUser.getUserId(), null).getContent();
 
             //then
             assertThat(chatroomRepository.findAll().size()).isEqualTo(3);
@@ -274,8 +278,8 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
         @DisplayName("채팅방의 검색어와 해시태그가 한글자 이상 일치하는 것을 검색한다.")
         void findChatroomMatchBetweenKeywordAndHashTag() {
             //when
-            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery("1", nonPartipantUser.getUserId());
-            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery("2", nonPartipantUser.getUserId());
+            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery("1", nonPartipantUser.getUserId(), null).getContent();
+            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery("2", nonPartipantUser.getUserId(), null).getContent();
 
             //then
             assertThat(chatroomRepository.findAll().size()).isEqualTo(3);
@@ -287,15 +291,48 @@ class ChatroomCustomRepositoryTest extends MySQLTestContainer {
         @DisplayName("검색한 유저가 참가하지 않는 채팅방만 검색된다.")
         void onlyFindNotParticipatedChatroom() {
             //when
-            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery("1", user1.getUserId());
-            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery("1", user3.getUserId());
+            List<ChatroomResponse> result1 = chatroomCustomRepository.findBySearchQuery("1", user1.getUserId(), null).getContent();
+            List<ChatroomResponse> result2 = chatroomCustomRepository.findBySearchQuery("1", user3.getUserId(), null).getContent();
 
-            Object result = chatroomParticipantRepository.findAll();
+            List<ChatroomParticipant> result = chatroomParticipantRepository.findAll();
 
             //then
             assertThat(result1.size()).isEqualTo(1);
             assertThat(result2.size()).isEqualTo(2);
         }
+
+        @ParameterizedTest
+        @CsvSource(value = {"1,1", "2,2", "3,3", "4,3", "null,3"}, nullValues = "null")
+        @DisplayName("PageRequest에 해당하는 부분을 반환한다.")
+        void returnThePartsCorrespondingToPageRequest(final Integer size, final Integer expectedResultSize) {
+            //given
+            PageRequest pageRequest = null;
+
+            if (size != null) pageRequest = PageRequest.ofSize(size);
+
+            //when
+            Slice<ChatroomResponse> result = chatroomCustomRepository.findBySearchQuery("1", nonPartipantUser.getUserId(), pageRequest);
+
+            //then
+            assertThat(result.getNumberOfElements()).isEqualTo(expectedResultSize);
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {"1,true", "2,true", "3,false", "4,false", "null,false"}, nullValues = "null")
+        @DisplayName("hasNext로 다음 부분이 있는지 표시한다.")
+        void showHasNext(final Integer size, final boolean hasNext) {
+            //given
+            PageRequest pageRequest = null;
+
+            if (size != null) pageRequest = PageRequest.ofSize(size);
+
+            //when
+            Slice<ChatroomResponse> result = chatroomCustomRepository.findBySearchQuery("1", nonPartipantUser.getUserId(), pageRequest);
+
+            //then
+            assertThat(result.hasNext()).isEqualTo(hasNext);
+        }
+
     }
 
     @Nested
