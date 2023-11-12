@@ -111,9 +111,9 @@ public class BoardRestController {
     @GetMapping("/list")
     public ResponseEntity<Slice<BoardListDto>> getList(
             @AuthenticatedUserId UserId userId,
-            @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+            @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
             @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "4") int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return ResponseEntity.ok(boardService.getBoardListWithRepliesBy(userId, pageable));
     }
 
@@ -131,10 +131,10 @@ public class BoardRestController {
     @GetMapping("/{boardId}")
     public ResponseEntity<BoardListDto> getBoard(
             @AuthenticatedUserId UserId userId,
-            @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+            @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
             @Parameter(description = "한 페이지에 보여줄 댓글 수") @RequestParam(value = "pageSize", defaultValue = "4") int pageSize,
             @PathVariable long boardId) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return ResponseEntity.ok(boardService.getBoardWithRepliesBy(boardId, userId, pageable));
     }
 
@@ -152,10 +152,10 @@ public class BoardRestController {
     @GetMapping("/search")
     public ResponseEntity<Slice<BoardListDto>> getSearchList(
             @AuthenticatedUserId UserId userId,
-            @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
-            @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "4") int pageSize,
+            @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
+            @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "100000", required = false) int pageSize,
             @Parameter(description = "검색어") @RequestParam(value = "query", required = false) String query) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return ResponseEntity.ok(boardService.searchBoardsByQuery(userId, pageable, query));
     }
 
@@ -173,9 +173,9 @@ public class BoardRestController {
     @GetMapping("/myPage")
     public ResponseEntity<Slice<BoardListDto>> getMyFeed(
             @AuthenticatedUserId UserId userId,
-            @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "0") int pageNumber,
+            @Parameter(description = "페이지 번호") @RequestParam(value = "pageNumber", defaultValue = "1") int pageNumber,
             @Parameter(description = "한 페이지에 보여줄 게시글 수") @RequestParam(value = "pageSize", defaultValue = "4") int pageSize) {
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         return ResponseEntity.ok(boardService.getBoardListWithRepliesByUser_UserId(userId, pageable));
     }
 
