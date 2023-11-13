@@ -10,6 +10,7 @@ import kr.co.pawpaw.mysql.chatroom.repository.ChatroomRepository;
 import kr.co.pawpaw.mysql.chatroom.repository.TrendingChatroomCustomRepository;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
@@ -23,8 +24,12 @@ public class ChatroomQuery {
     private final ChatroomCustomRepository chatroomCustomRepository;
     private final TrendingChatroomCustomRepository trendingChatroomCustomRepository;
 
-    public List<ChatroomResponse> findBySearchQuery(final String query, final UserId userId) {
-        return chatroomCustomRepository.findBySearchQuery(query, userId);
+    public Slice<ChatroomResponse> findBySearchQuery(
+        final String query,
+        final UserId userId,
+        final PageRequest pageRequest
+    ) {
+        return chatroomCustomRepository.findBySearchQuery(query, userId, pageRequest);
     }
 
     public Optional<Chatroom> findById(final Long chatroomId) {
