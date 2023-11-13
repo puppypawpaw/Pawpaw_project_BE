@@ -15,6 +15,7 @@ import kr.co.pawpaw.mysql.chatroom.domain.ChatroomParticipantRole;
 import kr.co.pawpaw.mysql.chatroom.dto.*;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.util.List;
+import java.util.Objects;
 
 @Tag(name = "chatroom")
 @RestController
@@ -46,11 +48,19 @@ public class ChatroomController {
         description = "채팅방 검색 API, 검색어로 이름, 설명, 태그를 검색. 검색어는 2글자 이상만 가능"
     )
     @GetMapping("/search")
-    public ResponseEntity<List<ChatroomResponse>> searchChatroom(
+    public ResponseEntity<Slice<ChatroomResponse>> searchChatroom(
         @RequestParam @Size(min=1) final String query,
-        @AuthenticatedUserId final UserId userId
+        @AuthenticatedUserId final UserId userId,
+        @RequestParam(required = false) final Integer page,
+        @RequestParam(required = false) final Integer size
     ) {
-        return ResponseEntity.ok(chatroomService.searchChatroom(query, userId));
+        PageRequest pageRequest = null;
+
+        if (Objects.nonNull(page) && Objects.nonNull(size)) {
+            pageRequest = PageRequest.of(page, size);
+        }
+
+        return ResponseEntity.ok(chatroomService.searchChatroom(query, userId, pageRequest));
     }
 
     @ApiResponses(value = {

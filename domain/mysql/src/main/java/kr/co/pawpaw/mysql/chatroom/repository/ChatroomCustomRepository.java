@@ -1,7 +1,6 @@
 package kr.co.pawpaw.mysql.chatroom.repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.group.Group;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
@@ -19,13 +18,14 @@ import kr.co.pawpaw.mysql.storage.domain.QFile;
 import kr.co.pawpaw.mysql.user.domain.QUser;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
@@ -47,13 +47,28 @@ public class ChatroomCustomRepository {
     private static final QFile qFileManager = new QFile("qFileManager");
     private static final QChatroomSchedule qChatroomSchedule = QChatroomSchedule.chatroomSchedule;
 
-    public List<ChatroomResponse> findBySearchQuery(final String query, final UserId userId) {
+    public Slice<ChatroomResponse> findBySearchQuery(
+        final String query,
+        final UserId userId,
+        PageRequest pageRequest
+    ) {
         // Full text search
         BooleanBuilder nameFullTextCondition = QueryUtil.fullTextSearchCondition(qChatroom.name, query);
         BooleanBuilder descriptionFullTextCondition = QueryUtil.fullTextSearchCondition(qChatroom.description, query);
         BooleanBuilder hashTagFullTextCondition = QueryUtil.fullTextSearchCondition(qChatroomHashTag.hashTag, query);
 
-        return queryFactory
+        if (Objects.isNull(pageRequest)) pageRequest = PageRequest.of(0, Integer.MAX_VALUE - 1);
+
+        List<ChatroomResponse> result = queryFactory
+            .select(
+                qChatroom.id,
+                qChatroom.name,
+                qChatroom.description,
+                Expressions.stringTemplate("function('group_concat_distinct',{0})", qChatroomHashTag.hashTag),
+                qUserManager.nickname,
+                qFileManager.fileUrl,
+                Expressions.stringTemplate("function('group_concat_distinct',{0})", qChatroomParticipant.id)
+            )
             .from(qChatroom)
             .innerJoin(qChatroom.manager, qChatroomParticipantManager)
             .innerJoin(qChatroomParticipantManager.user, qUserManager)
@@ -64,35 +79,37 @@ public class ChatroomCustomRepository {
                 qChatroom.id.notIn(JPAExpressions.select(qChatroomParticipant.chatroom.id)
                         .from(qChatroomParticipant)
                         .where(qChatroomParticipant.user.userId.eq(userId)))
-                .and(nameFullTextCondition
-                    .or(descriptionFullTextCondition)
-                    .or(qChatroom.in(JPAExpressions.select(qChatroomHashTag.chatroom)
-                        .from(qChatroomHashTag)
-                        .where(hashTagFullTextCondition))))
+                    .and(nameFullTextCondition
+                        .or(descriptionFullTextCondition)
+                        .or(qChatroom.in(JPAExpressions.select(qChatroomHashTag.chatroom)
+                            .from(qChatroomHashTag)
+                            .where(hashTagFullTextCondition))))
             )
-            .transform(groupBy(qChatroom.id)
-                .as(
-                    qChatroom.name,
-                    qChatroom.description,
-                    set(qChatroomHashTag.hashTag),
-                    qUserManager.nickname,
-                    qFileManager.fileUrl,
-                    set(qChatroomParticipant.id)
-                )).entrySet()
+            .groupBy(qChatroom.id)
+            .offset(pageRequest.getOffset())
+            .limit(pageRequest.getPageSize() + 1)
+            .fetch()
             .stream()
-            .map(entry -> {
-                Group value = entry.getValue();
-                return new ChatroomResponse(
-                    entry.getKey(),
-                    value.getOne(qChatroom.name),
-                    value.getOne(qChatroom.description),
-                    new ArrayList<>(value.getSet(qChatroomHashTag.hashTag)),
-                    value.getOne(qUserManager.nickname),
-                    value.getOne(qFileManager.fileUrl),
-                    (long) value.getSet(qChatroomParticipant.id).size()
-                );
-            })
+            .map(tuple -> new ChatroomResponse(
+                tuple.get(0, Long.class),
+                tuple.get(1, String.class),
+                tuple.get(2, String.class),
+                splitIfNonNull(tuple.get(3, String.class)),
+                tuple.get(4, String.class),
+                tuple.get(5, String.class),
+                countIfNonNull(splitIfNonNull(tuple.get(6, String.class)))
+            ))
             .collect(Collectors.toList());
+
+        return new SliceImpl<>(result.subList(0, Math.min(result.size(), pageRequest.getPageSize())), pageRequest, result.size() > pageRequest.getPageSize());
+    }
+
+    private static Collection<String> splitIfNonNull(final String str) {
+        return Objects.nonNull(str) ? Arrays.asList(str.split(",")) : null;
+    }
+
+    private static long countIfNonNull(final Collection<?> collection) {
+        return Objects.nonNull(collection) ? (long) collection.size() : 0;
     }
 
     public List<ChatroomDetailData> findAllByUserIdWithDetailData(final UserId userId) {

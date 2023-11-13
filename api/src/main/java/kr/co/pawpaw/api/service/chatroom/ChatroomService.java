@@ -61,8 +61,12 @@ public class ChatroomService {
     private final ChatroomScheduleService chatroomScheduleService;
 
     @Transactional(readOnly = true)
-    public List<ChatroomResponse> searchChatroom(final String query, final UserId userId) {
-        return chatroomQuery.findBySearchQuery(query, userId);
+    public Slice<ChatroomResponse> searchChatroom(
+        final String query,
+        final UserId userId,
+        final PageRequest pageRequest
+    ) {
+        return chatroomQuery.findBySearchQuery(query, userId, pageRequest);
     }
 
     @Transactional

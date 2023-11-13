@@ -7,7 +7,16 @@ import org.hibernate.type.StandardBasicTypes;
 public class CustomDialect extends MySQL8Dialect {
     public CustomDialect() {
         super();
-        registerFunction("within", new SQLFunctionTemplate(
+        registerFunction(
+            "group_concat_distinct",
+            new SQLFunctionTemplate(
+                StandardBasicTypes.STRING,
+                "group_concat(distinct ?1)"
+            )
+        );
+        registerFunction(
+            "within",
+            new SQLFunctionTemplate(
             StandardBasicTypes.DOUBLE,
             "ST_Within(ST_GeomFromText(CONCAT('POINT(', ?1, ' ', ?2, ')')), ST_GeomFromText(CONCAT('POLYGON ((', ?3, ' ', ?4, ', ', ?5, ' ', ?6, ', ', ?7, ' ', ?8, ', ', ?9, ' ', ?10, ', ', ?11, ' ', ?12,'))')))"));
         registerFunction("match", new SQLFunctionTemplate(StandardBasicTypes.DOUBLE, "match(?1) against (?2 in boolean mode)"));
