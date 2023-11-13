@@ -96,7 +96,7 @@ public final class Board extends BaseTimeEntity {
         this.content = content;
     }
     public void updateFileUrl(List<String> fileUrls) {
-        this.fileUrls.clear();
+        this.fileUrls = new ArrayList<>();
         if (fileUrls != null) {
             this.fileUrls.addAll(fileUrls);
         }
