@@ -4,18 +4,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 import static org.junit.jupiter.api.Assertions.*;
 class BoardTest {
-    @Mock
+
     private Board board;
 
     @BeforeEach
