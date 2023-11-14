@@ -4,6 +4,7 @@ import kr.co.pawpaw.mysql.board.domain.Board;
 import kr.co.pawpaw.mysql.boardlike.domain.BoardLikes;
 import kr.co.pawpaw.mysql.boardlike.repository.BoardLikesRepository;
 import kr.co.pawpaw.mysql.user.domain.User;
+import kr.co.pawpaw.mysql.user.domain.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -81,12 +82,14 @@ class BoardLikeQueryTest {
         @DisplayName("existsByUserAndBoard_true")
         void existsByUserAndBoard_true() throws Exception {
             //given
-            when(boardLikesRepository.existsByUserAndBoard(user, board)).thenReturn(true);
+            UserId userId = UserId.create();
+            when(boardLikesRepository.existsByUser_UserIdAndBoard(userId, board)).thenReturn(true);
+
             //when
-            boolean result = boardLikeQuery.existsByUserAndBoard(user, board);
+            boolean result = boardLikeQuery.existsByUser_UserIdAndBoard(userId, board);
 
             //then
-            verify(boardLikesRepository).existsByUserAndBoard(user, board);
+            verify(boardLikesRepository).existsByUser_UserIdAndBoard(userId, board);
             assertTrue(result);
         }
 
@@ -94,12 +97,14 @@ class BoardLikeQueryTest {
         @DisplayName("existsByUserAndBoard_false")
         void existsByUserAndBoard_false() throws Exception {
             //given
-            when(boardLikesRepository.existsByUserAndBoard(user, board)).thenReturn(false);
+            UserId userId = UserId.create();
+            when(boardLikesRepository.existsByUser_UserIdAndBoard(userId, board)).thenReturn(false);
+
             //when
-            boolean result = boardLikeQuery.existsByUserAndBoard(user, board);
+            boolean result = boardLikeQuery.existsByUser_UserIdAndBoard(userId, board);
 
             //then
-            verify(boardLikesRepository).existsByUserAndBoard(user, board);
+            verify(boardLikesRepository).existsByUser_UserIdAndBoard(userId, board);
             assertFalse(result);
         }
     }

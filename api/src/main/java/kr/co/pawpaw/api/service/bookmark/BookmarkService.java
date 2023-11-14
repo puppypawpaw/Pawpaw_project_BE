@@ -95,7 +95,7 @@ public class BookmarkService {
     }
 
     private BoardListDto convertBoardToDto(UserId userId, Board board) {
-        boolean existBoardLike = boardLikeService.checkLikeExist(board.getUser(), board);
+        boolean existBoardLike = boardLikeService.checkLikeExist(userId, board);
         boolean existBookmark = existsByUser_UserIdAndBoard(userId, board);
         String imageUrl = board.getUser().getUserImage().getFileUrl();
 
