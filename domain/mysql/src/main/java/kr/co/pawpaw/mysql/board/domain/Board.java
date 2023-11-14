@@ -34,6 +34,8 @@ public final class Board extends BaseTimeEntity {
 
     private boolean isBookmarked = false;
 
+    private boolean isReported = false;
+
     @Column(name = "liked_count")
     private int likedCount;
 
@@ -62,6 +64,7 @@ public final class Board extends BaseTimeEntity {
         this.writer = writer;
         this.isRemoved = false;
         this.isBookmarked = false;
+        this.isReported = false;
         this.fileUrls = fileUrls;
     }
     public void plusLikedCount(){
