@@ -8,6 +8,7 @@ import kr.co.pawpaw.api.service.boardlike.BoardLikeService;
 import kr.co.pawpaw.api.service.bookmark.BookmarkService;
 import kr.co.pawpaw.api.service.file.FileService;
 import kr.co.pawpaw.api.service.reply.ReplyService;
+import kr.co.pawpaw.api.service.report.ReportService;
 import kr.co.pawpaw.common.exception.board.BoardException;
 import kr.co.pawpaw.common.exception.board.BoardException.BoardNotFoundException;
 import kr.co.pawpaw.common.exception.common.PermissionRequiredException;
@@ -46,6 +47,7 @@ public class BoardService {
     private final ReplyService replyService;
     private final BoardLikeService boardLikeService;
     private final BookmarkService bookmarkService;
+    private final ReportService reportService;
     private final FileService fileService;
 
     @Transactional
@@ -193,8 +195,9 @@ public class BoardService {
 
     private BoardListDto convertBoardToDto(Board board, UserId userId) {
         String imageUrl = board.getUser().getUserImage().getFileUrl();
-        boolean existBoardLike = boardLikeService.checkLikeExist(board.getUser(), board);
+        boolean existBoardLike = boardLikeService.checkLikeExist(userId, board);
         boolean existBookmark = bookmarkService.existsByUser_UserIdAndBoard(userId, board);
+        boolean existReport = reportService.checkReportExist(userId, board);
 
         return BoardListDto.builder()
                 .userId(board.getUser().getUserId())
@@ -202,9 +205,11 @@ public class BoardService {
                 .content(board.getContent())
                 .likedCount(board.getLikedCount())
                 .replyCount(board.getReplyCount())
+                .reportedCount(board.getReportedCount())
                 .userImageUrl(imageUrl)
                 .boardLiked(existBoardLike)
                 .bookmarked(existBookmark)
+                .reported(existReport)
                 .writer(board.getWriter())
                 .createdDate(board.getCreatedDate())
                 .modifiedDate(board.getModifiedDate())
