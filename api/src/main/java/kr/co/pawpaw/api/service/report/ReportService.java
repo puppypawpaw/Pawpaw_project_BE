@@ -32,7 +32,7 @@ public class ReportService {
         if (board.getUser().getUserId().equals(userId)){
             throw new ReportException.CanNotSelfReportException();
         }
-        if (!checkReportExist(user, board)) {
+        if (!checkReportExist(userId, board)) {
             reportCommand.save(new BoardReport(board, user));
             board.plusReportedCount();
             return true;
@@ -44,14 +44,14 @@ public class ReportService {
     public boolean cancelReport(Long boardId, UserId userId) {
         Board board = boardQuery.findById(boardId).orElseThrow(BoardException.BoardNotFoundException::new);
         User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
-        if (checkReportExist(user, board)) {
+        if (checkReportExist(userId, board)) {
             reportQuery.deleteBoardReportByUserAndBoard(user, board);
             board.minusReportedCount();
             return true;
         }
         throw new ReportException.ReportCancelException();
     }
-    public boolean checkReportExist(User user, Board board) {
-        return reportQuery.existsByUserAndBoard(user, board);
+    public boolean checkReportExist(UserId userId, Board board) {
+        return reportQuery.existsByUser_UserIdAndBoard(userId, board);
     }
 }
