@@ -80,12 +80,16 @@ public class BoardDto {
         private int likedCount;
         @Schema(description = "게시글 댓글의 수", example = "12")
         private int replyCount;
+        @Schema(description = "게시글 신고누적 횟수", example = "2")
+        private int reportedCount;
         @Schema(description = "유저 프로필 url", example = "https://pub-8a7cf54e8cb44eabac95682c0d8fcc42.r2.dev/유저 기본 이미지.jpg")
         private String userImageUrl;
         @Schema(description = "좋아요 여부", example = "true")
         private boolean boardLiked;
         @Schema(description = "북마크 여부", example = "false")
         private boolean bookmarked;
+        @Schema(description = "게시글 신고 여부", example = "false")
+        private boolean reported;
         @Schema(description = "게시글 생성일자", example = "2023-10-17 15:01:36.464359")
         private LocalDateTime createdDate;
         @Schema(description = "게시글 수정일자", example = "2023-10-17 15:01:36.464359")
@@ -93,7 +97,7 @@ public class BoardDto {
 
         @Builder
         public BoardListDto(UserId userId, Long id, String content, String writer, int likedCount,
-                            int replyCount, String userImageUrl, boolean boardLiked, boolean bookmarked, LocalDateTime createdDate, LocalDateTime modifiedDate,
+                            int replyCount, int reportedCount, String userImageUrl, boolean boardLiked, boolean bookmarked, boolean reported, LocalDateTime createdDate, LocalDateTime modifiedDate,
                             List<ReplyListDto> replyListDto, List<String> fileUrls) {
             this.userId = userId;
             this.id = id;
@@ -101,9 +105,11 @@ public class BoardDto {
             this.writer = writer;
             this.likedCount = likedCount;
             this.replyCount = replyCount;
+            this.reportedCount = reportedCount;
             this.userImageUrl = userImageUrl;
             this.boardLiked = boardLiked;
             this.bookmarked = bookmarked;
+            this.reported = reported;
             this.createdDate = createdDate;
             this.modifiedDate = modifiedDate;
             this.replyListDto = replyListDto;

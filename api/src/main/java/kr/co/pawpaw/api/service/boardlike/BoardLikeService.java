@@ -28,7 +28,7 @@ public class BoardLikeService {
     public boolean addLike(Long boardId, UserId userId) {
         Board board = boardQuery.findById(boardId).orElseThrow(BoardNotFoundException::new);
         User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
-        if (!checkLikeExist(user, board)) {
+        if (!checkLikeExist(userId, board)) {
             boardLikeCommand.save(new BoardLikes(user, board));
             board.plusLikedCount();
             return true;
@@ -40,7 +40,7 @@ public class BoardLikeService {
     public boolean deleteLike(Long boardId, UserId userId) {
         Board board = boardQuery.findById(boardId).orElseThrow(BoardNotFoundException::new);
         User user = userQuery.findByUserId(userId).orElseThrow(NotFoundUserException::new);
-        if (checkLikeExist(user, board)) {
+        if (checkLikeExist(userId, board)) {
             boardLikeQuery.deleteBoardLikesByUserAndBoard(user, board);
             board.minusLikedCount();
             return true;
@@ -48,7 +48,7 @@ public class BoardLikeService {
         throw new BoardLikeException.BoardDeleteLikeFailException();
     }
 
-    public boolean checkLikeExist(User user, Board board) {
-        return boardLikeQuery.existsByUserAndBoard(user, board);
+    public boolean checkLikeExist(UserId userId, Board board) {
+        return boardLikeQuery.existsByUser_UserIdAndBoard(userId, board);
     }
 }
