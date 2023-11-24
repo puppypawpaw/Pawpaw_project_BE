@@ -21,5 +21,7 @@ spring:
 
 logging:
   level:
+    com.zaxxer.hikari.HikariConfig: DEBUG
+    com.zaxxer.hikari: TRACE
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
