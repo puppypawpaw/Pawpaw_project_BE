@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +25,7 @@ import static com.querydsl.core.group.GroupBy.list;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PlaceReviewCustomRepository {
     private final JPAQueryFactory queryFactory;
 

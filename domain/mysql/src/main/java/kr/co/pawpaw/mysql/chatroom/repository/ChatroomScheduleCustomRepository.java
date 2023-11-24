@@ -10,6 +10,7 @@ import kr.co.pawpaw.mysql.storage.domain.QFile;
 import kr.co.pawpaw.mysql.user.domain.QUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +20,7 @@ import static com.querydsl.core.group.GroupBy.set;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ChatroomScheduleCustomRepository {
     private final JPAQueryFactory queryFactory;
     private final QChatroomScheduleParticipant qChatroomScheduleParticipant = QChatroomScheduleParticipant.chatroomScheduleParticipant;

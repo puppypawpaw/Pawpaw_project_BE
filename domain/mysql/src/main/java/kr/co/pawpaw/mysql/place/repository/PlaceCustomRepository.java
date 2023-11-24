@@ -11,6 +11,7 @@ import kr.co.pawpaw.mysql.place.dto.QPlaceResponse;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -21,6 +22,7 @@ import static com.querydsl.core.group.GroupBy.set;
 
 @Repository
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class PlaceCustomRepository {
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
