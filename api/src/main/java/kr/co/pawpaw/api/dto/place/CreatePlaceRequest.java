@@ -19,14 +19,12 @@ public class CreatePlaceRequest {
     private Collection<String> placeImageUrls;
     private PlaceType placeType;
     private PositionRequest positionRequest;
-    private String openHours;
 
     public Place toPlace() {
         return Place.builder()
             .name(name)
             .placeType(placeType)
             .position(positionRequest.toEntity())
-            .openHours(openHours)
             .build();
     }
 

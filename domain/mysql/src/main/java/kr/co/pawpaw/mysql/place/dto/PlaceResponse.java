@@ -16,8 +16,48 @@ public class PlaceResponse {
     @Schema(description = "장소 이름", example = "탑골 공원")
     private String name;
     private PositionResponse position;
-    @Schema(description = "운영 시간", example = "토\\n▪\uFE0E\\t휴무\\n1,3주/토요일휴무\\t정기휴무 (매달 1, 3번째 토요일)\\n일\\n▪\uFE0E\\t정기휴무 (매주 일요일)\\n1,3주/토요일휴무\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더\\n월\\n▪\uFE0E\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더\\n1,3주/토요일휴무\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더\\n화\\n▪\uFE0E\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더\\n1,3주/토요일휴무\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더\\n수\\n▪\uFE0E\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더\\n1,3주/토요일휴무\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더\\n목\\n▪\uFE0E\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더\\n1,3주/토요일휴무\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더\\n금\\n▪\uFE0E\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더\\n1,3주/토요일휴무\\t11:00 - 21:00\\n15:00 - 17:00 브레이크타임\\n20:30 라스트오더")
-    private String openHours;
+    @Schema(description = "월요일 open 시간", example = "10:00")
+    private String monOpen;
+    @Schema(description = "월요일 close 시간", example = "23:00")
+    private String monClose;
+    @Schema(description = "월요일 라스트 오더 시간", example = "22:30")
+    private String monLastOrder;
+    @Schema(description = "화요일 open 시간", example = "10:00")
+    private String tueOpen;
+    @Schema(description = "화요일 close 시간", example = "23:00")
+    private String tueClose;
+    @Schema(description = "화요일 라스트 오더 시간", example = "22:30")
+    private String tueLastOrder;
+    @Schema(description = "수요일 open 시간", example = "10:00")
+    private String wedOpen;
+    @Schema(description = "수요일 close 시간", example = "23:00")
+    private String wedClose;
+    @Schema(description = "수요일 라스트 오더 시간", example = "22:30")
+    private String wedLastOrder;
+    @Schema(description = "목요일 open 시간", example = "10:00")
+    private String thuOpen;
+    @Schema(description = "목요일 close 시간", example = "23:00")
+    private String thuClose;
+    @Schema(description = "목요일 라스트 오더 시간", example = "22:30")
+    private String thuLastOrder;
+    @Schema(description = "금요일 open 시간", example = "10:00")
+    private String friOpen;
+    @Schema(description = "금요일 close 시간", example = "23:00")
+    private String friClose;
+    @Schema(description = "금요일 라스트 오더 시간", example = "22:30")
+    private String friLastOrder;
+    @Schema(description = "토요일 open 시간", example = "10:00")
+    private String satOpen;
+    @Schema(description = "토요일 close 시간", example = "23:00")
+    private String satClose;
+    @Schema(description = "토요일 라스트 오더 시간", example = "22:30")
+    private String satLastOrder;
+    @Schema(description = "일요일 open 시간", example = "10:00")
+    private String sunOpen;
+    @Schema(description = "일요일 close 시간", example = "23:00")
+    private String sunClose;
+    @Schema(description = "일요일 라스트 오더 시간", example = "22:30")
+    private String sunLastOrder;
     @Schema(description = "장소 북마크 여부", example = "true | false")
     private boolean bookmarked;
     @Schema(description = "평점", example = "4.8 | null")
@@ -41,7 +81,27 @@ public class PlaceResponse {
         final Set<String> imageUrlList,
         final String name,
         final PositionResponse position,
-        final String openHours,
+        final String monOpen,
+        final String monClose,
+        final String monLastOrder,
+        final String tueOpen,
+        final String tueClose,
+        final String tueLastOrder,
+        final String wedOpen,
+        final String wedClose,
+        final String wedLastOrder,
+        final String thuOpen,
+        final String thuClose,
+        final String thuLastOrder,
+        final String friOpen,
+        final String friClose,
+        final String friLastOrder,
+        final String satOpen,
+        final String satClose,
+        final String satLastOrder,
+        final String sunOpen,
+        final String sunClose,
+        final String sunLastOrder,
         final boolean bookmarked,
         final Double score,
         final Double scenicRatio,
@@ -55,7 +115,27 @@ public class PlaceResponse {
         this.imageUrlList = imageUrlList;
         this.name = name;
         this.position = position;
-        this.openHours = openHours;
+        this.monOpen = monOpen;
+        this.monClose = monClose;
+        this.monLastOrder = monLastOrder;
+        this.tueOpen = tueOpen;
+        this.tueClose = tueClose;
+        this.tueLastOrder = tueLastOrder;
+        this.wedOpen = wedOpen;
+        this.wedClose = wedClose;
+        this.wedLastOrder = wedLastOrder;
+        this.thuOpen = thuOpen;
+        this.thuClose = thuClose;
+        this.thuLastOrder = thuLastOrder;
+        this.friOpen = friOpen;
+        this.friClose = friClose;
+        this.friLastOrder = friLastOrder;
+        this.satOpen = satOpen;
+        this.satClose = satClose;
+        this.satLastOrder = satLastOrder;
+        this.sunOpen = sunOpen;
+        this.sunClose = sunClose;
+        this.sunLastOrder = sunLastOrder;
         this.bookmarked = bookmarked;
         this.score = score;
         this.scenicRatio = scenicRatio;
