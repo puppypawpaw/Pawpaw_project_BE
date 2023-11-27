@@ -36,7 +36,6 @@ class PlaceReviewImageRepositoryTest extends MySQLTestContainer {
         Place placeToReview = Place.builder()
             .placeType(PlaceType.RESTAURANT)
             .name("placeName")
-            .openHours("안 열어 임마")
             .position(Position.builder()
                 .address("안알랴줌")
                 .latitude(37.4)

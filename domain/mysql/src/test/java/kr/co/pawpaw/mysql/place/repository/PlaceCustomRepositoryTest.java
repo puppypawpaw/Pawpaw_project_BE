@@ -7,7 +7,6 @@ import kr.co.pawpaw.mysql.config.QuerydslConfig;
 import kr.co.pawpaw.mysql.place.domain.*;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
 import kr.co.pawpaw.mysql.user.domain.User;
-import kr.co.pawpaw.mysql.user.domain.UserId;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -53,7 +52,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .longitude(127.0079764)
                     .address("서울특별시 서초구 잠원동 121-9 1층 블루페이지 라운지")
                     .build())
-                .openHours("항상 열려있습니다.")
                 .build(),
             Place.builder()
                 .placeType(PlaceType.CAFE)
@@ -63,7 +61,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .longitude(127.1239929)
                     .address("서울특별시 강동구 성내동 126-4 1층")
                     .build())
-                .openHours("항상 닫혀있습니다.")
                 .build(),
             Place.builder()
                 .placeType(PlaceType.CAFE)
@@ -73,7 +70,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .longitude(127.1250743)
                     .address("서울특별시 강동구 성내동 38-9")
                     .build())
-                .openHours("항상 모릅니다.")
                 .build(),
             Place.builder()
                 .placeType(PlaceType.PARK)
@@ -83,7 +79,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .longitude(127.17076)
                     .address("서울특별시 강동구 상일동 309-1 1층 전체 전용주차5대")
                     .build())
-                .openHours("항상 압니다.")
                 .build(),
             Place.builder()
                 .placeType(PlaceType.PARK)
@@ -93,7 +88,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .longitude(127.1312724)
                     .address("서울특별시 강동구 천호동 166-115 1층 도깨비족발")
                     .build())
-                .openHours("몰라요.")
                 .build(),
             Place.builder()
                 .placeType(PlaceType.PARK)
@@ -103,7 +97,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .longitude(127.1281564)
                     .address("서울특별시 강동구 천호동 410-1 1층 곱창팩토리")
                     .build())
-                .openHours("알아요.")
                 .build()
         );
 
@@ -162,7 +155,69 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                         .collect(Collectors.toSet()),
                     place.getName(),
                     PositionResponse.of(place.getPosition()),
-                    place.getOpenHours(),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
                     placeBookmarkList.stream()
                         .map(PlaceBookmark::getPlace)
                         .collect(Collectors.toList()).contains(place),
@@ -205,7 +260,69 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                         .collect(Collectors.toSet()),
                     place.getName(),
                     PositionResponse.of(place.getPosition()),
-                    place.getOpenHours(),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
                     placeBookmarkList.stream()
                         .map(PlaceBookmark::getPlace)
                         .collect(Collectors.toList()).contains(place),
@@ -253,7 +370,69 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                         .collect(Collectors.toSet()),
                     place.getName(),
                     PositionResponse.of(place.getPosition()),
-                    place.getOpenHours(),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
                     placeBookmarkList.stream()
                         .map(PlaceBookmark::getPlace)
                         .collect(Collectors.toList())
@@ -295,7 +474,69 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                         .collect(Collectors.toSet()),
                     place.getName(),
                     PositionResponse.of(place.getPosition()),
-                    place.getOpenHours(),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getMonOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getTueOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getWedOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getThuOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getFriOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSatOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getOpen)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getClose)
+                        .orElse(null),
+                    Optional.ofNullable(place.getSunOpenHour())
+                        .map(DayOpenHour::getLastOrder)
+                        .orElse(null),
                     placeBookmarkList.stream()
                         .map(PlaceBookmark::getPlace)
                         .collect(Collectors.toList()).contains(place),
@@ -335,7 +576,6 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .longitude(127.17076)
                 .address("서울특별시 강동구 상일동 309-1 1층 전체 전용주차5대")
                 .build())
-            .openHours("항상 압니다.")
             .build();
 
         User user = User.builder()
