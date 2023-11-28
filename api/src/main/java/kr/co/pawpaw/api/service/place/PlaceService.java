@@ -43,6 +43,13 @@ public class PlaceService {
     private final PlaceBookmarkQuery placeBookmarkQuery;
     private final PlaceImageUrlCommand placeImageUrlCommand;
 
+    public PlaceResponse getPlace(
+        final Long placeId
+    ) {
+        return placeQuery.findByPlaceIdAsPlaceResponse(placeId)
+            .orElseThrow(NotFoundPlaceException::new);
+    }
+
     @Transactional
     public void addBookmarkPlace(
         final UserId userId,
