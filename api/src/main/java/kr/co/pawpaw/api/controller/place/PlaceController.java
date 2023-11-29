@@ -54,6 +54,22 @@ public class PlaceController {
     }
 
     @ApiResponses(value = {
+        @ApiResponse(responseCode = "200"),
+    })
+    @Operation(
+        method = "GET",
+        summary = "장소 조회",
+        description = "단일 장소 조회"
+    )
+    @GetMapping("/{placeId}")
+    public ResponseEntity<PlaceResponse> getPlace(
+        @AuthenticatedUserId final UserId userId,
+        @PathVariable final Long placeId
+    ) {
+        return ResponseEntity.ok(placeService.getPlace(placeId));
+    }
+
+    @ApiResponses(value = {
         @ApiResponse(responseCode = "204")
     })
     @Operation(
