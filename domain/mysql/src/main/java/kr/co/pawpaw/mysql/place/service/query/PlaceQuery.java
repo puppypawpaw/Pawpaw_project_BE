@@ -39,6 +39,10 @@ public class PlaceQuery {
         );
     }
 
+    public Optional<PlaceResponse> findByPlaceIdAsPlaceResponse(final Long placeId) {
+        return placeCustomRepository.findById(placeId);
+    }
+
     public Optional<Place> findByPlaceId(final Long placeId) {
         return placeRepository.findById(placeId);
     }
