@@ -108,6 +108,7 @@ public class PlaceReviewCustomRepository {
         return queryFactory.select(QPlaceReview.placeReview.id)
             .from(QPlaceReview.placeReview)
             .where(condition)
+            .orderBy(QPlaceReview.placeReview.id.desc())
             .limit(size + 1)
             .fetch();
     }
