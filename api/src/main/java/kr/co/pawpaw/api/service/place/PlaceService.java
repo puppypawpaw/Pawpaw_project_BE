@@ -83,7 +83,8 @@ public class PlaceService {
         final UserId userId,
         final Long placeId
     ) {
-        return placeReviewQuery.findByPlaceIdAndReviewerUserIdAsPlaceReviewResponse(placeId, userId);
+        return placeReviewQuery.findByPlaceIdAndReviewerUserIdAsPlaceReviewResponse(placeId, userId)
+            .orElseThrow(NotFoundPlaceReviewException::new);
     }
 
     public Slice<PlaceReviewResponse> getPlaceReviewList(
