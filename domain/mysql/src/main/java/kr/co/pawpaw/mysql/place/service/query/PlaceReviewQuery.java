@@ -21,7 +21,7 @@ public class PlaceReviewQuery {
         return placeReviewRepository.findByPlaceIdAndIdAndReviewerUserId(placeId, placeReviewId, userId);
     }
 
-    public PlaceReviewResponse findByPlaceIdAndReviewerUserIdAsPlaceReviewResponse(
+    public Optional<PlaceReviewResponse> findByPlaceIdAndReviewerUserIdAsPlaceReviewResponse(
         final Long placeId,
         final UserId userId
     ) {
