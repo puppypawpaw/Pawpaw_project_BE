@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
@@ -29,7 +30,7 @@ import static com.querydsl.core.group.GroupBy.list;
 public class PlaceReviewCustomRepository {
     private final JPAQueryFactory queryFactory;
 
-    public PlaceReviewResponse findByPlaceIdAndReviewerUserId(
+    public Optional<PlaceReviewResponse> findByPlaceIdAndReviewerUserId(
         final Long placeId,
         final UserId userId
     ) {
@@ -43,7 +44,7 @@ public class PlaceReviewCustomRepository {
                 .and(QPlaceReview.placeReview.reviewer.userId.eq(userId)))
             .transform(getGroupByResultTransformer());
 
-        return result.size() > 0 ? result.get(0) : null;
+        return result.size() > 0 ? Optional.of(result.get(0)) : Optional.empty();
     }
 
     public Slice<PlaceReviewResponse> findByPlaceIdAndIdBefore(
@@ -107,6 +108,7 @@ public class PlaceReviewCustomRepository {
         return queryFactory.select(QPlaceReview.placeReview.id)
             .from(QPlaceReview.placeReview)
             .where(condition)
+            .orderBy(QPlaceReview.placeReview.id.desc())
             .limit(size + 1)
             .fetch();
     }

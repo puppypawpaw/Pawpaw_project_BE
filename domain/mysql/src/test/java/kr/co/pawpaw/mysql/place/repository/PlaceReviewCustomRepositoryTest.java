@@ -684,11 +684,16 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
             );
 
             //when
-            PlaceReviewResponse result1 = placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), me.getUserId());
-            PlaceReviewResponse result2 = placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), user1.getUserId());
-            PlaceReviewResponse result3 = placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), user2.getUserId());
-            PlaceReviewResponse result4 = placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), user3.getUserId());
-            PlaceReviewResponse result5 = placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), user4.getUserId());
+            PlaceReviewResponse result1 = placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), me.getUserId())
+                .orElse(null);
+            PlaceReviewResponse result2 = placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), user1.getUserId())
+                .orElse(null);
+            PlaceReviewResponse result3 = placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), user2.getUserId())
+                .orElse(null);
+            PlaceReviewResponse result4 = placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), user3.getUserId())
+                .orElse(null);
+            PlaceReviewResponse result5 = placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), user4.getUserId())
+                .orElse(null);
 
             //then
             assertThat(result1).usingRecursiveComparison().isEqualTo(result1Expected);
@@ -699,11 +704,11 @@ class PlaceReviewCustomRepositoryTest extends MySQLTestContainer {
         }
 
         @Test
-        @DisplayName("리뷰를 작성하지 않은 유저가 조회를 하면 null을 반환한다.")
+        @DisplayName("리뷰를 작성하지 않은 유저가 조회를 하면 Optional empty를 반환한다.")
         void ifUserNotPostReviewAndFindThenReturnNull() {
             //then
-            assertThat(placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), UserId.create()))
-                .isNull();
+            assertThat(placeReviewCustomRepository.findByPlaceIdAndReviewerUserId(place.getId(), UserId.create()).isEmpty())
+                .isTrue();
 
         }
     }
