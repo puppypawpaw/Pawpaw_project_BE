@@ -3,6 +3,7 @@ package kr.co.pawpaw.mysql.place.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.mysql.common.dto.PositionResponse;
+import kr.co.pawpaw.mysql.place.enums.PlaceType;
 import lombok.Getter;
 
 import java.util.Set;
@@ -11,6 +12,8 @@ import java.util.Set;
 public class PlaceQueryDSLResponse {
     @Schema(description = "장소 아이디", example = "1")
     private Long id;
+    @Schema(description = "장소 유형", example = "RESTAURANT | CAFE")
+    private PlaceType type;
     @Schema(description = "이미지URL 목록", example = "[\"www.naver.com\",\"www.google.com\"]")
     private Set<String> imageUrlList;
     @Schema(description = "장소 이름", example = "탑골 공원")
@@ -78,6 +81,7 @@ public class PlaceQueryDSLResponse {
     @QueryProjection
     public PlaceQueryDSLResponse(
         final Long id,
+        final PlaceType type,
         final Set<String> imageUrlList,
         final String name,
         final PositionResponse position,
@@ -112,6 +116,7 @@ public class PlaceQueryDSLResponse {
         final Double safeRatio
     ) {
         this.id = id;
+        this.type = type;
         this.imageUrlList = imageUrlList;
         this.name = name;
         this.position = position;

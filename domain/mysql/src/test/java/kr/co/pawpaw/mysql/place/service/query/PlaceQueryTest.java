@@ -46,7 +46,7 @@ class PlaceQueryTest {
         ) {
             //given
             String query = "query";
-            PlaceType placeType = PlaceType.PARK;
+            PlaceType placeType = PlaceType.RESTAURANT;
             UserId userId = UserId.create();
 
             //when

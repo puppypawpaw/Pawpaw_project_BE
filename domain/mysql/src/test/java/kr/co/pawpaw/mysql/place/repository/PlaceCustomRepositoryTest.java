@@ -75,7 +75,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .build())
                 .build(),
             Place.builder()
-                .placeType(PlaceType.PARK)
+                .placeType(PlaceType.RESTAURANT)
                 .name("우돈숯불명가")
                 .position(Position.builder()
                     .latitude(37.546352)
@@ -84,7 +84,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .build())
                 .build(),
             Place.builder()
-                .placeType(PlaceType.PARK)
+                .placeType(PlaceType.RESTAURANT)
                 .name("도깨비족발")
                 .position(Position.builder()
                     .latitude(37.5381812)
@@ -93,7 +93,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .build())
                 .build(),
             Place.builder()
-                .placeType(PlaceType.PARK)
+                .placeType(PlaceType.RESTAURANT)
                 .name("곱창팩토리 천호본점")
                 .position(Position.builder()
                     .latitude(37.5397267)
@@ -152,6 +152,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .filter(place -> Objects.isNull(query) || place.getName().contains(query))
                 .map(place -> new PlaceQueryDSLResponse(
                     place.getId(),
+                    place.getPlaceType(),
                     placeImageUrlList.stream()
                         .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
                         .map(PlaceImageUrl::getUrl)
@@ -249,7 +250,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
         }
 
         @ParameterizedTest
-        @CsvSource(value = {"RESTAURANT", "CAFE", "PARK", "null"}, nullValues = {"null"})
+        @CsvSource(value = {"RESTAURANT", "CAFE", "null"}, nullValues = {"null"})
         @DisplayName("장소 유형으로 장소를 검색할 수 있다.")
         void searchByPlaceType(final PlaceType placeType) {
             //given
@@ -257,6 +258,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .filter(place -> Objects.isNull(placeType) || place.getPlaceType().equals(placeType))
                 .map(place -> new PlaceQueryDSLResponse(
                     place.getId(),
+                    place.getPlaceType(),
                     placeImageUrlList.stream()
                         .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
                         .map(PlaceImageUrl::getUrl)
@@ -367,6 +369,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 .filter(place -> place.getPosition().isInside(latMin, latMax, longMin, longMax))
                 .map(place -> new PlaceQueryDSLResponse(
                     place.getId(),
+                    place.getPlaceType(),
                     placeImageUrlList.stream()
                         .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
                         .map(PlaceImageUrl::getUrl)
@@ -471,6 +474,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
             List<PlaceQueryDSLResponse> resultExpected = placeList.stream()
                 .map(place -> new PlaceQueryDSLResponse(
                     place.getId(),
+                    place.getPlaceType(),
                     placeImageUrlList.stream()
                         .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
                         .map(PlaceImageUrl::getUrl)
@@ -572,7 +576,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
     @DisplayName("updatePlaceReviewInfo 메서드는")
     class UpdatePlaceReviewInfo {
         Place place = Place.builder()
-            .placeType(PlaceType.PARK)
+            .placeType(PlaceType.RESTAURANT)
             .name("우돈숯불명가")
             .position(Position.builder()
                 .latitude(37.546352)
@@ -701,7 +705,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .build())
                 .build(),
             Place.builder()
-                .placeType(PlaceType.PARK)
+                .placeType(PlaceType.RESTAURANT)
                 .name("우돈숯불명가")
                 .position(Position.builder()
                     .latitude(37.546352)

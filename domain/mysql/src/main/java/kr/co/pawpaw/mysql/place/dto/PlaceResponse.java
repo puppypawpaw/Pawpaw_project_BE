@@ -1,7 +1,9 @@
 package kr.co.pawpaw.mysql.place.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.mysql.common.dto.PositionResponse;
 import kr.co.pawpaw.mysql.place.enums.PlaceTag;
+import kr.co.pawpaw.mysql.place.enums.PlaceType;
 import lombok.Getter;
 
 import java.util.List;
@@ -9,10 +11,12 @@ import java.util.Set;
 
 @Getter
 public class PlaceResponse extends PlaceQueryDSLResponse {
-    private final List<PlaceTag> placeTagList;
+    @Schema(description = "장소 태그 목록", example = "[\"SCENIC\", \"QUIET\", \"COMFORTABLE\", \"ACCESSIBLE\", \"CLEAN\", \"SAFE\", \"MOST_SAVED\"]")
+    private List<PlaceTag> placeTagList;
 
     public PlaceResponse(
         final Long id,
+        final PlaceType type,
         final Set<String> imageUrlList,
         final String name,
         final PositionResponse position,
@@ -49,6 +53,7 @@ public class PlaceResponse extends PlaceQueryDSLResponse {
     ) {
         super(
             id,
+            type,
             imageUrlList,
             name,
             position,
@@ -91,6 +96,7 @@ public class PlaceResponse extends PlaceQueryDSLResponse {
     ) {
         super(
             placeQueryDSLResponse.getId(),
+            placeQueryDSLResponse.getType(),
             placeQueryDSLResponse.getImageUrlList(),
             placeQueryDSLResponse.getName(),
             placeQueryDSLResponse.getPosition(),

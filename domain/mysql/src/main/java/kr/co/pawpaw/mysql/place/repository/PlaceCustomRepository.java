@@ -38,7 +38,56 @@ public class PlaceCustomRepository {
     private final EntityManager entityManager;
 
     public Optional<PlaceQueryDSLResponse> findById(final Long placeId) {
-        return queryFactory.from(QPlace.place).innerJoin(QPlaceImageUrl.placeImageUrl).on(QPlaceImageUrl.placeImageUrl.place.eq(QPlace.place)).leftJoin(QPlaceBookmark.placeBookmark).on(QPlaceBookmark.placeBookmark.place.eq(QPlace.place)).where(QPlace.place.id.eq(placeId)).transform(groupBy(QPlace.place.id).list(new QPlaceQueryDSLResponse(QPlace.place.id, set(QPlaceImageUrl.placeImageUrl.url), QPlace.place.name, new QPositionResponse(QPlace.place.position.latitude, QPlace.place.position.longitude, QPlace.place.position.address), QPlace.place.monOpenHour.open, QPlace.place.monOpenHour.close, QPlace.place.monOpenHour.lastOrder, QPlace.place.tueOpenHour.open, QPlace.place.tueOpenHour.close, QPlace.place.tueOpenHour.lastOrder, QPlace.place.wedOpenHour.open, QPlace.place.wedOpenHour.close, QPlace.place.wedOpenHour.lastOrder, QPlace.place.thuOpenHour.open, QPlace.place.thuOpenHour.close, QPlace.place.thuOpenHour.lastOrder, QPlace.place.friOpenHour.open, QPlace.place.friOpenHour.close, QPlace.place.friOpenHour.lastOrder, QPlace.place.satOpenHour.open, QPlace.place.satOpenHour.close, QPlace.place.satOpenHour.lastOrder, QPlace.place.sunOpenHour.open, QPlace.place.sunOpenHour.close, QPlace.place.sunOpenHour.lastOrder, QPlaceBookmark.placeBookmark.id.isNotNull(), QPlace.place.reviewInfo.totalScore.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.scenicCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.quietCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.comfortableCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.accessibleCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.cleanCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.safeCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt)))).stream().findAny();
+        return queryFactory.from(QPlace.place)
+            .innerJoin(QPlaceImageUrl.placeImageUrl)
+            .on(QPlaceImageUrl.placeImageUrl.place.eq(QPlace.place))
+            .leftJoin(QPlaceBookmark.placeBookmark)
+            .on(QPlaceBookmark.placeBookmark.place.eq(QPlace.place))
+            .where(QPlace.place.id.eq(placeId))
+            .transform(groupBy(QPlace.place.id)
+                .list(new QPlaceQueryDSLResponse(
+                    QPlace.place.id,
+                    QPlace.place.placeType,
+                    set(QPlaceImageUrl.placeImageUrl.url),
+                    QPlace.place.name,
+                    new QPositionResponse(
+                        QPlace.place.position.latitude,
+                        QPlace.place.position.longitude,
+                        QPlace.place.position.address
+                    ),
+                    QPlace.place.monOpenHour.open,
+                    QPlace.place.monOpenHour.close,
+                    QPlace.place.monOpenHour.lastOrder,
+                    QPlace.place.tueOpenHour.open,
+                    QPlace.place.tueOpenHour.close,
+                    QPlace.place.tueOpenHour.lastOrder,
+                    QPlace.place.wedOpenHour.open,
+                    QPlace.place.wedOpenHour.close,
+                    QPlace.place.wedOpenHour.lastOrder,
+                    QPlace.place.thuOpenHour.open,
+                    QPlace.place.thuOpenHour.close,
+                    QPlace.place.thuOpenHour.lastOrder,
+                    QPlace.place.friOpenHour.open,
+                    QPlace.place.friOpenHour.close,
+                    QPlace.place.friOpenHour.lastOrder,
+                    QPlace.place.satOpenHour.open,
+                    QPlace.place.satOpenHour.close,
+                    QPlace.place.satOpenHour.lastOrder,
+                    QPlace.place.sunOpenHour.open,
+                    QPlace.place.sunOpenHour.close,
+                    QPlace.place.sunOpenHour.lastOrder,
+                    QPlaceBookmark.placeBookmark.id.isNotNull(),
+                    QPlace.place.reviewInfo.totalScore.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.scenicCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.quietCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.comfortableCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.accessibleCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.cleanCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.safeCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt)
+                    )
+                )
+            ).stream()
+            .findAny();
     }
 
     public List<PlaceQueryDSLResponse> findByQueryAndPlaceTypeAndPositionRange(final String query, final PlaceType placeType, final double latitudeMin, final double latitudeMax, final double longitudeMin, final double longitudeMax, final UserId userId) {
@@ -54,7 +103,54 @@ public class PlaceCustomRepository {
 
         condition = condition.and(QueryUtil.withInPositionCondition(QPlace.place.position.latitude, QPlace.place.position.longitude, latitudeMin, latitudeMax, longitudeMin, longitudeMax));
 
-        return queryFactory.from(QPlace.place).innerJoin(QPlaceImageUrl.placeImageUrl).on(QPlaceImageUrl.placeImageUrl.place.eq(QPlace.place)).leftJoin(QPlaceBookmark.placeBookmark).on(QPlaceBookmark.placeBookmark.place.eq(QPlace.place)).where(condition).transform(groupBy(QPlace.place.id).list(new QPlaceQueryDSLResponse(QPlace.place.id, set(QPlaceImageUrl.placeImageUrl.url), QPlace.place.name, new QPositionResponse(QPlace.place.position.latitude, QPlace.place.position.longitude, QPlace.place.position.address), QPlace.place.monOpenHour.open, QPlace.place.monOpenHour.close, QPlace.place.monOpenHour.lastOrder, QPlace.place.tueOpenHour.open, QPlace.place.tueOpenHour.close, QPlace.place.tueOpenHour.lastOrder, QPlace.place.wedOpenHour.open, QPlace.place.wedOpenHour.close, QPlace.place.wedOpenHour.lastOrder, QPlace.place.thuOpenHour.open, QPlace.place.thuOpenHour.close, QPlace.place.thuOpenHour.lastOrder, QPlace.place.friOpenHour.open, QPlace.place.friOpenHour.close, QPlace.place.friOpenHour.lastOrder, QPlace.place.satOpenHour.open, QPlace.place.satOpenHour.close, QPlace.place.satOpenHour.lastOrder, QPlace.place.sunOpenHour.open, QPlace.place.sunOpenHour.close, QPlace.place.sunOpenHour.lastOrder, QPlaceBookmark.placeBookmark.id.isNotNull(), QPlace.place.reviewInfo.totalScore.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.scenicCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.quietCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.comfortableCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.accessibleCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.cleanCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt), QPlace.place.reviewInfo.safeCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt))));
+        return queryFactory
+            .from(QPlace.place)
+            .innerJoin(QPlaceImageUrl.placeImageUrl)
+            .on(QPlaceImageUrl.placeImageUrl.place.eq(QPlace.place))
+            .leftJoin(QPlaceBookmark.placeBookmark)
+            .on(QPlaceBookmark.placeBookmark.place.eq(QPlace.place))
+            .where(condition)
+            .transform(groupBy(QPlace.place.id)
+                .list(new QPlaceQueryDSLResponse(
+                    QPlace.place.id,
+                    QPlace.place.placeType,
+                    set(QPlaceImageUrl.placeImageUrl.url),
+                    QPlace.place.name,
+                    new QPositionResponse(
+                        QPlace.place.position.latitude,
+                        QPlace.place.position.longitude,
+                        QPlace.place.position.address
+                    ),
+                    QPlace.place.monOpenHour.open,
+                    QPlace.place.monOpenHour.close,
+                    QPlace.place.monOpenHour.lastOrder,
+                    QPlace.place.tueOpenHour.open,
+                    QPlace.place.tueOpenHour.close,
+                    QPlace.place.tueOpenHour.lastOrder,
+                    QPlace.place.wedOpenHour.open,
+                    QPlace.place.wedOpenHour.close,
+                    QPlace.place.wedOpenHour.lastOrder,
+                    QPlace.place.thuOpenHour.open,
+                    QPlace.place.thuOpenHour.close,
+                    QPlace.place.thuOpenHour.lastOrder,
+                    QPlace.place.friOpenHour.open,
+                    QPlace.place.friOpenHour.close,
+                    QPlace.place.friOpenHour.lastOrder,
+                    QPlace.place.satOpenHour.open,
+                    QPlace.place.satOpenHour.close,
+                    QPlace.place.satOpenHour.lastOrder,
+                    QPlace.place.sunOpenHour.open,
+                    QPlace.place.sunOpenHour.close,
+                    QPlace.place.sunOpenHour.lastOrder,
+                    QPlaceBookmark.placeBookmark.id.isNotNull(),
+                    QPlace.place.reviewInfo.totalScore.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.scenicCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.quietCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.comfortableCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.accessibleCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.cleanCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt),
+                    QPlace.place.reviewInfo.safeCnt.doubleValue().divide(QPlace.place.reviewInfo.reviewCnt)
+                )));
     }
 
     @Transactional
