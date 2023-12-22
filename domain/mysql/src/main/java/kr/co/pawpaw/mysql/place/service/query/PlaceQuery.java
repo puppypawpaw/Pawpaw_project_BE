@@ -1,14 +1,16 @@
 package kr.co.pawpaw.mysql.place.service.query;
 
 import kr.co.pawpaw.mysql.place.domain.Place;
-import kr.co.pawpaw.mysql.place.domain.PlaceType;
-import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
+import kr.co.pawpaw.mysql.place.dto.PlaceTopBookmarkPercentageResponse;
+import kr.co.pawpaw.mysql.place.enums.PlaceType;
+import kr.co.pawpaw.mysql.place.dto.PlaceQueryDSLResponse;
 import kr.co.pawpaw.mysql.place.repository.PlaceCustomRepository;
 import kr.co.pawpaw.mysql.place.repository.PlaceRepository;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -19,7 +21,7 @@ public class PlaceQuery {
     private final PlaceCustomRepository placeCustomRepository;
     private final PlaceRepository placeRepository;
 
-    public List<PlaceResponse> findByQueryAndPlaceTypeAndPositionRange(
+    public List<PlaceQueryDSLResponse> findByQueryAndPlaceTypeAndPositionRange(
         final String query,
         final PlaceType placeType,
         final Double latitudeMin,
@@ -39,7 +41,11 @@ public class PlaceQuery {
         );
     }
 
-    public Optional<PlaceResponse> findByPlaceIdAsPlaceResponse(final Long placeId) {
+    public Collection<PlaceTopBookmarkPercentageResponse> findPlaceTopBookmarkPercentageList(final Collection<Long> placeIds) {
+        return placeCustomRepository.findPlaceTopBookmarkPercentageList(placeIds);
+    }
+
+    public Optional<PlaceQueryDSLResponse> findByPlaceIdAsPlaceResponse(final Long placeId) {
         return placeCustomRepository.findById(placeId);
     }
 

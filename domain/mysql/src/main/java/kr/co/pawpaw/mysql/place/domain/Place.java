@@ -2,6 +2,7 @@ package kr.co.pawpaw.mysql.place.domain;
 
 import kr.co.pawpaw.mysql.common.BaseTimeEntity;
 import kr.co.pawpaw.mysql.common.domain.Position;
+import kr.co.pawpaw.mysql.place.enums.PlaceType;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
