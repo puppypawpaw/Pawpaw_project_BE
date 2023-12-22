@@ -1,4 +1,4 @@
-package kr.co.pawpaw.mysql.place.domain;
+package kr.co.pawpaw.mysql.place.enums;
 
 public enum PlaceType {
     RESTAURANT,

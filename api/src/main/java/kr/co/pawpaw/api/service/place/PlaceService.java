@@ -8,8 +8,12 @@ import kr.co.pawpaw.common.exception.place.NotFoundPlaceException;
 import kr.co.pawpaw.common.exception.place.NotFoundPlaceReviewException;
 import kr.co.pawpaw.common.exception.user.NotFoundUserException;
 import kr.co.pawpaw.mysql.place.domain.*;
+import kr.co.pawpaw.mysql.place.dto.PlaceQueryDSLResponse;
 import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
 import kr.co.pawpaw.mysql.place.dto.PlaceReviewResponse;
+import kr.co.pawpaw.mysql.place.dto.PlaceTopBookmarkPercentageResponse;
+import kr.co.pawpaw.mysql.place.enums.PlaceTag;
+import kr.co.pawpaw.mysql.place.enums.PlaceType;
 import kr.co.pawpaw.mysql.place.service.command.*;
 import kr.co.pawpaw.mysql.place.service.query.PlaceBookmarkQuery;
 import kr.co.pawpaw.mysql.place.service.query.PlaceQuery;
@@ -23,10 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,8 +47,57 @@ public class PlaceService {
     public PlaceResponse getPlace(
         final Long placeId
     ) {
-        return placeQuery.findByPlaceIdAsPlaceResponse(placeId)
+        PlaceQueryDSLResponse placeQueryDSLResponse = placeQuery.findByPlaceIdAsPlaceResponse(placeId)
             .orElseThrow(NotFoundPlaceException::new);
+
+        PlaceTopBookmarkPercentageResponse placeTopBookmarkPercentageResponse = placeQuery.findPlaceTopBookmarkPercentageList(List.of(placeId))
+            .stream()
+            .findAny()
+            .orElseThrow(NotFoundPlaceException::new);
+
+        List<PlaceTag> placeTagList = getPlaceTagList(
+            placeQueryDSLResponse.getScenicRatio(),
+            placeQueryDSLResponse.getQuietRatio(),
+            placeQueryDSLResponse.getComfortableRatio(),
+            placeQueryDSLResponse.getAccessibleRatio(),
+            placeQueryDSLResponse.getCleanRatio(),
+            placeQueryDSLResponse.getSafeRatio(),
+            placeTopBookmarkPercentageResponse.getTopBookmarkPercentage()
+        );
+
+        return new PlaceResponse(
+            placeQueryDSLResponse,
+            placeTagList
+        );
+    }
+
+    private List<PlaceTag> getPlaceTagList(
+        final Double scenicRatio,
+        final Double quietRatio,
+        final Double comfortableRatio,
+        final Double accessibleRatio,
+        final Double cleanRatio,
+        final Double safeRatio,
+        final Double topBookmarkPercentage
+    ) {
+        Map<PlaceTag, Double> placeTagCurrentPercent = Map.of(
+            PlaceTag.SCENIC, getNonNullValue(scenicRatio),
+            PlaceTag.QUIET, getNonNullValue(quietRatio),
+            PlaceTag.COMFORTABLE, getNonNullValue(comfortableRatio),
+            PlaceTag.ACCESSIBLE, getNonNullValue(accessibleRatio),
+            PlaceTag.CLEAN, getNonNullValue(cleanRatio),
+            PlaceTag.SAFE, getNonNullValue(safeRatio),
+            PlaceTag.MOST_SAVED, getNonNullValue(topBookmarkPercentage)
+        );
+
+        return Arrays.stream(PlaceTag.values())
+            .filter(placeTag -> placeTag.isPlaceTagVisible(
+                placeTagCurrentPercent.get(placeTag)
+            )).collect(Collectors.toList());
+    }
+
+    private Double getNonNullValue(final Double value) {
+        return Objects.isNull(value) ? 0.0 : value;
     }
 
     @Transactional
@@ -109,7 +159,7 @@ public class PlaceService {
         final Double longitudeMin,
         final Double longitudeMax
     ) {
-        return placeQuery.findByQueryAndPlaceTypeAndPositionRange(
+        List<PlaceQueryDSLResponse> placeQueryDSLResponseList = placeQuery.findByQueryAndPlaceTypeAndPositionRange(
             query,
             placeType,
             latitudeMin,
@@ -118,6 +168,28 @@ public class PlaceService {
             longitudeMax,
             userId
         );
+
+        Map<Long, Double> placeTopBookmarkPercentageMap = placeQuery.findPlaceTopBookmarkPercentageList(
+                placeQueryDSLResponseList.stream()
+                    .map(PlaceQueryDSLResponse::getId)
+                    .collect(Collectors.toList())
+            ).stream()
+            .collect(Collectors.toMap(PlaceTopBookmarkPercentageResponse::getPlaceId, PlaceTopBookmarkPercentageResponse::getTopBookmarkPercentage));
+
+        return placeQueryDSLResponseList
+            .stream()
+            .map(placeQueryDSLResponse -> new PlaceResponse(
+                placeQueryDSLResponse,
+                getPlaceTagList(
+                    placeQueryDSLResponse.getScenicRatio(),
+                    placeQueryDSLResponse.getQuietRatio(),
+                    placeQueryDSLResponse.getComfortableRatio(),
+                    placeQueryDSLResponse.getAccessibleRatio(),
+                    placeQueryDSLResponse.getCleanRatio(),
+                    placeQueryDSLResponse.getSafeRatio(),
+                    placeTopBookmarkPercentageMap.get(placeQueryDSLResponse.getId())
+                )
+            )).collect(Collectors.toList());
     }
 
     @Transactional

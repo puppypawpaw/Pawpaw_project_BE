@@ -1,6 +1,6 @@
 package kr.co.pawpaw.mysql.place.service.query;
 
-import kr.co.pawpaw.mysql.place.domain.PlaceType;
+import kr.co.pawpaw.mysql.place.enums.PlaceType;
 import kr.co.pawpaw.mysql.place.repository.PlaceCustomRepository;
 import kr.co.pawpaw.mysql.user.domain.UserId;
 import org.junit.jupiter.api.DisplayName;
