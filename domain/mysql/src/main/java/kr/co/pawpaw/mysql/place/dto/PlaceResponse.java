@@ -1,83 +1,22 @@
 package kr.co.pawpaw.mysql.place.dto;
 
-import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.v3.oas.annotations.media.Schema;
 import kr.co.pawpaw.mysql.common.dto.PositionResponse;
+import kr.co.pawpaw.mysql.place.enums.PlaceTag;
+import kr.co.pawpaw.mysql.place.enums.PlaceType;
 import lombok.Getter;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
-public class PlaceResponse {
-    @Schema(description = "장소 아이디", example = "1")
-    private Long id;
-    @Schema(description = "이미지URL 목록", example = "[\"www.naver.com\",\"www.google.com\"]")
-    private Set<String> imageUrlList;
-    @Schema(description = "장소 이름", example = "탑골 공원")
-    private String name;
-    private PositionResponse position;
-    @Schema(description = "월요일 open 시간", example = "10:00")
-    private String monOpen;
-    @Schema(description = "월요일 close 시간", example = "23:00")
-    private String monClose;
-    @Schema(description = "월요일 라스트 오더 시간", example = "22:30")
-    private String monLastOrder;
-    @Schema(description = "화요일 open 시간", example = "10:00")
-    private String tueOpen;
-    @Schema(description = "화요일 close 시간", example = "23:00")
-    private String tueClose;
-    @Schema(description = "화요일 라스트 오더 시간", example = "22:30")
-    private String tueLastOrder;
-    @Schema(description = "수요일 open 시간", example = "10:00")
-    private String wedOpen;
-    @Schema(description = "수요일 close 시간", example = "23:00")
-    private String wedClose;
-    @Schema(description = "수요일 라스트 오더 시간", example = "22:30")
-    private String wedLastOrder;
-    @Schema(description = "목요일 open 시간", example = "10:00")
-    private String thuOpen;
-    @Schema(description = "목요일 close 시간", example = "23:00")
-    private String thuClose;
-    @Schema(description = "목요일 라스트 오더 시간", example = "22:30")
-    private String thuLastOrder;
-    @Schema(description = "금요일 open 시간", example = "10:00")
-    private String friOpen;
-    @Schema(description = "금요일 close 시간", example = "23:00")
-    private String friClose;
-    @Schema(description = "금요일 라스트 오더 시간", example = "22:30")
-    private String friLastOrder;
-    @Schema(description = "토요일 open 시간", example = "10:00")
-    private String satOpen;
-    @Schema(description = "토요일 close 시간", example = "23:00")
-    private String satClose;
-    @Schema(description = "토요일 라스트 오더 시간", example = "22:30")
-    private String satLastOrder;
-    @Schema(description = "일요일 open 시간", example = "10:00")
-    private String sunOpen;
-    @Schema(description = "일요일 close 시간", example = "23:00")
-    private String sunClose;
-    @Schema(description = "일요일 라스트 오더 시간", example = "22:30")
-    private String sunLastOrder;
-    @Schema(description = "장소 북마크 여부", example = "true | false")
-    private boolean bookmarked;
-    @Schema(description = "평점", example = "4.8 | null")
-    private Double score;
-    @Schema(description = "조경좋음 비율", example = "0.9 | null")
-    private Double scenicRatio;
-    @Schema(description = "조용함 비율", example = "0.9 | null")
-    private Double quietRatio;
-    @Schema(description = "편안함 비율", example = "0.9 | null")
-    private Double comfortableRatio;
-    @Schema(description = "접근성 좋음 비율", example = "0.9 | null")
-    private Double accessibleRatio;
-    @Schema(description = "깨끗함 비율", example = "0.9 | null")
-    private Double cleanRatio;
-    @Schema(description = "안전함 비율", example = "0.9 | null")
-    private Double safeRatio;
+public class PlaceResponse extends PlaceQueryDSLResponse {
+    @Schema(description = "장소 태그 목록", example = "[\"SCENIC\", \"QUIET\", \"COMFORTABLE\", \"ACCESSIBLE\", \"CLEAN\", \"SAFE\", \"MOST_SAVED\"]")
+    private List<PlaceTag> placeTagList;
 
-    @QueryProjection
     public PlaceResponse(
         final Long id,
+        final PlaceType type,
         final Set<String> imageUrlList,
         final String name,
         final PositionResponse position,
@@ -109,40 +48,88 @@ public class PlaceResponse {
         final Double comfortableRatio,
         final Double accessibleRatio,
         final Double cleanRatio,
-        final Double safeRatio
+        final Double safeRatio,
+        final List<PlaceTag> placeTagList
     ) {
-        this.id = id;
-        this.imageUrlList = imageUrlList;
-        this.name = name;
-        this.position = position;
-        this.monOpen = monOpen;
-        this.monClose = monClose;
-        this.monLastOrder = monLastOrder;
-        this.tueOpen = tueOpen;
-        this.tueClose = tueClose;
-        this.tueLastOrder = tueLastOrder;
-        this.wedOpen = wedOpen;
-        this.wedClose = wedClose;
-        this.wedLastOrder = wedLastOrder;
-        this.thuOpen = thuOpen;
-        this.thuClose = thuClose;
-        this.thuLastOrder = thuLastOrder;
-        this.friOpen = friOpen;
-        this.friClose = friClose;
-        this.friLastOrder = friLastOrder;
-        this.satOpen = satOpen;
-        this.satClose = satClose;
-        this.satLastOrder = satLastOrder;
-        this.sunOpen = sunOpen;
-        this.sunClose = sunClose;
-        this.sunLastOrder = sunLastOrder;
-        this.bookmarked = bookmarked;
-        this.score = score;
-        this.scenicRatio = scenicRatio;
-        this.quietRatio = quietRatio;
-        this.comfortableRatio = comfortableRatio;
-        this.accessibleRatio = accessibleRatio;
-        this.cleanRatio = cleanRatio;
-        this.safeRatio = safeRatio;
+        super(
+            id,
+            type,
+            imageUrlList,
+            name,
+            position,
+            monOpen,
+            monClose,
+            monLastOrder,
+            tueOpen,
+            tueClose,
+            tueLastOrder,
+            wedOpen,
+            wedClose,
+            wedLastOrder,
+            thuOpen,
+            thuClose,
+            thuLastOrder,
+            friOpen,
+            friClose,
+            friLastOrder,
+            satOpen,
+            satClose,
+            satLastOrder,
+            sunOpen,
+            sunClose,
+            sunLastOrder,
+            bookmarked,
+            score,
+            scenicRatio,
+            quietRatio,
+            comfortableRatio,
+            accessibleRatio,
+            cleanRatio,
+            safeRatio
+        );
+        this.placeTagList = placeTagList;
+    }
+
+    public PlaceResponse(
+        final PlaceQueryDSLResponse placeQueryDSLResponse,
+        final List<PlaceTag> placeTagList
+    ) {
+        super(
+            placeQueryDSLResponse.getId(),
+            placeQueryDSLResponse.getType(),
+            placeQueryDSLResponse.getImageUrlList(),
+            placeQueryDSLResponse.getName(),
+            placeQueryDSLResponse.getPosition(),
+            placeQueryDSLResponse.getMonOpen(),
+            placeQueryDSLResponse.getMonClose(),
+            placeQueryDSLResponse.getMonLastOrder(),
+            placeQueryDSLResponse.getTueOpen(),
+            placeQueryDSLResponse.getTueClose(),
+            placeQueryDSLResponse.getTueLastOrder(),
+            placeQueryDSLResponse.getWedOpen(),
+            placeQueryDSLResponse.getWedClose(),
+            placeQueryDSLResponse.getWedLastOrder(),
+            placeQueryDSLResponse.getThuOpen(),
+            placeQueryDSLResponse.getThuClose(),
+            placeQueryDSLResponse.getThuLastOrder(),
+            placeQueryDSLResponse.getFriOpen(),
+            placeQueryDSLResponse.getFriClose(),
+            placeQueryDSLResponse.getFriLastOrder(),
+            placeQueryDSLResponse.getSatOpen(),
+            placeQueryDSLResponse.getSatClose(),
+            placeQueryDSLResponse.getSatLastOrder(),
+            placeQueryDSLResponse.getSunOpen(),
+            placeQueryDSLResponse.getSunClose(),
+            placeQueryDSLResponse.getSunLastOrder(),
+            placeQueryDSLResponse.isBookmarked(),
+            placeQueryDSLResponse.getScore(),
+            placeQueryDSLResponse.getScenicRatio(),
+            placeQueryDSLResponse.getQuietRatio(),
+            placeQueryDSLResponse.getComfortableRatio(),
+            placeQueryDSLResponse.getAccessibleRatio(),
+            placeQueryDSLResponse.getCleanRatio(),
+            placeQueryDSLResponse.getSafeRatio()
+        );
+        this.placeTagList = placeTagList;
     }
 }

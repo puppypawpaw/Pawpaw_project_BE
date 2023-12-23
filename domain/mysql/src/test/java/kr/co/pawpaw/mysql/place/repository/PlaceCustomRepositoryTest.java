@@ -5,7 +5,9 @@ import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.common.dto.PositionResponse;
 import kr.co.pawpaw.mysql.config.QuerydslConfig;
 import kr.co.pawpaw.mysql.place.domain.*;
-import kr.co.pawpaw.mysql.place.dto.PlaceResponse;
+import kr.co.pawpaw.mysql.place.dto.PlaceQueryDSLResponse;
+import kr.co.pawpaw.mysql.place.dto.PlaceTopBookmarkPercentageResponse;
+import kr.co.pawpaw.mysql.place.enums.PlaceType;
 import kr.co.pawpaw.mysql.user.domain.User;
 import kr.co.pawpaw.mysql.user.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -16,6 +18,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -25,7 +28,7 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("ChatroomCustomRepository 의")
-@Import(value = { PlaceCustomRepository.class, QuerydslConfig.class })
+@Import(value = {PlaceCustomRepository.class, QuerydslConfig.class})
 class PlaceCustomRepositoryTest extends MySQLTestContainer {
     @Autowired
     private PlaceCustomRepository placeCustomRepository;
@@ -72,7 +75,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .build())
                 .build(),
             Place.builder()
-                .placeType(PlaceType.PARK)
+                .placeType(PlaceType.RESTAURANT)
                 .name("우돈숯불명가")
                 .position(Position.builder()
                     .latitude(37.546352)
@@ -81,7 +84,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .build())
                 .build(),
             Place.builder()
-                .placeType(PlaceType.PARK)
+                .placeType(PlaceType.RESTAURANT)
                 .name("도깨비족발")
                 .position(Position.builder()
                     .latitude(37.5381812)
@@ -90,7 +93,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                     .build())
                 .build(),
             Place.builder()
-                .placeType(PlaceType.PARK)
+                .placeType(PlaceType.RESTAURANT)
                 .name("곱창팩토리 천호본점")
                 .position(Position.builder()
                     .latitude(37.5397267)
@@ -126,8 +129,8 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 )).collect(Collectors.toList()));
             user = userRepository.save(user);
             placeBookmarkList = placeBookmarkRepository.saveAll(List.of(PlaceBookmark.builder()
-                    .user(user)
-                    .place(placeList.get(0))
+                .user(user)
+                .place(placeList.get(0))
                 .build()));
         }
 
@@ -145,10 +148,11 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
         @Transactional(propagation = Propagation.NOT_SUPPORTED)
         void searchByNameQuery(final String query) {
             //given
-            List<PlaceResponse> resultExpected = placeList.stream()
+            List<PlaceQueryDSLResponse> resultExpected = placeList.stream()
                 .filter(place -> Objects.isNull(query) || place.getName().contains(query))
-                .map(place -> new PlaceResponse(
+                .map(place -> new PlaceQueryDSLResponse(
                     place.getId(),
+                    place.getPlaceType(),
                     placeImageUrlList.stream()
                         .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
                         .map(PlaceImageUrl::getUrl)
@@ -231,7 +235,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 )).collect(Collectors.toList());
 
             //when
-            List<PlaceResponse> result = placeCustomRepository.findByQueryAndPlaceTypeAndPositionRange(
+            List<PlaceQueryDSLResponse> result = placeCustomRepository.findByQueryAndPlaceTypeAndPositionRange(
                 query,
                 null,
                 latMin,
@@ -246,14 +250,15 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
         }
 
         @ParameterizedTest
-        @CsvSource(value = {"RESTAURANT", "CAFE", "PARK", "null"}, nullValues = {"null"})
+        @CsvSource(value = {"RESTAURANT", "CAFE", "null"}, nullValues = {"null"})
         @DisplayName("장소 유형으로 장소를 검색할 수 있다.")
         void searchByPlaceType(final PlaceType placeType) {
             //given
-            List<PlaceResponse> resultExpected = placeList.stream()
+            List<PlaceQueryDSLResponse> resultExpected = placeList.stream()
                 .filter(place -> Objects.isNull(placeType) || place.getPlaceType().equals(placeType))
-                .map(place -> new PlaceResponse(
+                .map(place -> new PlaceQueryDSLResponse(
                     place.getId(),
+                    place.getPlaceType(),
                     placeImageUrlList.stream()
                         .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
                         .map(PlaceImageUrl::getUrl)
@@ -336,7 +341,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 )).collect(Collectors.toList());
 
             //when
-            List<PlaceResponse> result = placeCustomRepository.findByQueryAndPlaceTypeAndPositionRange(
+            List<PlaceQueryDSLResponse> result = placeCustomRepository.findByQueryAndPlaceTypeAndPositionRange(
                 null,
                 placeType,
                 latMin,
@@ -360,10 +365,11 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
             final double longMax
         ) {
             //given
-            List<PlaceResponse> resultExpected = placeList.stream()
+            List<PlaceQueryDSLResponse> resultExpected = placeList.stream()
                 .filter(place -> place.getPosition().isInside(latMin, latMax, longMin, longMax))
-                .map(place -> new PlaceResponse(
+                .map(place -> new PlaceQueryDSLResponse(
                     place.getId(),
+                    place.getPlaceType(),
                     placeImageUrlList.stream()
                         .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
                         .map(PlaceImageUrl::getUrl)
@@ -447,7 +453,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 )).collect(Collectors.toList());
 
             //when
-            List<PlaceResponse> result = placeCustomRepository.findByQueryAndPlaceTypeAndPositionRange(
+            List<PlaceQueryDSLResponse> result = placeCustomRepository.findByQueryAndPlaceTypeAndPositionRange(
                 null,
                 null,
                 latMin,
@@ -465,9 +471,10 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
         @DisplayName("북마크 여부를 검사할 수 있다.")
         void checkBookmark() {
             //given
-            List<PlaceResponse> resultExpected = placeList.stream()
-                .map(place -> new PlaceResponse(
+            List<PlaceQueryDSLResponse> resultExpected = placeList.stream()
+                .map(place -> new PlaceQueryDSLResponse(
                     place.getId(),
+                    place.getPlaceType(),
                     placeImageUrlList.stream()
                         .filter(placeImageUrl -> placeImageUrl.getPlace().equals(place))
                         .map(PlaceImageUrl::getUrl)
@@ -550,7 +557,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 )).collect(Collectors.toList());
 
             //when
-            List<PlaceResponse> result = placeCustomRepository.findByQueryAndPlaceTypeAndPositionRange(
+            List<PlaceQueryDSLResponse> result = placeCustomRepository.findByQueryAndPlaceTypeAndPositionRange(
                 null,
                 null,
                 latMin,
@@ -569,7 +576,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
     @DisplayName("updatePlaceReviewInfo 메서드는")
     class UpdatePlaceReviewInfo {
         Place place = Place.builder()
-            .placeType(PlaceType.PARK)
+            .placeType(PlaceType.RESTAURANT)
             .name("우돈숯불명가")
             .position(Position.builder()
                 .latitude(37.546352)
@@ -597,12 +604,12 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
             place = placeRepository.save(place);
             user = userRepository.save(user);
             placeReview = placeReviewRepository.save(PlaceReview.builder()
-                    .place(place)
-                    .reviewer(user)
-                    .isQuiet(true)
-                    .isClean(true)
-                    .score(5L)
-                    .content("굳")
+                .place(place)
+                .reviewer(user)
+                .isQuiet(true)
+                .isClean(true)
+                .score(5L)
+                .content("굳")
                 .build());
         }
 
@@ -623,7 +630,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 1,
                 placeReview.getScore(),
                 placeReview.isQuiet() ? 1 : 0,
-                placeReview.isAccessible() ? 1: 0,
+                placeReview.isAccessible() ? 1 : 0,
                 placeReview.isSafe() ? 1 : 0,
                 placeReview.isScenic() ? 1 : 0,
                 placeReview.isClean() ? 1 : 0,
@@ -654,7 +661,7 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
                 1,
                 placeReview.getScore(),
                 placeReview.isQuiet() ? 1 : 0,
-                placeReview.isAccessible() ? 1: 0,
+                placeReview.isAccessible() ? 1 : 0,
                 placeReview.isSafe() ? 1 : 0,
                 placeReview.isScenic() ? 1 : 0,
                 placeReview.isClean() ? 1 : 0,
@@ -663,6 +670,164 @@ class PlaceCustomRepositoryTest extends MySQLTestContainer {
 
             //then
             assertThat(place.getReviewInfo()).usingRecursiveComparison().isEqualTo(expectedResult);
+        }
+    }
+
+    @Nested
+    @DisplayName("findPlaceTopBookmarkPercentageList 메서드는")
+    class FindPlaceTopBookmarkPercentageList {
+        private List<Place> placeList = List.of(
+            Place.builder()
+                .placeType(PlaceType.RESTAURANT)
+                .name("블루페이지")
+                .position(Position.builder()
+                    .latitude(37.5193292)
+                    .longitude(127.0079764)
+                    .address("서울특별시 서초구 잠원동 121-9 1층 블루페이지 라운지")
+                    .build())
+                .build(),
+            Place.builder()
+                .placeType(PlaceType.CAFE)
+                .name("하다식당")
+                .position(Position.builder()
+                    .latitude(37.5324715)
+                    .longitude(127.1239929)
+                    .address("서울특별시 강동구 성내동 126-4 1층")
+                    .build())
+                .build(),
+            Place.builder()
+                .placeType(PlaceType.CAFE)
+                .name("철판살롱")
+                .position(Position.builder()
+                    .latitude(37.5360048)
+                    .longitude(127.1250743)
+                    .address("서울특별시 강동구 성내동 38-9")
+                    .build())
+                .build(),
+            Place.builder()
+                .placeType(PlaceType.RESTAURANT)
+                .name("우돈숯불명가")
+                .position(Position.builder()
+                    .latitude(37.546352)
+                    .longitude(127.17076)
+                    .address("서울특별시 강동구 상일동 309-1 1층 전체 전용주차5대")
+                    .build())
+                .build()
+        );
+
+        private List<User> userList = List.of(
+            User.builder()
+                .name("user-name-1")
+                .position(Position.builder()
+                    .address("서울특별시 강동구")
+                    .latitude(36.8)
+                    .longitude(36.7)
+                    .build())
+                .nickname("user-nickname-1")
+                .phoneNumber("user-phoneNumber-1")
+                .email("email1@liame.com")
+                .build(),
+            User.builder()
+                .name("user-name-2")
+                .position(Position.builder()
+                    .address("서울특별시 강동구")
+                    .latitude(36.8)
+                    .longitude(36.7)
+                    .build())
+                .nickname("user-nickname-2")
+                .phoneNumber("user-phoneNumber-2")
+                .email("email2@liame.com")
+                .build(),
+            User.builder()
+                .name("user-name-3")
+                .position(Position.builder()
+                    .address("서울특별시 강동구")
+                    .latitude(36.8)
+                    .longitude(36.7)
+                    .build())
+                .nickname("user-nickname-3")
+                .phoneNumber("user-phoneNumber-3")
+                .email("email3@liame.com")
+                .build(),
+            User.builder()
+                .name("user-name-4")
+                .position(Position.builder()
+                    .address("서울특별시 강동구")
+                    .latitude(36.8)
+                    .longitude(36.7)
+                    .build())
+                .nickname("user-nickname-4")
+                .phoneNumber("user-phoneNumber-4")
+                .email("email4@liame.com")
+                .build()
+        );
+
+        private List<PlaceBookmark> placeBookmarkList;
+
+        @BeforeEach
+        void setup() {
+            userList = userRepository.saveAll(userList);
+            placeList = placeRepository.saveAll(placeList);
+            placeBookmarkList = placeBookmarkRepository.saveAll(List.of(
+                PlaceBookmark.builder()
+                    .user(userList.get(0))
+                    .place(placeList.get(0))
+                    .build(),
+                PlaceBookmark.builder()
+                    .user(userList.get(0))
+                    .place(placeList.get(1))
+                    .build(),
+                PlaceBookmark.builder()
+                    .user(userList.get(0))
+                    .place(placeList.get(2))
+                    .build(),
+                PlaceBookmark.builder()
+                    .user(userList.get(0))
+                    .place(placeList.get(3))
+                    .build(),
+                PlaceBookmark.builder()
+                    .user(userList.get(1))
+                    .place(placeList.get(0))
+                    .build(),
+                PlaceBookmark.builder()
+                    .user(userList.get(1))
+                    .place(placeList.get(1))
+                    .build(),
+                PlaceBookmark.builder()
+                    .user(userList.get(1))
+                    .place(placeList.get(2))
+                    .build(),
+                PlaceBookmark.builder()
+                    .user(userList.get(2))
+                    .place(placeList.get(0))
+                    .build(),
+                PlaceBookmark.builder()
+                    .user(userList.get(2))
+                    .place(placeList.get(1))
+                    .build(),
+                PlaceBookmark.builder()
+                    .user(userList.get(3))
+                    .place(placeList.get(0))
+                    .build()
+            ));
+        }
+
+        @Test
+        @DisplayName("입력받은 placeId 에 해당하는 place들의 순위 비율을 반환한다.")
+        void returnPlaceTopBookmarkPercentage() {
+            //given
+            Collection<PlaceTopBookmarkPercentageResponse> expectedResult = List.of(
+                new PlaceTopBookmarkPercentageResponse(placeList.get(0).getId(), 0.0),
+                new PlaceTopBookmarkPercentageResponse(placeList.get(2).getId(), 0.6666666666666666)
+            );
+
+            //when
+            Collection<PlaceTopBookmarkPercentageResponse> placeTopBookmarkPercentageResponses = placeCustomRepository.findPlaceTopBookmarkPercentageList(
+                expectedResult.stream().map(PlaceTopBookmarkPercentageResponse::getPlaceId).collect(Collectors.toList())
+            );
+
+            //then
+            assertThat(placeTopBookmarkPercentageResponses).usingRecursiveComparison().isEqualTo(expectedResult);
         }
     }
 }

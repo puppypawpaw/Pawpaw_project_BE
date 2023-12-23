@@ -3,7 +3,7 @@ package kr.co.pawpaw.api.dto.place;
 import kr.co.pawpaw.api.dto.position.PositionRequest;
 import kr.co.pawpaw.mysql.place.domain.Place;
 import kr.co.pawpaw.mysql.place.domain.PlaceImageUrl;
-import kr.co.pawpaw.mysql.place.domain.PlaceType;
+import kr.co.pawpaw.mysql.place.enums.PlaceType;
 import lombok.*;
 
 import java.util.Collection;

@@ -5,7 +5,7 @@ import kr.co.pawpaw.mysql.common.domain.Position;
 import kr.co.pawpaw.mysql.place.domain.Place;
 import kr.co.pawpaw.mysql.place.domain.PlaceReview;
 import kr.co.pawpaw.mysql.place.domain.PlaceReviewImage;
-import kr.co.pawpaw.mysql.place.domain.PlaceType;
+import kr.co.pawpaw.mysql.place.enums.PlaceType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
