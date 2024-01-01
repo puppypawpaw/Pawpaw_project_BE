@@ -16,14 +16,14 @@ public enum PlaceTag {
     private final double visibleConditionUpperPercentLimit;
 
     PlaceTag(
-        final double visibleConditionLowerPercentLimit,
-        final double visibleConditionUpperPercentLimit
+        double visibleConditionLowerPercentLimit,
+        double visibleConditionUpperPercentLimit
     ) {
         this.visibleConditionLowerPercentLimit = visibleConditionLowerPercentLimit;
         this.visibleConditionUpperPercentLimit = visibleConditionUpperPercentLimit;
     }
 
-    public boolean isPlaceTagVisible(final double placeTagPercentage) {
+    public boolean isPlaceTagVisible(double placeTagPercentage) {
         return visibleConditionLowerPercentLimit <= placeTagPercentage
             && placeTagPercentage <= visibleConditionUpperPercentLimit;
     }

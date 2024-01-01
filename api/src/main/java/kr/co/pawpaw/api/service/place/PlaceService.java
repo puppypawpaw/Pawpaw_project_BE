@@ -50,10 +50,16 @@ public class PlaceService {
         PlaceQueryDSLResponse placeQueryDSLResponse = placeQuery.findByPlaceIdAsPlaceResponse(placeId)
             .orElseThrow(NotFoundPlaceException::new);
 
-        PlaceTopBookmarkPercentageResponse placeTopBookmarkPercentageResponse = placeQuery.findPlaceTopBookmarkPercentageList(List.of(placeId))
+        List<Long> placeIdsToFindTopBookmarkPercentage = List.of(placeId);
+
+        Collection<PlaceTopBookmarkPercentageResponse> placeTopBookmarkPercentageResponses = placeQuery.findPlaceTopBookmarkPercentageList(placeIdsToFindTopBookmarkPercentage);
+
+        Double placeTopBookmarkPercentage = placeTopBookmarkPercentageResponses
             .stream()
+            .filter(response -> response.getPlaceId().equals(placeId))
+            .map(PlaceTopBookmarkPercentageResponse::getTopBookmarkPercentage)
             .findAny()
-            .orElseThrow(NotFoundPlaceException::new);
+            .orElse(null);
 
         List<PlaceTag> placeTagList = getPlaceTagList(
             placeQueryDSLResponse.getScenicRatio(),
@@ -62,7 +68,7 @@ public class PlaceService {
             placeQueryDSLResponse.getAccessibleRatio(),
             placeQueryDSLResponse.getCleanRatio(),
             placeQueryDSLResponse.getSafeRatio(),
-            placeTopBookmarkPercentageResponse.getTopBookmarkPercentage()
+            placeTopBookmarkPercentage
         );
 
         return new PlaceResponse(
@@ -80,24 +86,26 @@ public class PlaceService {
         final Double safeRatio,
         final Double topBookmarkPercentage
     ) {
-        Map<PlaceTag, Double> placeTagCurrentPercent = Map.of(
-            PlaceTag.SCENIC, getNonNullValue(scenicRatio),
-            PlaceTag.QUIET, getNonNullValue(quietRatio),
-            PlaceTag.COMFORTABLE, getNonNullValue(comfortableRatio),
-            PlaceTag.ACCESSIBLE, getNonNullValue(accessibleRatio),
-            PlaceTag.CLEAN, getNonNullValue(cleanRatio),
-            PlaceTag.SAFE, getNonNullValue(safeRatio),
-            PlaceTag.MOST_SAVED, getNonNullValue(topBookmarkPercentage)
+        Map<PlaceTag, Optional<Double>> placeTagCurrentPercent = Map.of(
+            PlaceTag.SCENIC, Optional.ofNullable(scenicRatio),
+            PlaceTag.QUIET, Optional.ofNullable(quietRatio),
+            PlaceTag.COMFORTABLE, Optional.ofNullable(comfortableRatio),
+            PlaceTag.ACCESSIBLE, Optional.ofNullable(accessibleRatio),
+            PlaceTag.CLEAN, Optional.ofNullable(cleanRatio),
+            PlaceTag.SAFE, Optional.ofNullable(safeRatio),
+            PlaceTag.MOST_SAVED, Optional.ofNullable(topBookmarkPercentage)
         );
 
         return Arrays.stream(PlaceTag.values())
-            .filter(placeTag -> placeTag.isPlaceTagVisible(
-                placeTagCurrentPercent.get(placeTag)
-            )).collect(Collectors.toList());
+            .filter(placeTag -> placeTagCurrentPercent
+                    .get(placeTag)
+                    .map(placeTag::isPlaceTagVisible)
+                    .orElse(false)
+            ).collect(Collectors.toList());
     }
 
     private Double getNonNullValue(final Double value) {
-        return Objects.isNull(value) ? 0.0 : value;
+        return Objects.isNull(value) ? -1 : value;
     }
 
     @Transactional
